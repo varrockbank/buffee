@@ -4,13 +4,15 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   $e.style.fontSize = `${lineHeight}px`;
   const $lc = node.querySelector('.🧛');
   const $container = node.querySelector('.🦄');
-  const $cursors = [];   // We place an invisible cursor on each viewport line. We only display the active cursors.
+  const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
 
-  const Cursor = {
-    row: 1,
-    col: 3,
+  const Selection = {
+    tail: { row: 1, col: 5 },
+    head: { row: 1, col: 3 },
+    get edges() { return [this.head, this.tail] },
+
   };
 
   const Model = {
@@ -55,9 +57,9 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
     lineCount: -1
   };
 
-  function populateCursors() {
+  function populateSelections() {
     for (let i = 0; i < Viewport.size; i++) {
-      $cursors[i] = fragmentSelections.appendChild(
+      $selections[i] = fragmentSelections.appendChild(
         Object.assign(document.createElement("div"), {
           className: "🧹",
           style: `
@@ -77,31 +79,38 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
       $lc.textContent = lastRender.lineCount = Model.lastIndex + 1;
     }
 
-    // Renders the containers for the viewport lines, as well as cursors
-    // TODO: can be made more efficient by only removing delta of cursors
+    // Renders the containers for the viewport lines, as well as selections
+    // TODO: can be made more efficient by only removing delta of selections
     if(renderLineContainers) {
       $e.textContent = null;
       for (let i = 0; i < Viewport.size; i++)
         fragmentLines.appendChild(document.createElement("pre"));
       $e.appendChild(fragmentLines);
 
-      // Remove all the cursors
-      while($cursors.length > 0) $cursors.pop().remove();
-      populateCursors();
+      // Remove all the selections
+      while($selections.length > 0) $selections.pop().remove();
+      populateSelections();
     }
 
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
 
-    // * BEGIN render cursor
-    // Clear all cursors
-    for (let i = 0; i < $cursors.length; i++)
-      $cursors[i].style.visibility = 'hidden';
-    // Activate the current cursor
-    $cursors[Cursor.row-1].style.left = `${Cursor.col-1}ch`;
-    $cursors[Cursor.row-1].style.visibility = 'visible';
-    // * END render cursor
+    // * BEGIN render selection
+    // Clear all selections
+    for (let i = 0; i < $selections.length; i++)
+      $selections[i].style.visibility = 'hidden';
+
+    const [firstEdge, secondEdge] = Selection.edges;
+    // Configure the two new edges.
+    $selections[firstEdge.row-1].style.left = `${firstEdge.col - 1}ch`;
+    if (secondEdge.row === firstEdge.row) {
+      $selections[firstEdge.row-1].style.width = `${secondEdge.col - firstEdge.col + 1}ch`;
+      $selections[firstEdge.row-1].style.visibility = 'visible';
+    } else {
+      alert("doesn't support multiline selection yet")
+    }
+    // * END render selection
 
     return this;
   }
