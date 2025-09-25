@@ -15,6 +15,7 @@ function WarrenBuffer(id) {
   const Model = {
     lines: [],
     lc: 0,
+    get lastIndex() { return this.lines.length - 1 },
     set text(text) {
       this.lines = text.split("\n");
       this.lc = this.lines.length;
@@ -29,6 +30,9 @@ function WarrenBuffer(id) {
   const Viewport = {
     start: 0,
     size: 10,
+    get end() {
+      return Math.min(this.start + this.size - 1, Model.lastIndex);
+    },
     // @param i, amount to scroll viewport by.
     scroll(i) {
       this.start += i;
@@ -40,6 +44,9 @@ function WarrenBuffer(id) {
       this.size = size;
       render();
     },
+    get lines() {
+      return Model.lines.slice(this.start, this.end + 1);
+    },
   };
 
   function render() {
@@ -47,10 +54,7 @@ function WarrenBuffer(id) {
     // Begin render editor
     self._elEditor.innerHTML = null;
 
-    const viewportLines = Model.lines.slice(
-      Viewport.start,
-      Viewport.start + Viewport.size
-    );
+    const viewportLines = Viewport.lines;
 
     // Render viewport lines;
     for (let i = 0; i < viewportLines.length; i++) {
