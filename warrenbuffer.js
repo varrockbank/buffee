@@ -176,7 +176,7 @@ function WarrenBuffer(node,
     $gutter.textContent = null;
     for (let i = 0; i < Viewport.size; i++) {
       const div = document.createElement("div")
-      div.textContent = i + 1;
+      div.textContent = Viewport.start + i + 1;
       fragmentGutters.appendChild(div);
     }
 
