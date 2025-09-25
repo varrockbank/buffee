@@ -2,11 +2,12 @@
 <head>
 <script src="warrenbuffer.js"></script>
 <style>
-  /************* Boxes *************/
+  /************* "Atomic CSS" classes for Boxes *************/
   .💪 { display: flex }                                 /* Flex like muscles.   */
   .🥷 { overflow: hidden }
   .🪜 { flex-flow: column }
   .🌳 { flex: 1 }                                       /* Grow like a tree.    */
+  .🦠 { justify-content: space-between }                /* Stay spread apart.   */
 
   /*** Classes for WarrenBuffer ***/
   .wb {
@@ -64,7 +65,14 @@
           <div class="wb-gutter"></div>
           <div class="wb-lines 🌳 🥷"></div>
       </div>
-      <div class="💪 wb-status"><span class="wb-linecount"></span></div>
+      <div class="💪 wb-status 🦠">
+          <div class="wb-status-left 💪">
+              <span class="wb-linecount"></span>
+          </div>
+          <div class="wb-status-right 💪">
+              <span class="wb-indentation"></span>
+          </div>
+      </div>
   </blockquote>
   <script type="text/javascript">
     const node = document.querySelector(".wb"); <!-- This is unambiguous if only 1 instance -->

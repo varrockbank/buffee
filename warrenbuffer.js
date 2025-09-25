@@ -1,7 +1,8 @@
 function WarrenBuffer(node,
     lineHeight = 24,
     initialViewportSize = 20,
-    editorPaddingPX = 4 ) {
+    editorPaddingPX = 4 ,
+    indentation = 2) {
   const $e = node.querySelector('.wb .wb-lines');
   $e.style.lineHeight = `${lineHeight}px`;
   $e.style.fontSize = `${lineHeight}px`;
@@ -13,8 +14,8 @@ function WarrenBuffer(node,
   $status.style.padding = "6px";
   $status.style.background = "black";
   $status.style.color = "white";
-
   const $lineCounter = node.querySelector('.wb .wb-linecount');
+  const $indentation = node.querySelector('.wb .wb-indentation');
 
   // TOOD: make this width based on number of digits of line
   const $gutter = Object.assign(node.querySelector('.wb .wb-gutter'), {
@@ -130,9 +131,7 @@ function WarrenBuffer(node,
         const [first, second] = this.ordered;
         const { index, left } = this.partitionLine(first);
         const p = this.partitionLine({ row: second.row, col: second.col + 1 });
-        console.log(p)
         const {right} = p;
-        console.log("index:" + index);
         Model.splice(index, [left + c + right], second.row - first.row + 1);
 
         tail.row = first.row;
@@ -141,7 +140,7 @@ function WarrenBuffer(node,
       } else {
         const { index, left, right } = this.partitionLine(head);
         Model.lines[index] = left + c + right;
-        tail.col++;
+        tail.col += c.length;
       }
       render(true);
     },
@@ -333,8 +332,10 @@ function WarrenBuffer(node,
         $selections[secondEdge.row].style.visibility = 'visible';
       }
     }
-
     // * END render selection
+
+    // TODO: this is infrequently changed. Render it ad-hoc in the mutator method.
+    $indentation.innerHTML = `Spaces: ${indentation}`;
 
     return this;
   }
@@ -368,6 +369,15 @@ function WarrenBuffer(node,
     } else if (event.key === "Enter") {
       Selection.newLine();
     } else if (event.key === "Escape") {
+    } else if (event.key === "Tab" ) {
+      // TODO: Behavior of selection is to indent on relevant lines.
+      if(Selection.isSelection) {
+
+      } else {
+        Selection.insert(" ".repeat(indentation));
+      }
+    } else if (event.key.length > 1) {
+      console.warn('Ignoring unknown key: ', event.code, key);
     } else {
       Selection.insert(event.key);
     }
