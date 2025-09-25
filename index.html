@@ -1,0 +1,105 @@
+<html>
+<head>
+<script src="warrenbuffer.js"></script>
+<style>
+  #buffer-container {
+    font-size: 20px;
+    width: 1000px;
+  }
+  #buffer-container .editor {
+    border: 1px solid;
+    font-family: monospace;
+  }
+</style>
+</head>
+
+<body>
+  <h2>Playground Harness</h2>
+  <label for="viewport-start">Viewport Start: </label>
+  <input id="viewport-start" value="0"></input>
+  <label for="viewport-size">Viewport Size:</label>
+  <input id="viewport-size" value="10"></input>
+  <button id="viewport-update">Update viewport</button>
+  <button id="viewport-scroll-up-1">Scroll -1</button>
+  <button id="viewport-scroll-down-1">Scroll +1</button>
+  <hr />
+  <input id="file-input" type="file" name="myFiles">
+  total size: <span id="fileSize">0</span>
+  <div>
+    <button id="load-file">Load File</button>
+  </div>
+  <div>
+    <button id="append-file">Append File</button><br />
+    Append at Line number: <input id="append-at-line" value="1"></input>
+  </div>
+  <hr />
+  <div id="buffer-container"></div>
+
+  <script type="text/javascript">
+    const elId = "buffer-container";
+    const textDocument = "This is my first text document\nWoohoo\nFoobar";
+
+    const warrenBuffer = new WarrenBuffer(elId).setText(textDocument);
+
+    // Bind UI controls to move viewport
+    document.getElementById('viewport-update').addEventListener('click', () => {
+      const viewportStart = parseInt(document.getElementById('viewport-start').value);
+      const viewportSize = parseInt(document.getElementById('viewport-size').value);
+      warrenBuffer.viewportSet(viewportStart, viewportSize);
+    });
+    document.getElementById('viewport-scroll-up-1').addEventListener('click', () => {
+      warrenBuffer.viewportScroll(-1);
+    });
+    document.getElementById('viewport-scroll-down-1').addEventListener('click', () => {
+      warrenBuffer.viewportScroll(1);
+    });
+    // Bind keyboard control to move viewport
+    document.addEventListener('keydown', event => {
+      if (event.key === "ArrowDown") {
+        warrenBuffer.viewportScroll(1);
+      } else if (event.key === "ArrowUp") {
+        warrenBuffer.viewportScroll(-1);
+      }
+    });
+
+    document.getElementById("file-input").addEventListener("change", () => {
+        const file = this.files[0];
+        const nBytes = file.size;
+        const aMultiples = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+        let sOutput = "";
+        for (nMultiple = 0, nApprox = nBytes / 1024; nApprox > 1; nApprox /= 1024, nMultiple++) {
+            sOutput = nApprox.toFixed(3) + " " + aMultiples[nMultiple] + " (" + nBytes + " bytes)";
+        }
+        document.getElementById("fileSize").innerHTML = sOutput || (nBytes + " bytes");
+    }, false);
+    document.getElementById('load-file').addEventListener('click', () => {
+      const t0 = performance.now();
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+      } else {
+        f.text().then(text => {
+          warrenBuffer.setText(text);
+          const t1 = performance.now();
+          console.log(`Reading file took ${t1 - t0} millis.`);
+        });
+      }
+    });
+    document.getElementById('append-file').addEventListener('click', () => {
+      const lineNumber = parseInt(document.getElementById('append-at-line').value);
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+      } else {
+        f.text().then(text => {
+          const s = text.split("\n");
+          const t0 = performance.now();
+          warrenBuffer.splice(lineNumber, s);
+          const t1 = performance.now();
+          console.log(`Took ${parseFloat(t1 - t0).toFixed(2)} millis to splice ${s.length.toLocaleString()} elements at ${index.toLocaleString()} w/ ${warrenBuffer._lc.toLocaleString()} lines.`);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
