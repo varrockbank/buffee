@@ -173,6 +173,11 @@ function WarrenBuffer(node,
       $lineCounter.textContent = `${lastRender.lineCount = Model.lastIndex + 1}L`;
     }
 
+    const digitsInLargestLineNumber = Viewport.end.toString().length;
+    if(digitsInLargestLineNumber > 2 ) {
+      $gutter.style.width = `${ digitsInLargestLineNumber +  1 }ch`;
+    }
+
     $gutter.textContent = null;
     for (let i = 0; i < Viewport.size; i++) {
       const div = document.createElement("div")
