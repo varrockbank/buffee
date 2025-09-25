@@ -12,6 +12,20 @@ function WarrenBuffer(id) {
 
   self = this;
 
+  const Model = {
+    lines: [],
+    lc: 0,
+    set text(text) {
+      this.lines = text.split("\n");
+      this.lc = this.lines.length;
+      render();
+    },
+    splice(i, lines) {
+      this.lines.splice(i - 1, 0, ...lines);
+      this.lc = this.lines.length;
+      render();
+    }
+  }
   const Viewport = {
     start: 0,
     size: 10,
@@ -29,11 +43,11 @@ function WarrenBuffer(id) {
   };
 
   function render() {
-    self._elLineCount.innerHTML = `Line Count: ${self._lc}`;
+    self._elLineCount.innerHTML = `Line Count: ${Model.lc}`;
     // Begin render editor
     self._elEditor.innerHTML = null;
 
-    const viewportLines = self._lines.slice(
+    const viewportLines = Model.lines.slice(
       Viewport.start,
       Viewport.start + Viewport.size
     );
@@ -56,29 +70,10 @@ function WarrenBuffer(id) {
     return this;
   }
   this.Viewport = Viewport;
-  this.render = render;
+  this.Model = Model;
 
-  this.setText("");
+  render();
 }
-
-WarrenBuffer.prototype.setText = function (text) {
-  this._lines = text.split("\n");
-  this._lc = this._lines.length;
-  this.Viewport.start = 0;
-  this.Viewport.size = 10;
-  return this.render();
-};
-
-/**
- *
- * @param i line number
- * @param lines
- */
-WarrenBuffer.prototype.splice = function (i, lines) {
-  this._lines.splice(i - 1, 0, ...lines);
-  this._lc = this._lines.length;
-  this.render();
-};
 
 function $clamp(value, min, max) {
   if (value < min) {

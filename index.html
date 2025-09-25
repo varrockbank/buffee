@@ -39,7 +39,8 @@
     const elId = "buffer-container";
     const textDocument = "This is my first text document\nWoohoo\nFoobar";
 
-    const warrenBuffer = new WarrenBuffer(elId).setText(textDocument);
+    const warrenBuffer = new WarrenBuffer(elId);
+    warrenBuffer.Model.text = textDocument;
 
     // Bind UI controls to move viewport
     document.getElementById('viewport-update').addEventListener('click', () => {
@@ -79,7 +80,7 @@
         alert("No file selected");
       } else {
         f.text().then(text => {
-          warrenBuffer.setText(text);
+          warrenBuffer.Model.text = text;
           const t1 = performance.now();
           console.log(`Reading file took ${t1 - t0} millis.`);
         });
@@ -94,9 +95,9 @@
         f.text().then(text => {
           const s = text.split("\n");
           const t0 = performance.now();
-          warrenBuffer.splice(lineNumber, s);
+          warrenBuffer.Model.splice(lineNumber, s);
           const t1 = performance.now();
-          console.log(`Took ${parseFloat(t1 - t0).toFixed(2)} millis to splice ${s.length.toLocaleString()} elements at ${index.toLocaleString()} w/ ${warrenBuffer._lc.toLocaleString()} lines.`);
+          console.log(`Took ${parseFloat(t1 - t0).toFixed(2)} millis to splice ${s.length.toLocaleString()} elements at ${index.toLocaleString()} w/ ${warrenBuffer.Model.lc.toLocaleString()} lines.`);
         });
       }
     });
