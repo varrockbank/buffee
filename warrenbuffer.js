@@ -367,6 +367,7 @@ function WarrenBuffer(node,
     } else if (event.key === "Shift") {
     } else if (event.key === "Enter") {
       Selection.newLine();
+    } else if (event.key === "Escape") {
     } else {
       Selection.insert(event.key);
     }
