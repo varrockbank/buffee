@@ -181,6 +181,15 @@ function WarrenBuffer(node,
   this.Model = Model;
 
   render(true);
+
+  // Bind keyboard control to move viewport
+  node.addEventListener('keydown', event => {
+    if (event.key === "ArrowDown") {
+      warrenBuffer.Viewport.scroll(1);
+    } else if (event.key === "ArrowUp") {
+      warrenBuffer.Viewport.scroll(-1);
+    }
+  });
 }
 
 function $clamp(value, min, max) {
