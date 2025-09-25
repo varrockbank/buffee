@@ -10,6 +10,8 @@ function WarrenBuffer(id) {
   elWrapper.appendChild(elStatusLine);
   elWrapper.appendChild($e);
 
+  const fragmentLines = document.createDocumentFragment();
+
   const Model = {
     lines: [],
     lc: 0,
@@ -64,9 +66,10 @@ function WarrenBuffer(id) {
       elLineDiv.style.lineHeight = '1.2em';
       elLineDiv.style.minHeight = '1.2em';
 
-      // TODO: faster if we append to a fragment then render in a single go
-      $e.appendChild(elLineDiv);
+      fragmentLines.appendChild(elLineDiv);
     }
+    $e.appendChild(fragmentLines);
+
     // End render editor
 
     return this;
