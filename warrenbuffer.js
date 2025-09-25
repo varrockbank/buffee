@@ -1,16 +1,14 @@
 function WarrenBuffer(id) {
-  this._elEditor = document.createElement("div");
-  this._elEditor.setAttribute("class", "editor");
+  const $e = document.createElement("div");
+  $e.setAttribute("class", "editor");
 
-  this._elLineCount = document.createElement("div");
+  const $lc = document.createElement("div");
   const elStatusLine = document.createElement("div");
-  elStatusLine.appendChild(this._elLineCount);
+  elStatusLine.appendChild($lc);
 
   const elWrapper = document.getElementById(id);
   elWrapper.appendChild(elStatusLine);
-  elWrapper.appendChild(this._elEditor);
-
-  self = this;
+  elWrapper.appendChild($e);
 
   const Model = {
     lines: [],
@@ -50,9 +48,9 @@ function WarrenBuffer(id) {
   };
 
   function render() {
-    self._elLineCount.innerHTML = `Line Count: ${Model.lc}`;
+    $lc.innerHTML = `Line Count: ${Model.lc}`;
     // Begin render editor
-    self._elEditor.innerHTML = null;
+    $e.innerHTML = null;
 
     const viewportLines = Viewport.lines;
 
@@ -67,7 +65,7 @@ function WarrenBuffer(id) {
       elLineDiv.style.minHeight = '1.2em';
 
       // TODO: faster if we append to a fragment then render in a single go
-      self._elEditor.appendChild(elLineDiv);
+      $e.appendChild(elLineDiv);
     }
     // End render editor
 
