@@ -177,6 +177,19 @@ function WarrenBuffer(node,
       }
       render(true);
     },
+    indent() {
+      if(!this.isSelection) return;
+      const [first, second] = this.ordered;
+
+      for(let i = first.row; i <= second.row; i++) {
+          const realRow = Viewport.start + i;
+          Model.lines[realRow] = " ".repeat(indentation) + Model.lines[realRow];
+      }
+      first.col += indentation;
+      second.col += indentation;
+
+      render(true);
+    },
     // Utility to extract the text left, right, and character at the col of the
     // position for the row of the position.
     partitionLine({ row, col }) {
@@ -358,6 +371,7 @@ function WarrenBuffer(node,
       } else if (event.key === "ArrowUp") {
         Selection.moveRow(-1);
       } else if (event.key === "ArrowLeft") {
+        // FIX: arrowleft when inside selection doesn't move to front of selection
         Selection.moveCol(-1);
       } else if (event.key === "ArrowRight") {
         Selection.moveCol(1);
@@ -372,7 +386,7 @@ function WarrenBuffer(node,
     } else if (event.key === "Tab" ) {
       // TODO: Behavior of selection is to indent on relevant lines.
       if(Selection.isSelection) {
-
+        Selection.indent();
       } else {
         Selection.insert(" ".repeat(indentation));
       }
