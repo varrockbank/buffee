@@ -2,9 +2,9 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   const $e = node.querySelector('.🦄 .🌮');
   $e.style.lineHeight = `${lineHeight}px`;
   $e.style.fontSize = `${lineHeight}px`;
-  const $lc = node.querySelector('.🧛');
+  const $lineCounter = node.querySelector('.🦄 .🧛');
 
-  // TOOD: make this based on number of digits of line
+  // TOOD: make this width based on number of digits of line
   const $gutter = Object.assign(node.querySelector('.🦄 .gutter'), {
     style: `
             font-size: ${lineHeight}px;
@@ -91,7 +91,7 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   }
   function render(renderLineContainers = false) {
     if (lastRender.lineCount !== Model.lastIndex + 1 ) {
-      $lc.textContent = lastRender.lineCount = Model.lastIndex + 1;
+      $lineCounter.textContent = lastRender.lineCount = Model.lastIndex + 1;
     }
 
     $gutter.textContent = null;
