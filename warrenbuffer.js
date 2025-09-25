@@ -1,8 +1,36 @@
-function WarrenBuffer(node) {
+function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   const $e = node.querySelector('.🌮');
+  $e.style.lineHeight = `${lineHeight}px`;
   const $lc = node.querySelector('.🧛');
+  const $container = node.querySelector('.🦄');
+  $e.style.fontSize = `${lineHeight}px`;
 
+  // TODO: use initialLines to specify number of initial line fragments
   const fragmentLines = document.createDocumentFragment();
+
+  const fragmentSelections = document.createDocumentFragment();
+  // We place an invisible cursor on each viewport line. We only display the active cursors.
+  const $cursors = [];
+  // TODO: we don't garbage collect "excess" cursors
+  addNewCursors(initialViewportSize);
+  function addNewCursors(quantity) {
+    const start = $cursors.length;
+    for (let i = 0; i < quantity; i++) {
+      const div = $cursors[start + i] = document.createElement('div');
+      div.style.display = 'block';
+      div.style.visibility = 'hidden';
+      div.style.width = `1ch`;
+      div.style.height = div.style.fontSize = `${lineHeight}px`;
+      div.classList.add('🧹');
+      fragmentSelections.appendChild(div);
+    }
+    $container.appendChild(fragmentSelections);
+  }
+
+  const Cursor = {
+    row: 1,
+    col: 3,
+  };
 
   const Model = {
     lines: [],
@@ -18,7 +46,7 @@ function WarrenBuffer(node) {
   }
   const Viewport = {
     start: 0,
-    size: 20,
+    size: initialViewportSize,
     get end() {
       return Math.min(this.start + this.size - 1, Model.lastIndex);
     },
@@ -58,6 +86,15 @@ function WarrenBuffer(node) {
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
+
+    // * BEGIN render cursor
+    // Clear all cursors
+    for (let i = 0; i < $cursors.length; i++)
+      $cursors[i].style.visibility = 'hidden';
+    // Activate the current cursor
+    $cursors[Cursor.row-1].style.left = `${Cursor.col-1}ch`;
+    $cursors[Cursor.row-1].style.visibility = 'visible';
+    // * END render cursor
 
     return this;
   }
