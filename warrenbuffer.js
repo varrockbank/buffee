@@ -9,8 +9,8 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   const fragmentSelections = document.createDocumentFragment();
 
   const Selection = {
-    tail: { row: 2, col: 5 },
-    head: { row: 2, col: 3 },
+    head: { row: 1, col: 3 },
+    tail: { row: 6, col: 12 },
     get edges() { return [this.head, this.tail] },
 
   };
@@ -98,19 +98,45 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
       $e.children[i].textContent = Viewport.lines[i] || null;
 
     // * BEGIN render selection
-    // Clear all selections
-    for (let i = 0; i < $selections.length; i++)
+    // Hide all selections
+    for (let i = 0; i < $selections.length; i++) {
       $selections[i].style.visibility = 'hidden';
-
+    }
     const [firstEdge, secondEdge] = Selection.edges;
-    // Configure the two new edges.
+
+    // Render selection lines lines. Behavior is consistent with vim/vscode but not Intellij.
+    for (let i = firstEdge.row + 1; i <= secondEdge.row - 1; i++) {
+      $selections[i - 1].style.visibility = 'visible';
+      $selections[i - 1].style.left = 0;
+      if (i - 1 < Viewport.lines.length) { // TODO: this can be removed if selection is constrained to source content
+        const content = Viewport.lines[i-1];
+        console.log(i + " , " + content + ", with length: " + content.length);
+        if(content.length > 0 ) {
+          $selections[i - 1].style.width = `${content.length}ch`;
+        } else {
+          // For empty line, we still render 1 character selection
+          $selections[i - 1].style.width = `1ch`;
+        }
+      }
+    }
+
+    // Render the leading and tailing selection line
     $selections[firstEdge.row-1].style.left = `${firstEdge.col - 1}ch`;
     if (secondEdge.row === firstEdge.row) {
       $selections[firstEdge.row-1].style.width = `${secondEdge.col - firstEdge.col + 1}ch`;
       $selections[firstEdge.row-1].style.visibility = 'visible';
     } else {
-      alert("doesn't support multiline selection yet")
+      if(firstEdge.row <= Viewport.lines.length) { // TODO: this can be removed if selection is constrained to source content
+        const text = Viewport.lines[firstEdge.row-1];
+
+        $selections[firstEdge.row - 1].style.width = `${text.length - firstEdge.col + 1}ch`;
+        $selections[firstEdge.row - 1].style.visibility = 'visible';
+
+        $selections[secondEdge.row - 1 ].style.width = `${secondEdge.col}ch`;
+        $selections[secondEdge.row - 1].style.visibility = 'visible';
+      }
     }
+
     // * END render selection
 
     return this;
