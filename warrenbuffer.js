@@ -9,8 +9,8 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   const fragmentSelections = document.createDocumentFragment();
 
   const Selection = {
-    tail: { row: 1, col: 5 },
-    head: { row: 1, col: 3 },
+    tail: { row: 2, col: 5 },
+    head: { row: 2, col: 3 },
     get edges() { return [this.head, this.tail] },
 
   };
@@ -68,6 +68,7 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
             width: 1ch;
             height: ${lineHeight}px;
             font-size: ${lineHeight}px;
+            top: ${i * lineHeight}px;
           `
         })
       );
