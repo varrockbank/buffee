@@ -1,12 +1,26 @@
 function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
-  const $e = node.querySelector('.🌮');
+  const $e = node.querySelector('.🦄 .🌮');
   $e.style.lineHeight = `${lineHeight}px`;
   $e.style.fontSize = `${lineHeight}px`;
   const $lc = node.querySelector('.🧛');
-  const $container = node.querySelector('.🦄');
+
+  // TOOD: make this based on number of digits of line
+  const $gutter = Object.assign(node.querySelector('.🦄 .gutter'), {
+    style: `
+            font-size: ${lineHeight}px;
+            line-height: ${lineHeight}px;
+            text-align: right;
+            padding-right: 8px;
+            background-color: black;
+            color: white;
+            width: ${3}ch;
+          `
+  });
+
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
+  const fragmentGutters = document.createDocumentFragment();
 
   const Selection = {
     head: { row: 1, col: 3 },
@@ -73,12 +87,21 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
         })
       );
     }
-    $container.appendChild(fragmentSelections);
+    $e.appendChild(fragmentSelections);
   }
   function render(renderLineContainers = false) {
     if (lastRender.lineCount !== Model.lastIndex + 1 ) {
       $lc.textContent = lastRender.lineCount = Model.lastIndex + 1;
     }
+
+    $gutter.textContent = null;
+    for (let i = 0; i < Viewport.size; i++) {
+      const div = document.createElement("div")
+      div.textContent = i + 1;
+      fragmentGutters.appendChild(div);
+    }
+
+    $gutter.appendChild(fragmentGutters);
 
     // Renders the containers for the viewport lines, as well as selections
     // TODO: can be made more efficient by only removing delta of selections

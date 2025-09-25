@@ -4,6 +4,9 @@
 <style>
   /************* Boxes *************/
   .💪 { display: flex }                                 /* Flex like muscles.   */
+  .🥷 { overflow: hidden }
+  .🪜 { flex-flow: column }
+  .🌳 { flex: 1 }                                       /* Grow like a tree.    */
 
   /************* Legendary Buffer
 🦄 : The Legend
@@ -15,14 +18,7 @@
       position: relative;
       outline: none;
       font-family: monospace;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
       border: 1px solid black;
-  }
-  .🦄 .🌮 {
-      flex-grow: 1;
-      overflow: hidden;
   }
   .🦄 .🌮>pre::before {
       content: "\200B";
@@ -31,7 +27,6 @@
       margin: 0;
       overflow: hidden;
   }
-
   .🦄 .💸 {
       padding: 6px;
       background: black;
@@ -68,11 +63,19 @@
     Append at Line number: <input id="append-at-line" value="1"></input>
   </div>
 </details>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 " id="buffer-container">
-      <div class="🦄" >
-          <div class="🌮 🥷"></div>
-          <div class="💪 💸">Line count: <span class="🧛"></span></div>
+  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 🦄" id="buffer-container">
+      <div class="💪">
+          <div class="gutter" style="padding-top: 5px"></div>
+          <!-- position relative forces the selections to be relative to this,
+         rather than the parent container -->
+          <div class="🌮 🌳 🥷"
+               style="position: relative; margin-left: 4px; margin-top: 4px">
+              <pre>Another block</pre>
+              <pre>Second line</pre>
+              <pre>Third line</pre>
+          </div>
       </div>
+      <div class="💪 💸">Line count: <span class="🧛"></span></div>
   </blockquote>
   <script type="text/javascript">
     const node = document.getElementById("buffer-container");
