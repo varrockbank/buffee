@@ -10,14 +10,32 @@ function WarrenBuffer(id) {
   elWrapper.appendChild(elStatusLine);
   elWrapper.appendChild(this._elEditor);
 
-  function render() {
-    this._elLineCount.innerHTML = `Line Count: ${this._lc}`;
-    // Begin render editor
-    this._elEditor.innerHTML = null;
+  self = this;
 
-    const viewportLines = this._lines.slice(
-      this._viewportStartIndex,
-      this._viewportStartIndex + this._viewportSize
+  const Viewport = {
+    start: 0,
+    size: 10,
+    // @param i, amount to scroll viewport by.
+    scroll(i) {
+      this.start += i;
+      this.start = $clamp(this.start, 0, this._lc - 1);
+      render();
+    },
+    set(start, size) {
+      this.start = $clamp(start, 0, this._lc - 1);
+      this.size = size;
+      render();
+    },
+  };
+
+  function render() {
+    self._elLineCount.innerHTML = `Line Count: ${self._lc}`;
+    // Begin render editor
+    self._elEditor.innerHTML = null;
+
+    const viewportLines = self._lines.slice(
+      Viewport.start,
+      Viewport.start + Viewport.size
     );
 
     // Render viewport lines;
@@ -31,12 +49,13 @@ function WarrenBuffer(id) {
       elLineDiv.style.minHeight = '1.2em';
 
       // TODO: faster if we append to a fragment then render in a single go
-      this._elEditor.appendChild(elLineDiv);
+      self._elEditor.appendChild(elLineDiv);
     }
     // End render editor
 
     return this;
   }
+  this.Viewport = Viewport;
   this.render = render;
 
   this.setText("");
@@ -45,8 +64,8 @@ function WarrenBuffer(id) {
 WarrenBuffer.prototype.setText = function (text) {
   this._lines = text.split("\n");
   this._lc = this._lines.length;
-  this._viewportStartIndex = 0;
-  this._viewportSize = 10;
+  this.Viewport.start = 0;
+  this.Viewport.size = 10;
   return this.render();
 };
 
@@ -60,21 +79,6 @@ WarrenBuffer.prototype.splice = function (i, lines) {
   this._lc = this._lines.length;
   this.render();
 };
-
-
-WarrenBuffer.prototype.viewportSet = function (startIndex, size) {
-  this._viewportStartIndex = startIndex;
-  this._viewportStartIndex = $clamp(this._viewportStartIndex, 0, this._lc - 1);
-  this._viewportSize = size;
-  this.render();
-}
-
-// @param i, amount to scroll viewport by.
-WarrenBuffer.prototype.viewportScroll = function (i) {
-  this._viewportStartIndex += i;
-  this._viewportStartIndex = $clamp(this._viewportStartIndex, 0, this._lc - 1);
-  this.render();
-}
 
 function $clamp(value, min, max) {
   if (value < min) {

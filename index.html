@@ -45,20 +45,20 @@
     document.getElementById('viewport-update').addEventListener('click', () => {
       const viewportStart = parseInt(document.getElementById('viewport-start').value);
       const viewportSize = parseInt(document.getElementById('viewport-size').value);
-      warrenBuffer.viewportSet(viewportStart, viewportSize);
+      warrenBuffer.Viewport.set(viewportStart, viewportSize);
     });
     document.getElementById('viewport-scroll-up-1').addEventListener('click', () => {
-      warrenBuffer.viewportScroll(-1);
+      warrenBuffer.Viewport.scroll(-1);
     });
     document.getElementById('viewport-scroll-down-1').addEventListener('click', () => {
-      warrenBuffer.viewportScroll(1);
+      warrenBuffer.Viewport.scroll(1);
     });
     // Bind keyboard control to move viewport
     document.addEventListener('keydown', event => {
       if (event.key === "ArrowDown") {
-        warrenBuffer.viewportScroll(1);
+        warrenBuffer.Viewport.scroll(1);
       } else if (event.key === "ArrowUp") {
-        warrenBuffer.viewportScroll(-1);
+        warrenBuffer.Viewport.scroll(-1);
       }
     });
 
