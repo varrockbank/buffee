@@ -1,31 +1,12 @@
 function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   const $e = node.querySelector('.🌮');
   $e.style.lineHeight = `${lineHeight}px`;
+  $e.style.fontSize = `${lineHeight}px`;
   const $lc = node.querySelector('.🧛');
   const $container = node.querySelector('.🦄');
-  $e.style.fontSize = `${lineHeight}px`;
-
-  // TODO: use initialLines to specify number of initial line fragments
+  const $cursors = [];   // We place an invisible cursor on each viewport line. We only display the active cursors.
   const fragmentLines = document.createDocumentFragment();
-
   const fragmentSelections = document.createDocumentFragment();
-  // We place an invisible cursor on each viewport line. We only display the active cursors.
-  const $cursors = [];
-  // TODO: we don't garbage collect "excess" cursors
-  addNewCursors(initialViewportSize);
-  function addNewCursors(quantity) {
-    const start = $cursors.length;
-    for (let i = 0; i < quantity; i++) {
-      const div = $cursors[start + i] = document.createElement('div');
-      div.style.display = 'block';
-      div.style.visibility = 'hidden';
-      div.style.width = `1ch`;
-      div.style.height = div.style.fontSize = `${lineHeight}px`;
-      div.classList.add('🧹');
-      fragmentSelections.appendChild(div);
-    }
-    $container.appendChild(fragmentSelections);
-  }
 
   const Cursor = {
     row: 1,
@@ -58,10 +39,12 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
     },
     set(start, size) {
       this.start = $clamp(start, 0, Model.lastIndex);
-      this.size = size;
-      // TODO: there is a bug if change from 20 to 15 viewport. 5 dont get updated
-      // Perhaps need to call render(true);
-      render();
+      if(this.size !== size) {
+        this.size = size;
+        render(true );
+      } else {
+        render();
+      }
     },
     get lines() {
       return Model.lines.slice(this.start, this.end + 1);
@@ -71,18 +54,37 @@ function WarrenBuffer(node, lineHeight = 24, initialViewportSize = 20) {
   const lastRender = {
     lineCount: -1
   };
+
+  function populateCursors() {
+    for (let i = 0; i < Viewport.size; i++) {
+      const div = $cursors[i] = document.createElement('div');
+      div.style.display = 'block';
+      div.style.visibility = 'hidden';
+      div.style.width = `1ch`;
+      div.style.height = div.style.fontSize = `${lineHeight}px`;
+      div.classList.add('🧹');
+      fragmentSelections.appendChild(div);
+    }
+    $container.appendChild(fragmentSelections);
+  }
   function render(renderLineContainers = false) {
     if (lastRender.lineCount !== Model.lastIndex + 1 ) {
       $lc.textContent = lastRender.lineCount = Model.lastIndex + 1;
     }
 
-    // Renders the containers for the viewport lines
+    // Renders the containers for the viewport lines, as well as cursors
+    // TODO: can be made more efficient by only removing delta of cursors
     if(renderLineContainers) {
       $e.textContent = null;
       for (let i = 0; i < Viewport.size; i++)
         fragmentLines.appendChild(document.createElement("pre"));
       $e.appendChild(fragmentLines);
+
+      // Remove all the cursors
+      while($cursors.length > 0) $cursors.pop().remove();
+      populateCursors();
     }
+
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
