@@ -115,6 +115,11 @@ function WarrenBuffer(node,
     get isForwardSelection() {
       return head.row == tail.row && head.col < tail.col || head.row < tail.row;
     },
+    setCursor({row, col}) {
+      tail.row = row;
+      tail.col = col;
+      this.makeCursor();
+    },
     makeCursor() {
       head.row = tail.row;
       head.col = tail.col;
@@ -354,6 +359,7 @@ function WarrenBuffer(node,
   }
   this.Viewport = Viewport;
   this.Model = Model;
+  this.Selection = Selection;
 
   render(true);
 
@@ -362,19 +368,32 @@ function WarrenBuffer(node,
     event.preventDefault();
 
     if(event.key.startsWith("Arrow")) {
-      if (event.shiftKey) {
-        if (!Selection.isSelection) Selection.makeSelection();
-      } else if (Selection.isSelection) Selection.makeCursor();
+      if (!event.shiftKey && Selection.isSelection) {
+        if(event.key === "ArrowLeft") {
+          Selection.setCursor(Selection.ordered[0]); // Move cursor to the first edge
+          render(true);
+        } else if (event.key === "ArrowRight") {
+          Selection.setCursor(Selection.ordered[1]); // Move cursor to the second edge
+          render(true);
+        } else if (event.key === "ArrowUp") {
+          Selection.setCursor(Selection.ordered[0]);
+          Selection.moveRow(-1);
+        } else if (event.key === "ArrowDown") {
+          Selection.setCursor(Selection.ordered[1]);
+          Selection.moveRow(1);
+        }
+      } else {
+        if (event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-      if (event.key === "ArrowDown") {
-        Selection.moveRow(1);
-      } else if (event.key === "ArrowUp") {
-        Selection.moveRow(-1);
-      } else if (event.key === "ArrowLeft") {
-        // FIX: arrowleft when inside selection doesn't move to front of selection
-        Selection.moveCol(-1);
-      } else if (event.key === "ArrowRight") {
-        Selection.moveCol(1);
+        if (event.key === "ArrowDown") {
+          Selection.moveRow(1);
+        } else if (event.key === "ArrowUp") {
+          Selection.moveRow(-1);
+        } else if (event.key === "ArrowLeft") {
+          Selection.moveCol(-1);
+        } else if (event.key === "ArrowRight") {
+          Selection.moveCol(1);
+        }
       }
     } else if (event.metaKey) {
     } else if (event.key === "Backspace") {
@@ -384,7 +403,6 @@ function WarrenBuffer(node,
       Selection.newLine();
     } else if (event.key === "Escape") {
     } else if (event.key === "Tab" ) {
-      // TODO: Behavior of selection is to indent on relevant lines.
       if(Selection.isSelection) {
         Selection.indent();
       } else {
