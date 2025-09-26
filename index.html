@@ -9,8 +9,17 @@
   .🌳 { flex: 1 }                                       /* Grow like a tree.    */
   .🦠 { justify-content: space-between }                /* Stay spread apart.   */
 
+  body {
+      background-color: #494460;
+      color: white;
+  }
+  blockquote {
+      margin: 15px;
+  }
   /*** Classes for WarrenBuffer ***/
   .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
       position: relative;
       outline: none;
       font-family: monospace;
@@ -32,9 +41,9 @@
   .wb .wb-selection {
       left: 0ch;
       top: 0ch;
-      background-color: green;;
+      background-color: #EDAD10;
       position: absolute;
-      opacity: .7;
+      mix-blend-mode: difference;        /* inverts underlying pixels */
   }
   .wb .wb-status span {
       padding-right: 4px;
@@ -44,7 +53,7 @@
 
 <body>
 <details>
-  <summary>Playground Harness</summary>
+  <summary>Diagnostics</summary>
   <label for="viewport-start">Viewport Start: </label>
   <input id="viewport-start" value="0"></input>
   <label for="viewport-size">Viewport Size:</label>
@@ -136,6 +145,15 @@
         });
       }
     });
+
+    fetch("warrenbuffer.js")
+      .then(response => response.text())
+      .then(source => {
+        warrenBuffer.Model.text = source;
+      })
+      .catch(err => {
+        console.error("Error reading foobar.js:", err);
+      });
   </script>
 </body>
 </html>

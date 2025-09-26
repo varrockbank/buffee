@@ -2,7 +2,9 @@ function WarrenBuffer(node,
     lineHeight = 24,
     initialViewportSize = 20,
     editorPaddingPX = 4 ,
-    indentation = 2) {
+    indentation = 2,
+    colorPrimary = "#B2B2B2",
+    colorSecondary = "#212026") {
   const $e = node.querySelector('.wb .wb-lines');
   $e.style.lineHeight = `${lineHeight}px`;
   $e.style.fontSize = `${lineHeight}px`;
@@ -12,8 +14,8 @@ function WarrenBuffer(node,
 
   const $status = node.querySelector('.wb .wb-status');
   $status.style.padding = "6px";
-  $status.style.background = "black";
-  $status.style.color = "white";
+  $status.style.background = colorSecondary;
+  $status.style.color = colorPrimary;
   const $statusLineCoord = node.querySelector('.wb .wb-coordinate');
   const $lineCounter = node.querySelector('.wb .wb-linecount');
   const $indentation = node.querySelector('.wb .wb-indentation');
@@ -26,8 +28,8 @@ function WarrenBuffer(node,
             text-align: right;
             padding-top: ${editorPaddingPX}px;
             padding-right: ${editorPaddingPX * 2}px;
-            background-color: black;
-            color: white;
+            background-color: ${colorSecondary};
+            color: ${colorPrimary};
             width: ${3}ch;
           `
   });
