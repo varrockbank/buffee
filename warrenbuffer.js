@@ -14,6 +14,7 @@ function WarrenBuffer(node,
   $status.style.padding = "6px";
   $status.style.background = "black";
   $status.style.color = "white";
+  const $statusLineCoord = node.querySelector('.wb .wb-coordinate');
   const $lineCounter = node.querySelector('.wb .wb-linecount');
   const $indentation = node.querySelector('.wb .wb-indentation');
 
@@ -354,6 +355,8 @@ function WarrenBuffer(node,
 
     // TODO: this is infrequently changed. Render it ad-hoc in the mutator method.
     $indentation.innerHTML = `Spaces: ${indentation}`;
+
+    $statusLineCoord.innerHTML = `Ln ${tail.row + 1 }, Col ${tail.col + 1 }`;
 
     return this;
   }
