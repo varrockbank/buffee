@@ -213,9 +213,13 @@ function WarrenBuffer(node,
 
   const Model = {
     lines: [],
+    byteCount: "",
+    originalLineCount: 0,
     get lastIndex() { return this.lines.length - 1 },
     set text(text) {
       this.lines = text.split("\n");
+      this.byteCount = new TextEncoder().encode(text).length
+      this.originalLineCount = this.lines.length;
       render(true);
     },
     splice(i, lines, n = 0) {
@@ -276,7 +280,7 @@ function WarrenBuffer(node,
   }
   function render(renderLineContainers = false) {
     if (lastRender.lineCount !== Model.lastIndex + 1 ) {
-      $lineCounter.textContent = `${lastRender.lineCount = Model.lastIndex + 1}L`;
+      $lineCounter.textContent = `${lastRender.lineCount = Model.lastIndex + 1}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
     }
 
     const digitsInLargestLineNumber = Viewport.end.toString().length;
@@ -381,9 +385,11 @@ function WarrenBuffer(node,
           Selection.setCursor(Selection.ordered[1]); // Move cursor to the second edge
           render(true);
         } else if (event.key === "ArrowUp") {
+          // TODO: bug when selection coincides will scrolling the viewport
           Selection.setCursor(Selection.ordered[0]);
           Selection.moveRow(-1);
         } else if (event.key === "ArrowDown") {
+          // TODO: bug when selection coincides will scrolling the viewport
           Selection.setCursor(Selection.ordered[1]);
           Selection.moveRow(1);
         }
