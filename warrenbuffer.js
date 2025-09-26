@@ -1,4 +1,6 @@
 function WarrenBuffer(node,
+    treeSitterParser = null,
+    treeSitterQuery = null,
     lineHeight = 24,
     initialViewportSize = 20,
     editorPaddingPX = 4 ,
@@ -215,11 +217,22 @@ function WarrenBuffer(node,
     lines: [],
     byteCount: "",
     originalLineCount: 0,
+    treeSitterTree: null,
+    treeSitterCaptures: [],
     get lastIndex() { return this.lines.length - 1 },
     set text(text) {
       this.lines = text.split("\n");
       this.byteCount = new TextEncoder().encode(text).length
       this.originalLineCount = this.lines.length;
+      if(treeSitterParser && treeSitterQuery) {
+        this.treeSitterTree = treeSitterParser.parse(text);
+        this.treeSitterCaptures = treeSitterQuery.captures(this.treeSitterTree.rootNode);
+        for (const { name, node } of this.treeSitterCaptures) {
+          console.log(name, node.text); // e.g. "function greet"
+          console.log(node);
+        }
+      }
+
       render(true);
     },
     splice(i, lines, n = 0) {
@@ -313,6 +326,48 @@ function WarrenBuffer(node,
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
+
+    if(Model.treeSitterCaptures) {
+      let minJ = 0;
+      for(let i = 0; i < Viewport.size; i++) {
+        const contents = Viewport.lines[i] || null;
+        // TODO: terribly inefficient loop. Just grab the elements that are relevant
+        for(let j = minJ; j < Model.treeSitterCaptures.length; j++) {
+          const capture = Model.treeSitterCaptures[j]
+          const startPosition = capture.node.startPosition;
+          if(startPosition.row === Viewport.start + i) {
+            const startCol = startPosition.column;
+            const endCol = startCol + capture.node.text.length;
+
+            const line = $e.children[i].textContent;
+            const left = line.slice(0, startCol);
+            const right = line.slice(endCol);
+
+            console.log("original string: ", line);
+            console.log("   left: ", left);
+            console.log("  right: ", right);
+            console.log("  startPostion:", startPosition);
+            console.log("  endCol:", endCol);
+
+            // TODO: be careful if this is HTML, it is escaped.
+            if (capture.name === "function") {
+              if(left.length > 8) {
+                const leftA = left.slice(0, left.length - 9);
+                const leftB = left.slice(left.length - 9);
+                $e.children[i].innerHTML = `${leftA}<span class="highlight-function">${leftB}</span><span class="highlight-function-name">${capture.node.text}</span>${right}`;
+              }
+            } else if (capture.name === "string") {
+              $e.children[i].innerHTML = `${left}<span class="highlight-string">${capture.node.text}</span>${right}`;
+            }
+
+            console.log("after: ", $e.children[i].textContent);
+
+            minJ = j;
+            break;
+          }
+        }
+      }
+    }
 
     // * BEGIN render selection
     // Hide all selections

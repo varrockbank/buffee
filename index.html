@@ -48,6 +48,15 @@
   .wb .wb-status span {
       padding-right: 4px;
   }
+  .wb .wb-lines pre .highlight-function {
+      color: orange;
+  }
+  .wb .wb-lines pre .highlight-function-name {
+      color: cadetblue ;
+  }
+  .wb .wb-lines pre .highlight-string {
+      color: green;
+  }
 </style>
 </head>
 
@@ -88,11 +97,27 @@
           </div>
       </div>
   </blockquote>
-  <script type="text/javascript">
-    const node = document.querySelector(".wb"); <!-- This is unambiguous if only 1 instance -->
+  <script type="module">
+    import { Parser, Language, Query } from "https://cdn.jsdelivr.net/npm/web-tree-sitter@0.25.10/tree-sitter.js";
+
+    await Parser.init(); // loads tree-sitter.wasm from the same CDN path
+    const treesitterParser = new Parser();
+    const javascriptParser = await Language.load(
+      "https://cdn.jsdelivr.net/npm/tree-sitter-wasms@0.1.12/out/tree-sitter-javascript.wasm"
+    );
+    treesitterParser.setLanguage(javascriptParser);
+
+    const highlightQuery = `
+      (function_declaration name: (identifier) @function)
+      (string) @string
+    `;
+    const query = new Query(javascriptParser, highlightQuery);
+
+    const node = document.querySelector(".wb"); // This is unambiguous if only 1 instance
     const textDocument = "This is my first text document\nWoohoo\nFoobar\njfdhfjhfdg\njfdhj\ndh";
-    const warrenBuffer = new WarrenBuffer(node);
+    const warrenBuffer = new WarrenBuffer(node, treesitterParser, query);
     warrenBuffer.Model.text = textDocument;
+    window.warrenBuffer = warrenBuffer;
 
     // Bind UI controls to move viewport
     document.getElementById('viewport-update').addEventListener('click', () => {
