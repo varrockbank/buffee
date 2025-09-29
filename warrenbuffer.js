@@ -22,6 +22,8 @@ function WarrenBuffer(node,
   const $lineCounter = node.querySelector('.wb .wb-linecount');
   const $indentation = node.querySelector('.wb .wb-indentation');
 
+  const $clipboardBridge  = node.querySelector('.wb-clipboard-bridge');
+
   const $gutter = Object.assign(node.querySelector('.wb .wb-gutter'), {
     style: `
             font-size: ${lineHeight}px;
@@ -123,6 +125,17 @@ function WarrenBuffer(node,
       tail.row = row;
       tail.col = col;
       this.makeCursor();
+    },
+    get lines() {
+      const [left, right] = this.ordered;
+      if(left.row === right.row) {
+        return [Model.lines[Viewport.start + left.row].slice(left.col, right.col + 1)];
+      } else {
+        const firstLine = Model.lines[Viewport.start + left.row].slice(left.col);
+        const lastLine = Model.lines[Viewport.start + right.row].slice(0, right.col + 1);
+        const middle = Model.lines.slice(Viewport.start + left.row + 1, Viewport.start + right.row);
+        return [firstLine, ...middle, lastLine]
+      }
     },
     makeCursor() {
       head.row = tail.row;
@@ -505,8 +518,7 @@ function WarrenBuffer(node,
   render(true);
 
   // Reading clipboard from the keydown listener involves a different security model.
-  node.addEventListener("paste", (e) => {
-    console.log("handling paste");
+  node.addEventListener('paste', e => {
     e.preventDefault(); // stop browser from inserting raw clipboard text
     const text = e.clipboardData.getData("text/plain");
     if (text) {
@@ -514,11 +526,25 @@ function WarrenBuffer(node,
     }
   });
 
+  // Triggered by a keydown paste event. a copy event handler can read the clipboard
+  // by the standard security model. Meanwhile, we don't have to make the editor "selectable".
+  node.addEventListener('copy', e => {
+    e.preventDefault();                    // take over the clipboard contents
+    e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
+  });
+
   // Bind keyboard control to move viewport
   node.addEventListener('keydown', event => {
     // Do nothing for Meta+V (on Mac) or Ctrl+V (on Windows/Linux) as to avoid conflict with the paste event.
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "v") {
       // just return, no preventDefault, no custom handling
+      return;
+    }
+
+    // On Ctrl/⌘+C, *don’t* preventDefault. Just redirect selection briefly.
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
+      $clipboardBridge.focus({ preventScroll: true });
+      $clipboardBridge.select();
       return;
     }
 
