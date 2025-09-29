@@ -193,7 +193,9 @@ function WarrenBuffer(node,
 
       for(let i = first.row; i <= second.row; i++) {
           const realRow = Viewport.start + i;
+          console.log("Before: " + Model.lines[realRow]);
           Model.lines[realRow] = " ".repeat(indentation) + Model.lines[realRow];
+          console.log("After: " + Model.lines[realRow]);
       }
       first.col += indentation;
       second.col += indentation;
@@ -258,10 +260,10 @@ function WarrenBuffer(node,
       if(treeSitterParser && treeSitterQuery) {
         this.treeSitterTree = treeSitterParser.parse(text);
         this.treeSitterCaptures = treeSitterQuery.captures(this.treeSitterTree.rootNode);
-        for (const { name, node } of this.treeSitterCaptures) {
-          console.log(name, node.text); // e.g. "function greet"
-          console.log(node);
-        }
+        // for (const { name, node } of this.treeSitterCaptures) {
+        //   console.log(name, node.text); // e.g. "function greet"
+        //   console.log(node);
+        // }
       }
 
       render(true);
@@ -354,14 +356,26 @@ function WarrenBuffer(node,
       populateSelections();
     }
 
+
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
 
     if(Model.treeSitterCaptures) {
+      // The point of tree sitter is to incremental restructuring of the tree.
+      // That is, each text editor operation changes the underlying positions and therefore
+      // the tree needs to be revised. the simplest revision is updating index. the harder revisions
+      // is the addition and removal of nodes. at any rate, each text editor operation would need to be
+      // coupled to changes in treesitter tree. here, we are lazy and reparse the tree everytime
+
+      const text = Model.lines.join("\n")
+      Model.treeSitterTree = treeSitterParser.parse(text);
+      Model.treeSitterCaptures = treeSitterQuery.captures(Model.treeSitterTree.rootNode);
+
       let minJ = 0;
       for(let i = 0; i < Viewport.size; i++) {
-        const contents = Viewport.lines[i] || null;
+        $e.children[i].innerHTML = "";
+        $e.children[i].textContent = Viewport.lines[i] || null;
         // TODO: terribly inefficient loop. Just grab the elements that are relevant
         for(let j = minJ; j < Model.treeSitterCaptures.length; j++) {
           const capture = Model.treeSitterCaptures[j]
@@ -374,11 +388,11 @@ function WarrenBuffer(node,
             const left = line.slice(0, startCol);
             const right = line.slice(endCol);
 
-            console.log("original string: ", line);
-            console.log("   left: ", left);
-            console.log("  right: ", right);
-            console.log("  startPostion:", startPosition);
-            console.log("  endCol:", endCol);
+            // console.log("original string: ", line);
+            // console.log("  left: ", left);
+            // console.log("  right: ", right);
+            // console.log("  startPostion:", startPosition);
+            // console.log("  endCol:", endCol);
 
             // TODO: be careful if this is HTML, it is escaped.
             if (capture.name === "function") {
@@ -390,8 +404,7 @@ function WarrenBuffer(node,
             } else if (capture.name === "string") {
               $e.children[i].innerHTML = `${left}<span class="highlight-string">${capture.node.text}</span>${right}`;
             }
-
-            console.log("after: ", $e.children[i].textContent);
+            // console.log("after: ", $e.children[i].textContent);
 
             minJ = j;
             break;
