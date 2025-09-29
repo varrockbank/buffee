@@ -200,6 +200,37 @@ function WarrenBuffer(node,
 
       render(true);
     },
+    unindent() {
+       if(!this.isSelection) return;
+      // Note: Vim, VSCode, Intellij all has slightly different unindent behavior.
+      // VSCode: for lines not aligned at a multiple of indentation number of spaces, align them to the
+      // first such position.
+      // vim: removes the selection, although it does keep a hidden memory of the most recent indentation operation which you can repeat.
+      // intellij: move all selected lines by indentation of number spaces, unless there is not enough to unindent
+      // Currently we follow intellij implementation but perhaps VSCode's is the best.
+      const [first, second] = this.ordered;
+
+      for(let i = first.row; i <= second.row; i++) {
+        const realRow = Viewport.start + i;
+        const line = Model.lines[realRow];
+        let maxUnindent = 0;
+        for(let i = 0; i < Math.min(indentation, line.length); i++) {
+          if(line.charAt(0) === " ") {
+            maxUnindent++;
+          } else {
+            break;
+          }
+        }
+        Model.lines[realRow] = line.slice(maxUnindent);
+        if(i == first.row) {
+          first.col -= maxUnindent;
+        } else if ( i == second.row) {
+          second.col -= maxUnindent;
+        }
+
+        render(true);
+      }
+    },
     // Utility to extract the text left, right, and character at the col of the
     // position for the row of the position.
     partitionLine({ row, col }) {
@@ -376,7 +407,7 @@ function WarrenBuffer(node,
     }
     const [firstEdge, secondEdge] = Selection.ordered;
 
-    // Render selection lines lines. Behavior is consistent with vim/vscode but not Intellij.
+    // Render selection lines. Behavior is consistent with vim/vscode but not Intellij.
     for (let i = firstEdge.row + 1; i <= secondEdge.row - 1; i++) {
       $selections[i].style.visibility = 'visible';
       $selections[i].style.left = 0;
@@ -464,18 +495,23 @@ function WarrenBuffer(node,
     } else if (event.metaKey) {
     } else if (event.key === "Backspace") {
       Selection.delete();
-    } else if (event.key === "Shift") {
     } else if (event.key === "Enter") {
       Selection.newLine();
     } else if (event.key === "Escape") {
     } else if (event.key === "Tab" ) {
       if(Selection.isSelection) {
-        Selection.indent();
+        if(event.shiftKey) {
+          console.log("here");
+          Selection.unindent();
+        } else {
+          Selection.indent();
+        }
       } else {
         Selection.insert(" ".repeat(indentation));
       }
     } else if (event.key.length > 1) {
       console.warn('Ignoring unknown key: ', event.code, key);
+    } else if (event.key === "Shift") {
     } else {
       Selection.insert(event.key);
     }
