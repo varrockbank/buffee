@@ -411,7 +411,7 @@ function WarrenBuffer(node,
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
 
-    if(Model.treeSitterCaptures) {
+    if(Model.treeSitterTree && Model.treeSitterCaptures) {
       // The point of tree sitter is to incremental restructuring of the tree.
       // That is, each text editor operation changes the underlying positions and therefore
       // the tree needs to be revised. the simplest revision is updating index. the harder revisions
