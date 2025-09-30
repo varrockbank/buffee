@@ -171,9 +171,11 @@ function WarrenBuffer(node,
       if(lines.length === 1) {
         this.insert(lines[0]);
       } else {
-        const { index, left, right } = this.partitionLine(head);
+        const [firstEdge, secondEdge] = this.ordered
+        const { index, left, _ } = this.partitionLine(firstEdge);
+        const { index: secondIndex, right } = this.partitionLine(secondEdge);
         Model.lines[index] = left + lines[0];
-        Model.lines.splice(index+1, 0, ...lines.slice(1, -1));
+        Model.lines.splice(index+1, secondIndex - index - 1, ...lines.slice(1, -1));
         Model.lines[index + lines.length - 1] = lines[lines.length-1] + right;
         this.setCursor({row: index + lines.length - 1, col: lines[lines.length-1].length})
         render(true);
