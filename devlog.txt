@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 2.1.0-alpha.1 [2025-09-30]
+*** ✨iOS Support
+- Support tap to set cursor
+
 ** 2.0.0-alpha.1 [2025-09-30]
 *** ✨iOS Support
 - Launch iOS keyboard and handles backspace, new line, characters

@@ -149,6 +149,7 @@
 
     const notes = new WarrenBuffer(document.getElementById('notes'), null, null, 20);
     notes.Model.text = ``;
+    window.notes = notes;
 
     // Bind UI controls to move viewport
     document.getElementById('viewport-update').addEventListener('click', () => {
@@ -225,9 +226,9 @@
   window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("playground").focus();
     const editor = document.getElementById("notes");
+    const notesEditingArea = editor.querySelector('.wb-lines');
 
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (isIOS) {
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
       // Use contenteditable so tapping opens the keyboard
       editor.setAttribute('contenteditable', 'true');
       editor.setAttribute('role', 'textbox');
@@ -257,6 +258,50 @@
       function resetSink() {
         sink.value = L + R;                 // always 2 chars
         sink.selectionStart = sink.selectionEnd = 1; // caret between L and R
+      }
+
+      // Measure 1ch using the div's font (reliable across browsers)
+      function measureChWidth() {
+        // Fast path using CSS 1ch
+        const probe = document.createElement('span');
+        probe.textContent = '0';
+        // Match the target div’s font & letter spacing
+        const cs = getComputedStyle(notesEditingArea);
+        probe.style.font = cs.font;
+        probe.style.letterSpacing = cs.letterSpacing;
+        probe.style.visibility = 'hidden';
+        probe.style.position = 'absolute';
+        probe.style.whiteSpace = 'pre';
+        document.body.appendChild(probe);
+        const w = probe.getBoundingClientRect().width;
+        document.body.removeChild(probe);
+        return w;
+      }
+      let ch = measureChWidth();
+      // Recompute on font changes / resize (optional but nice)
+      new ResizeObserver(() => { ch = measureChWidth(); }).observe(notesEditingArea);
+
+      function getPoint(evt) {
+        const rect = notesEditingArea.getBoundingClientRect();
+        const touch = evt.changedTouches?.[0] ?? evt.touches?.[0];
+        const clientX = touch ? touch.clientX : evt.clientX;
+        const clientY = touch ? touch.clientY : evt.clientY;
+        // position inside content box, including scroll offset
+        // (rect gives viewport coords; add scroll to get content coords)
+        const x = (clientX - rect.left) + notesEditingArea.scrollLeft;
+        const y = (clientY - rect.top)  + notesEditingArea.scrollTop;
+        // subtract padding so (0,0) = top-left of text content, not the padding
+        const cs = getComputedStyle(notesEditingArea);
+        const padL = parseFloat(cs.paddingLeft)  || 0;
+        const padT = parseFloat(cs.paddingTop)   || 0;
+        return { x: x - padL, y: y - padT };
+      }
+
+      function setCursor(evt) {
+        const { x, y } = getPoint(evt);
+        const row = Math.max(0, Math.floor(y / 24));
+        const col = Math.max(0, Math.floor(x / ch));
+        notes.Selection.setCursorAndRender({ row, col });
       }
 
       // Map beforeinput → synthetic keydown(s)
@@ -301,15 +346,15 @@
 
       // Focus on tap (otherwise iOS may not show keyboard)
       // Focus the sink on tap so iOS shows the keyboard.
-      editor.addEventListener('pointerdown', () => {
+      editor.addEventListener('pointerdown', e => {
         sink.focus();
+        setCursor(e);
       });
       editor.addEventListener('click', () => {
         sink.focus();
       });
     }
   });
-
 </script>
 </body>
 </html>

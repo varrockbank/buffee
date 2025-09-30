@@ -7,7 +7,7 @@ function WarrenBuffer(node,
     indentation = 2,
     colorPrimary = "#B2B2B2",
     colorSecondary = "#212026") {
-  this.version = "2.0.0-alpha.1";
+  this.version = "2.1.0-alpha.1";
 
   const $e = node.querySelector('.wb .wb-lines');
   $e.style.lineHeight = `${lineHeight}px`;
@@ -120,6 +120,10 @@ function WarrenBuffer(node,
     // Assumes we are in selection
     get isForwardSelection() {
       return head.row === tail.row && head.col < tail.col || head.row < tail.row;
+    },
+    setCursorAndRender({row, col}) {
+      this.setCursor({row, col});
+      render(true);
     },
     setCursor({row, col}) {
       tail.row = row;
