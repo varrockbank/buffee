@@ -173,10 +173,14 @@ function WarrenBuffer(node,
       } else {
         const [firstEdge, secondEdge] = this.ordered
         const { index, left, _ } = this.partitionLine(firstEdge);
-        const { index: secondIndex, right } = this.partitionLine(secondEdge);
+        const { index: secondIndex, right, rightExclusive } = this.partitionLine(secondEdge);
         Model.lines[index] = left + lines[0];
         Model.lines.splice(index+1, secondIndex - index - 1, ...lines.slice(1, -1));
-        Model.lines[index + lines.length - 1] = lines[lines.length-1] + right;
+        if (this.isSelection) {
+          Model.lines[index + lines.length - 1] = lines[lines.length-1] + rightExclusive;
+        } else {
+          Model.lines[index + lines.length - 1] = lines[lines.length-1] + right;
+        }
         this.setCursor({row: index + lines.length - 1, col: lines[lines.length-1].length})
         render(true);
       }
@@ -287,7 +291,10 @@ function WarrenBuffer(node,
       return {
         index,
         left: line.slice(0, col),
-        right: line.slice(col)
+        right: line.slice(col),
+        // In the case where the partitioning point is a selection, we exclude the character
+        // at th cursor
+        rightExclusive: line.slice(col+1)
       }
     }
   };
