@@ -244,9 +244,9 @@
       sink.setAttribute('autocorrect', 'off');
       sink.setAttribute('spellcheck', 'false');
       Object.assign(sink.style, {
-        position: 'absolute',
+        position: 'fixed',
         opacity: 0,
-        left: '-9999px',
+        left: '0',
         top: '0',
         height: '1px',
         width: '1px',
@@ -347,7 +347,7 @@
       // Focus on tap (otherwise iOS may not show keyboard)
       // Focus the sink on tap so iOS shows the keyboard.
       editor.addEventListener('pointerdown', e => {
-        sink.focus();
+        sink.focus({preventScroll: true});
         setCursor(e);
       });
       editor.addEventListener('click', () => {

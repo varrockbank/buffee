@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 2.1.1-alpha.1 [2025-09-30]
+*** 🐞 Bug Fixes
+- Prevent iOS viewport scrolling to the "sink" used to accept iOS keyboard input
+
 ** 2.1.0-alpha.1 [2025-09-30]
 *** ✨iOS Support
 - Support tap to set cursor
