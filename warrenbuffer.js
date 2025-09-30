@@ -82,7 +82,7 @@ function WarrenBuffer(node,
     },
     moveCol(value) {
       if (value === 1) {
-        if (tail.col + 1 < Viewport.lines[tail.row].length) {    // Move right 1 character.
+        if (tail.col < Viewport.lines[tail.row].length - (this.isSelection ? 1 : 0 )) {    // Move right 1 character.
           maxCol = ++tail.col;
         } else {
           if (tail.row < (Viewport.end - Viewport.start)) {     // Move to beginning of next line.
@@ -101,7 +101,7 @@ function WarrenBuffer(node,
         } else {
           if (tail.row > 0) {                                 // Move to end of previous line
             tail.row--;
-            maxCol = tail.col = Math.max(0, Viewport.lines[tail.row].length - 1);
+            maxCol = tail.col = Math.max(0, Viewport.lines[tail.row].length - (this.isSelection ? 1 : 0));
           } else {
             if (Viewport.start !== 0) {                       // Scroll then move tail to end of new current line.
               Viewport.scroll(-1);
@@ -119,7 +119,7 @@ function WarrenBuffer(node,
     },
     // Assumes we are in selection
     get isForwardSelection() {
-      return head.row == tail.row && head.col < tail.col || head.row < tail.row;
+      return head.row === tail.row && head.col < tail.col || head.row < tail.row;
     },
     setCursor({row, col}) {
       tail.row = row;
@@ -164,7 +164,7 @@ function WarrenBuffer(node,
     moveCursorEndOfLine() {
       const row = tail.row;
       const realRow = Viewport.start + row;
-      maxCol = tail.col = Model.lines[realRow].length - 1;
+      maxCol = tail.col = Model.lines[realRow].length - (this.isSelection ? 1 : 0);
       render(true);
     },
     // Inserts list of string lines into the selection
@@ -409,7 +409,6 @@ function WarrenBuffer(node,
       populateSelections();
     }
 
-
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
@@ -497,7 +496,11 @@ function WarrenBuffer(node,
       if(firstEdge.row < Viewport.lines.length) { // TODO: this can be removed if selection is constrained to source content
         const text = Viewport.lines[firstEdge.row];
 
-        $selections[firstEdge.row].style.width = `${text.length - firstEdge.col}ch`;
+        // There is edge case where text.length - firstEdge.col is 0. Namely, if the selection started
+        // on the last cursor position, menaing the cursor is between the last char and new line.
+        // We want to render 1 char to represent this new line.
+        $selections[firstEdge.row].style.width = `${Math.max(1, text.length - firstEdge.col)}ch`;
+        console.log("First row width: " + (text.length - firstEdge.col));
         $selections[firstEdge.row].style.visibility = 'visible';
       }
       if(secondEdge.row < Viewport.lines.length) {
@@ -582,6 +585,7 @@ function WarrenBuffer(node,
           Selection.moveRow(1);
         }
       } else { // no meta key.
+        // TODO: handle special case where begin a selection and we are at last character on line
         if (event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
         if (event.key === "ArrowDown") {
