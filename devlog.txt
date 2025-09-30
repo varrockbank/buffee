@@ -1,6 +1,13 @@
 * Project Devlog
 
-** 1.0.0-alpha.1 [2025-09-30]
+** 2.0.0-alpha.1 [2025-09-30]
+*** ✨iOS Support
+- Launch iOS keyboard and handles backspace, new line, characters
+
+*** 😶 Known issues
+- Emoji glyphs are wider than 1ch and lines with emojis misaligned
+
+** 1.0.0-alpha.1 [2025-09-29]
 
 *** ✨ New Features
 - Clipboard `⌘ + V` paste and `⌘ + C` copy

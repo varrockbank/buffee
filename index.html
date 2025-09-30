@@ -224,7 +224,92 @@
 <script>
   window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("playground").focus();
+    const editor = document.getElementById("notes");
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      // Use contenteditable so tapping opens the keyboard
+      editor.setAttribute('contenteditable', 'true');
+      editor.setAttribute('role', 'textbox');
+      editor.setAttribute('aria-multiline', 'true');
+      editor.setAttribute('spellcheck', 'false');
+      editor.setAttribute('autocapitalize', 'off');
+      editor.setAttribute('autocorrect', 'off');
+      editor.setAttribute('inputmode', 'text');
+
+      // ---------- iOS adapter: hidden textarea "input sink" ----------
+      const sink = document.createElement('textarea');
+      sink.setAttribute('autocapitalize', 'off');
+      sink.setAttribute('autocorrect', 'off');
+      sink.setAttribute('spellcheck', 'false');
+      Object.assign(sink.style, {
+        position: 'absolute',
+        opacity: 0,
+        left: '-9999px',
+        top: '0',
+        height: '1px',
+        width: '1px',
+      });
+      const L = '\u200B';           // left sentinel (zero-width space)
+      const R = '\u200B';           // right sentinel (optional, helps if you add ForwardDelete later)
+      sink.value = L + R ;
+      document.body.appendChild(sink);
+      function resetSink() {
+        sink.value = L + R;                 // always 2 chars
+        sink.selectionStart = sink.selectionEnd = 1; // caret between L and R
+      }
+
+      // Map beforeinput → synthetic keydown(s)
+      sink.addEventListener('beforeinput', (e) => {
+        // We consume the DOM change; we’ll notify the editor via keydown.
+        e.preventDefault();
+
+        if(e.inputType === 'insertText') {
+          for (const ch of e.data || '') synthKeydown(ch);
+        } else if (e.inputType === 'deleteContentBackward') {
+          synthKeydown('Backspace');
+        } else if (e.inputType === 'insertLineBreak') {
+          synthKeydown('Enter');
+        }
+        resetSink(); // <- ALWAYS restore L•R with caret in the middle
+      });
+      // IME/dictation: commit composed text as keydowns
+      sink.addEventListener('compositionend', (e) => {
+        if (e.data) {
+          for (const ch of e.data) synthKeydown(ch);
+        }
+      });
+      // Helper: dispatch a synthetic keydown into your editor
+      function synthKeydown(key) {
+        // Use only what your handler needs; e.key is the important bit.
+        const ev = new KeyboardEvent('keydown', {
+          key,
+          bubbles: true,
+          cancelable: true,
+          // Best-effort code; fine if it's not perfect for non-letters.
+          code: key.length === 1 ? ('Key' + key.toUpperCase()) : key
+        });
+        // Some code checks isTrusted; this won’t be trusted, so avoid that check.
+        editor.dispatchEvent(ev);
+      }
+      // Optional: keep the editor looking focused when sink is focused.
+      function syncFocusRing() {
+        editor.classList.toggle('is-focused', document.activeElement === sink || document.activeElement === editor);
+      }
+      document.addEventListener('focusin', syncFocusRing);
+      document.addEventListener('focusout', syncFocusRing);
+
+      // Focus on tap (otherwise iOS may not show keyboard)
+      // Focus the sink on tap so iOS shows the keyboard.
+      editor.addEventListener('pointerdown', () => {
+        sink.focus();
+      });
+      editor.addEventListener('click', () => {
+        sink.focus();
+      });
+    }
   });
+
 </script>
 </body>
 </html>
