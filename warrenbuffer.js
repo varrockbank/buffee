@@ -1,12 +1,14 @@
 function WarrenBuffer(node,
     treeSitterParser = null,
     treeSitterQuery = null,
-    lineHeight = 24,
     initialViewportSize = 20,
+    lineHeight = 24,
     editorPaddingPX = 4 ,
     indentation = 2,
     colorPrimary = "#B2B2B2",
     colorSecondary = "#212026") {
+  this.version = "1.0.0-alpha.1";
+
   const $e = node.querySelector('.wb .wb-lines');
   $e.style.lineHeight = `${lineHeight}px`;
   $e.style.fontSize = `${lineHeight}px`;
@@ -42,9 +44,9 @@ function WarrenBuffer(node,
   const fragmentSelections = document.createDocumentFragment();
   const fragmentGutters = document.createDocumentFragment();
 
-  const detachedTail = { row : 0, col : 2};
+  const detachedTail = { row : 0, col : 0};
   // In case where we have cursor, we want tail === head.
-  let tail = head = { row: 0, col: 2 };
+  let tail = head = { row: 0, col: 0 };
   let maxCol = tail.col;
   const Selection = {
     get ordered() { return this.isForwardSelection ? [head, tail] : [tail, head] },
@@ -551,7 +553,7 @@ function WarrenBuffer(node,
 
     // On Ctrl/⌘+C, *don’t* preventDefault. Just redirect selection briefly.
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
-      $clipboardBridge.focus({ preventScroll: true });
+      $clipboardBridge.focus({ preventScroll: true }); // Prevent browser from scrolling to textarea
       $clipboardBridge.select();
       return;
     }

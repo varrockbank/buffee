@@ -1,0 +1,30 @@
+        .-""""-.
+      .'  .-.   '.
+     /   (o o)    \
+    |     =|=      |    <--- ChatGPT thinks this is the Wizard of Omaha
+    |   .-===-.    |
+     \  |     |   /
+      '._\___/_.'
+         /| |\
+        /_| |_\
+       /__| |__\
+      /___| |___\
+     /____| |____\
+
+Usage Instructions
+-----------------------------------
+  - Navigation:
+    - ↓ (Down arrow)    : Move cursor down
+    - ← (Left arrow)    : Move cursor left
+    - → (Right arrow)   : Move cursor right
+    - ↑ (Up arrow)      : Move cursor up
+    - ⌘ + ←             : Move to first non-white space character on line
+    - ⌘ + →             : Move to last character on line
+  - Indentation:
+    - Shift+Tab         : Outdent cursor line or selection lines by 2 spaces (configurable)
+    - Tab               : Indent current line or selection lines
+  - Selection:
+    - Shift             : Hold shift and navigate
+  - Clipboard:
+    - ⌘ + V           : Paste from clipboard (macOS)
+    - ⌘ + C           : Copy selection to clipboard (macOS)

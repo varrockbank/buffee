@@ -92,7 +92,7 @@
     Append at Line number: <input id="append-at-line" value="1"></input>
   </div>
 </details>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0">
+  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="playground">
     <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="💪">
@@ -110,6 +110,24 @@
           </div>
       </div>
   </blockquote>
+  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="notes">
+    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div class="💪">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines 🌳 🥷"></div>
+    </div>
+    <div class="💪 wb-status 🦠">
+      <div class="wb-status-left 💪">
+        <span class="wb-linecount"></span>
+      </div>
+      <div class="wb-status-right 💪">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
   <script type="module">
     import { Parser, Language, Query } from "https://cdn.jsdelivr.net/npm/web-tree-sitter@0.25.10/tree-sitter.js";
 
@@ -119,18 +137,18 @@
       "https://cdn.jsdelivr.net/npm/tree-sitter-wasms@0.1.12/out/tree-sitter-javascript.wasm"
     );
     treesitterParser.setLanguage(javascriptParser);
-
     const highlightQuery = `
       (function_declaration name: (identifier) @function)
       (string) @string
     `;
     const query = new Query(javascriptParser, highlightQuery);
 
-    const node = document.querySelector(".wb"); // This is unambiguous if only 1 instance
-    const textDocument = "This is my first text document\nWoohoo\nFoobar\njfdhfjhfdg\njfdhj\ndh";
-    const warrenBuffer = new WarrenBuffer(node, treesitterParser, query);
-    warrenBuffer.Model.text = textDocument;
-    window.warrenBuffer = warrenBuffer;
+    const node = document.getElementById("playground");
+    const warrenBuffer = new WarrenBuffer(node, null, null);
+    warrenBuffer.Model.text = "This is my first text document\nWoohoo\nFoobar\njfdhfjhfdg\njfdhj\ndh";
+
+    const notes = new WarrenBuffer(document.getElementById('notes'), null, null, 20);
+    notes.Model.text = ``;
 
     // Bind UI controls to move viewport
     document.getElementById('viewport-update').addEventListener('click', () => {
@@ -184,7 +202,7 @@
       }
     });
 
-    fetch("warrenbuffer.js")
+    fetch("instructions.txt")
       .then(response => response.text())
       .then(source => {
         warrenBuffer.Model.text = source;
@@ -192,6 +210,21 @@
       .catch(err => {
         console.error("Error reading foobar.js:", err);
       });
+
+    fetch("devlog.txt")
+      .then(response => response.text())
+      .then(source => {
+        notes.Model.text = source;
+      })
+      .catch(err => {
+        console.error("Error reading foobar.js:", err);
+      });
+
   </script>
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("playground").focus();
+  });
+</script>
 </body>
 </html>

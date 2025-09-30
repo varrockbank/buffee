@@ -1,0 +1,23 @@
+* Project Devlog
+
+** 1.0.0-alpha.1 [2025-09-30]
+
+*** ✨ New Features
+- Clipboard `⌘ + V` paste and `⌘ + C` copy
+  - Maximizes browser compatibility using 'copy'/'paste' event instead of keypress listener
+    - standard security
+    - copy required <textarea> as an event bridge, force a next tick with settimeout
+- Gutter that resizes at large line numbers
+- Status line w/ cursor coordinates
+- Multi-line Selections
+- Multiple instances of editor on the webpage is okay
+
+*** 🧪 Experimental
+- Tree-Sitter based syntax parsing
+- TODO: investigate CRDTs compatibility with a command stack
+
+*** 🔮 Next Up
+- undo/redos. probably with a command stack
+
+*** 🐞 Bug Fixes
+- off-by-1 bugs related to last char of line. Cursor should be able to move 1 past
