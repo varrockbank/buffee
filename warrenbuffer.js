@@ -53,29 +53,27 @@ function WarrenBuffer(node,
         if (tail.row < (Viewport.end - Viewport.start)) {                      // Inner line, Move down
           tail.row ++;
           if(Viewport.lines[tail.row].length >= tail.col) {
-            tail.col = Math.min(maxCol, Math.max(0, Viewport.lines[tail.row].length-1));
+            tail.col = Math.min(maxCol, Math.max(0, Viewport.lines[tail.row].length));
           } else {
-            tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length-1));
+            tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length));
           }
         } else {                                                                // Last line of viewport, scroll viewport down
           if (Viewport.end !== Model.lastIndex) {
             Viewport.scroll(1);
-            tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length - 1));
+            tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length));
           } else { }                                                             // Last line of file, No-Op.
         }
       } else {
         if (tail.row === 0) {                                                    // First line of viewport, scroll viewport up
           Viewport.scroll(-1);
-          tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length - 1 ));
+          tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length ));
         } else {                                                                 // Inner line, move up.
           tail.row--;
           if(Viewport.lines[tail.row].length >= tail.col) {
-            tail.col = Math.min(maxCol, Math.max(0, Viewport.lines[tail.row].length-1));
+            tail.col = Math.min(maxCol, Math.max(0, Viewport.lines[tail.row].length));
           } else {
-            tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length-1));
+            tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length));
           }
-
-          tail.col = Math.min(tail.col, Math.max(0, Viewport.lines[tail.row].length - 1));
         }
       }
       render(true);
