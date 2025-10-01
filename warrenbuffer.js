@@ -7,7 +7,7 @@ function WarrenBuffer(node,
     indentation = 2,
     colorPrimary = "#B2B2B2",
     colorSecondary = "#212026") {
-  this.version = "2.2.1-alpha.1";
+  this.version = "2.2.2-alpha.1";
 
   const $e = node.querySelector('.wb .wb-lines');
   $e.style.lineHeight = `${lineHeight}px`;
@@ -264,10 +264,14 @@ function WarrenBuffer(node,
         let j = tail.col;
         if (isSpace(s[j])) { // Case 1: at whitespace → skip to next non-space character
           while (j > 0 && isSpace(s[j])) j--;
+          while (j > 0 && isWord(s[j])) j--;
         } else if (isWord(s[j])) { // Case 2: at word-chars → consume word run to 1 past the word
           while (j > 0 && isWord(s[j])) j--;
         } else { // Case 3: at punctuation/symbols
+          const c = s[j];
           j--;
+          // Consuming continuous sequence of the same char
+          while( j > 0 && s[j] === c) j--;
         }
         tail.col = j;
       }
@@ -287,12 +291,16 @@ function WarrenBuffer(node,
         const isSpace = ch => /\s/.test(ch);
         const isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
         let j = tail.col;
-        if (isSpace(s[j])) { // Case 1: at whitespace → skip to next non-space character
+        if (isSpace(s[j])) { // Case 1: at whitespace → skip run to end of spaces, then next non-word
           while (j < n && isSpace(s[j])) j++;
+          while (j < n && isWord(s[j])) j++;
         } else if (isWord(s[j])) { // Case 2: at word-chars → consume word run to 1 past the word
           while (j < n && isWord(s[j])) j++;
         } else { // Case 3: at punctuation/symbols
+          const c = s[j];
           j++;
+          // Consuming continuous sequence of the same char
+          while( j < n && s[j] === c) j++;
         }
         tail.col = j;
       }
