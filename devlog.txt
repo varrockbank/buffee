@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 2.2.1-alpha.1 [2025-10-1]
+*** ✨ New Features
+- support moving to back word with option (MacOS) / alt (windows) + arrow left
+
 ** 2.2.0-alpha.1 [2025-10-1]
 *** ✨ New Features
 - support moving to next word with option (MacOS) / alt (windows) + arrow right

@@ -7,7 +7,7 @@ function WarrenBuffer(node,
     indentation = 2,
     colorPrimary = "#B2B2B2",
     colorSecondary = "#212026") {
-  this.version = "2.2.0-alpha.1";
+  this.version = "2.2.1-alpha.1";
 
   const $e = node.querySelector('.wb .wb-lines');
   $e.style.lineHeight = `${lineHeight}px`;
@@ -246,6 +246,32 @@ function WarrenBuffer(node,
       } else {
         Viewport.scroll(1);
       }
+      render(true);
+    },
+    moveBackWord() {
+      const s = Model.lines[tail.row];
+      const n = s.length;
+
+      if(tail.col === 0) {
+        // TODO: handle viewport scroll
+        if(tail.row > 0) {
+          tail.row--;
+          tail.col = Viewport.lines[tail.row].length;
+        }
+      } else {
+        const isSpace = ch => /\s/.test(ch);
+        const isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
+        let j = tail.col;
+        if (isSpace(s[j])) { // Case 1: at whitespace → skip to next non-space character
+          while (j > 0 && isSpace(s[j])) j--;
+        } else if (isWord(s[j])) { // Case 2: at word-chars → consume word run to 1 past the word
+          while (j > 0 && isWord(s[j])) j--;
+        } else { // Case 3: at punctuation/symbols
+          j--;
+        }
+        tail.col = j;
+      }
+
       render(true);
     },
     moveWord() {
@@ -608,6 +634,7 @@ function WarrenBuffer(node,
       } else if (event.altKey) {
         if(!event.shiftKey) Selection.makeCursor();
         if(event.key === "ArrowLeft") {
+          Selection.moveBackWord();
         } else if (event.key === "ArrowRight") {
           Selection.moveWord();
         }
