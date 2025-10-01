@@ -1,0 +1,50 @@
+* Notes on Implementation Decisions
+
+** Indexing
+
+Buffer exposes Array of lines, which is 0-indexed
+Viewport is 0-indexed
+
+** Conventions
+
+Element variables are prefixed with $
+
+** Character support
+
+Currently, the implementation assumes characters '1ch' wide in monospace font.
+This assumptions breaks for 2ch wide kanji.
+Emojis are 2ch wide on the terminal but do not take a full 2ch in the DOM. Making it 2chs
+would require wrapping it is a container.
+
+** Accessibility
+
+Editor captures the tab keypresses. This will be an issue for accessbility as
+users can't tab out to the next element in the DOM.
+
+** Compatibility
+
+Currently tested and developed around Mac OS keys, namely Meta key. Should not be diffcult
+to support Windows.
+
+** Clipboard
+
+Paste and copy is not handled through keydown event, as doing so would require calling the
+clipboard API access which requires additional security permissions.
+
+*** Paste
+
+Simply handling a paste event is sufficient.
+
+*** Copy
+
+A dummy textarea was needed as bridge.
+
+** Extensions
+
+Are to be provided by the client
+
+- Treesitter
+- iOS support by proxing to Keyboard evnets
+
+
+
