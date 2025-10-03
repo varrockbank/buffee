@@ -11,7 +11,7 @@ function WarrenBuf(node,
     gutterPadding = 1) {
   this.version = "2.2.5-alpha.1";
 
-  const $e = node.querySelector('.wb .wb-lines');
+  const $e = node.querySelector('.wb-lines');
   Object.assign($e.style, {
     lineHeight: lineHeight+'px',
     fontSize: lineHeight+'px',
@@ -19,19 +19,19 @@ function WarrenBuf(node,
     margin: editorPaddingPX+'px'
   });
 
-  const $status = node.querySelector('.wb .wb-status');
+  const $status = node.querySelector('.wb-status');
   Object.assign($status.style, {
     padding: '6px',
     background: colorSecondary,
     color: colorPrimary
   });
-  const $statusLineCoord = node.querySelector('.wb .wb-coordinate');
-  const $lineCounter = node.querySelector('.wb .wb-linecount');
-  const $indentation = node.querySelector('.wb .wb-indentation');
+  const $statusLineCoord = node.querySelector('.wb-coordinate');
+  const $lineCounter = node.querySelector('.wb-linecount');
+  const $indentation = node.querySelector('.wb-indentation');
 
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
 
-  const $gutter = node.querySelector('.wb .wb-gutter');
+  const $gutter = node.querySelector('.wb-gutter');
   Object.assign($gutter.style, {
     fontSize: lineHeight+'px',
     lineHeight: lineHeight+'px',
