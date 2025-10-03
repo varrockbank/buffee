@@ -64,17 +64,17 @@ runner.describe('Basic Typing', () => {
   runner.it('should insert single character', () => {
     dispatchKey(node, 'a');
     expect(wb.Model.lines[0]).toBe('a');
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 1 });
-    expect(tail).toEqual({ row: 0, col: 1 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 1 });
+    expect(SecondEdge).toEqual({ row: 0, col: 1 });
   }, "Insert single character 'a'");
 
   runner.it('should insert multiple characters', () => {
     type(node, 'Hello');
     expect(wb.Model.lines[0]).toBe('Hello');
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 5 });
-    expect(tail).toEqual({ row: 0, col: 5 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 });
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Insert 'Hello'");
 
   runner.it('should insert word with spaces', () => {
@@ -215,9 +215,9 @@ runner.describe('Complex Sequences', () => {
     dispatchKey(node, 'Backspace');
     expect(wb.Model.lines).toHaveLength(1);
     expect(wb.Model.lines[0]).toBe('HelloWorld');
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 5 });
-    expect(tail).toEqual({ row: 0, col: 5 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 });
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Delete across boundaries");
 
   runner.it('should create paragraph and edit middle', () => {
@@ -251,18 +251,18 @@ runner.describe('Selection', () => {
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
     dispatchKey(node, 'ArrowRight', { shift: true }); // Select 1 char
     expect(wb.Selection.isSelection).toBe(true);
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 0 });
-    expect(tail).toEqual({ row: 0, col: 1 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 0, col: 1 });
   }, "Select one character with Shift+ArrowRight");
 
   runner.it('should create selection with Shift+ArrowLeft', () => {
     type(node, 'Hello');
     dispatchKey(node, 'ArrowLeft', { shift: true }); // Select 1 char backward
     expect(wb.Selection.isSelection).toBe(true);
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 4 });
-    expect(tail).toEqual({ row: 0, col: 5 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 4 });
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Select one character with Shift+ArrowLeft");
 
   runner.it('should create multi-line selection with Shift+ArrowDown', () => {
@@ -273,9 +273,9 @@ runner.describe('Selection', () => {
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Start of Line 1
     dispatchKey(node, 'ArrowDown', { shift: true }); // Select to Line 2
     expect(wb.Selection.isSelection).toBe(true);
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 0 });
-    expect(tail).toEqual({ row: 1, col: 0 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 1, col: 0 });
   }, "Select multiple lines with Shift+ArrowDown");
 
   runner.it('should move cursor up without selection', () => {
@@ -284,9 +284,9 @@ runner.describe('Selection', () => {
     type(node, 'Line 2');
     dispatchKey(node, 'ArrowUp');
     expect(wb.Selection.isSelection).toBe(false);
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 6 });
-    expect(tail).toEqual({ row: 0, col: 6 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 6 });
+    expect(SecondEdge).toEqual({ row: 0, col: 6 });
   }, "Move cursor up without selection");
 
   runner.it('should create multi-line selection with Shift+ArrowUp', () => {
@@ -295,9 +295,9 @@ runner.describe('Selection', () => {
     type(node, 'Line 2');
     dispatchKey(node, 'ArrowUp', { shift: true });
     expect(wb.Selection.isSelection).toBe(true);
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 6 });
-    expect(tail).toEqual({ row: 1, col: 6 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 6 });
+    expect(SecondEdge).toEqual({ row: 1, col: 6 });
   }, "Select upward with Shift+ArrowUp");
 
   runner.it('should extend selection with multiple Shift+Arrow', () => {
@@ -309,9 +309,9 @@ runner.describe('Selection', () => {
     dispatchKey(node, 'ArrowRight', { shift: true }); // Hell
     dispatchKey(node, 'ArrowRight', { shift: true }); // Hello
     expect(wb.Selection.isSelection).toBe(true);
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 0 });
-    expect(tail).toEqual({ row: 0, col: 5 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Extend selection with multiple Shift+Arrow");
 });
 
@@ -330,9 +330,9 @@ runner.describe('Cursor movement - varying line lengths', () => {
     dispatchKey(node, 'Enter');
     type(node, 'Much longer line');
     dispatchKey(node, 'ArrowUp');
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 5 });
-    expect(tail).toEqual({ row: 0, col: 5 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 });
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Long to short: cursor at end of short line");
 
   runner.it('should restore column when moving back to long line', () => {
@@ -340,15 +340,15 @@ runner.describe('Cursor movement - varying line lengths', () => {
     dispatchKey(node, 'Enter');
     type(node, 'Much longer line');
     // Assert cursor position after typing
-    let [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 1, col: 16 }); // One past last char
-    expect(tail).toEqual({ row: 1, col: 16 });
+    let [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 1, col: 16 }); // One past last char
+    expect(SecondEdge).toEqual({ row: 1, col: 16 });
 
     dispatchKey(node, 'ArrowUp');  // Move to "Short", col clamped to 5
     dispatchKey(node, 'ArrowDown'); // Move back to "Much longer line"
-    [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 1, col: 16 }); // Should restore to col 16
-    expect(tail).toEqual({ row: 1, col: 16 });
+    [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 1, col: 16 }); // Should restore to col 16
+    expect(SecondEdge).toEqual({ row: 1, col: 16 });
   }, "Should restore original column when moving back");
 
   runner.it('should clamp column to line end on shorter line', () => {
@@ -356,9 +356,9 @@ runner.describe('Cursor movement - varying line lengths', () => {
     dispatchKey(node, 'Enter');
     type(node, 'Very long line here');
     dispatchKey(node, 'ArrowUp');
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 1 }); // Clamped to end of "A"
-    expect(tail).toEqual({ row: 0, col: 1 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 1 }); // Clamped to end of "A"
+    expect(SecondEdge).toEqual({ row: 0, col: 1 });
   }, "Clamp to shorter line end");
 
   runner.it('should handle moving through multiple lines of varying length', () => {
@@ -370,9 +370,9 @@ runner.describe('Cursor movement - varying line lengths', () => {
     // Cursor at (2, 20)
     dispatchKey(node, 'ArrowUp'); // to "Two", clamped to (1, 3)
     dispatchKey(node, 'ArrowUp'); // to "Line one", should restore toward original col
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 8 }); // End of "Line one"
-    expect(tail).toEqual({ row: 0, col: 8 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 8 }); // End of "Line one"
+    expect(SecondEdge).toEqual({ row: 0, col: 8 });
   }, "Multiple lines with varying lengths");
 });
 
@@ -390,17 +390,17 @@ runner.describe('Meta+Arrow navigation', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
     dispatchKey(node, 'ArrowRight', { meta: true }); // Move to end
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 11 });
-    expect(tail).toEqual({ row: 0, col: 11 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 11 });
+    expect(SecondEdge).toEqual({ row: 0, col: 11 });
   }, "Meta+Right moves to end of line");
 
   runner.it('should move to start of line with Meta+Left', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 0 });
-    expect(tail).toEqual({ row: 0, col: 0 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 0, col: 0 });
   }, "Meta+Left moves to start of line");
 
   runner.it('should move to start of line from middle', () => {
@@ -409,9 +409,9 @@ runner.describe('Meta+Arrow navigation', () => {
     dispatchKey(node, 'ArrowLeft');
     dispatchKey(node, 'ArrowLeft');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Jump to start
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 0 });
-    expect(tail).toEqual({ row: 0, col: 0 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 0, col: 0 });
   }, "Meta+Left from middle of line");
 
   runner.it('should work on multi-line document', () => {
@@ -419,14 +419,14 @@ runner.describe('Meta+Arrow navigation', () => {
     dispatchKey(node, 'Enter');
     type(node, 'Second line here');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Start of line 2
-    let [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 1, col: 0 });
-    expect(tail).toEqual({ row: 1, col: 0 });
+    let [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 1, col: 0 });
+    expect(SecondEdge).toEqual({ row: 1, col: 0 });
 
     dispatchKey(node, 'ArrowRight', { meta: true }); // End of line 2
-    [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 1, col: 16 });
-    expect(tail).toEqual({ row: 1, col: 16 });
+    [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 1, col: 16 });
+    expect(SecondEdge).toEqual({ row: 1, col: 16 });
   }, "Meta+Left/Right on second line");
 
   runner.it('should work when navigating between lines', () => {
@@ -435,9 +435,9 @@ runner.describe('Meta+Arrow navigation', () => {
     type(node, 'Much longer line');
     dispatchKey(node, 'ArrowUp'); // Move to line 1
     dispatchKey(node, 'ArrowRight', { meta: true }); // End of line 1
-    const [head, tail] = wb.Selection.ordered;
-    expect(head).toEqual({ row: 0, col: 5 });
-    expect(tail).toEqual({ row: 0, col: 5 });
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 });
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Meta+Right after moving between lines");
 });
 
