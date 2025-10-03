@@ -448,19 +448,17 @@ function WarrenBuf(node,
 
   function populateSelections() {
     for (let i = 0; i < Viewport.size; i++) {
-      $selections[i] = fragmentSelections.appendChild(
-        Object.assign(document.createElement("div"), {
-          className: "wb-selection",
-          style: `
-            display: block;
-            visibility: hidden;
-            width: 1ch;
-            height: ${lineHeight}px;
-            font-size: ${lineHeight}px;
-            top: ${i * lineHeight}px;
-          `
-        })
-      );
+      const sel = document.createElement("div");
+      sel.className = "wb-selection";
+      Object.assign(sel.style, {
+        display: 'block',
+        visibility: 'hidden',
+        width: '1ch',
+        height: lineHeight+'px',
+        fontSize: lineHeight+'px',
+        top: i * lineHeight+'px'
+      });
+      $selections[i] = fragmentSelections.appendChild(sel);
     }
     $e.appendChild(fragmentSelections);
   }
