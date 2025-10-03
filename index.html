@@ -207,12 +207,12 @@
       }
     });
 
-    fetch("instructions.txt")
+    fetch("docs/instructions.txt")
       .then(response => response.text())
       .then(source => primary.Model.text = source)
       .catch(err => console.error("Error reading foobar.js:", err));
 
-    fetch("devlog.txt")
+    fetch("docs/devlog.txt")
       .then(response => response.text())
       .then(source => notes.Model.text = source)
       .catch(err => console.error("Error reading foobar.js:", err));
