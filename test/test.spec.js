@@ -8,7 +8,7 @@ runner.describe('Basic Typing', () => {
 
   runner.it('should insert single character', () => {
     fixture.press('a').once();
-    expect(fixture.wb.Model.lines[0]).toBe('a');
+    expect(fixture).toHaveLines('a');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 1 });
     expect(SecondEdge).toEqual({ row: 0, col: 1 });
@@ -16,7 +16,7 @@ runner.describe('Basic Typing', () => {
 
   runner.it('should insert multiple characters', () => {
     fixture.type('Hello');
-    expect(fixture.wb.Model.lines[0]).toBe('Hello');
+    expect(fixture).toHaveLines('Hello');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 5 });
     expect(SecondEdge).toEqual({ row: 0, col: 5 });
@@ -24,12 +24,12 @@ runner.describe('Basic Typing', () => {
 
   runner.it('should insert word with spaces', () => {
     fixture.type('Hello World');
-    expect(fixture.wb.Model.lines[0]).toBe('Hello World');
+    expect(fixture).toHaveLines('Hello World');
   }, "Insert 'Hello World' with spaces");
 
   runner.it('should type sentence', () => {
     fixture.type('The quick brown fox');
-    expect(fixture.wb.Model.lines[0]).toBe('The quick brown fox');
+    expect(fixture).toHaveLines('The quick brown fox');
   }, "Insert sentence 'The quick brown fox'");
 });
 
@@ -44,26 +44,26 @@ runner.describe('Backspace', () => {
   runner.it('should delete single character', () => {
     fixture.type('Hello');
     fixture.press(Key.Backspace).once();
-    expect(fixture.wb.Model.lines[0]).toBe('Hell');
+    expect(fixture).toHaveLines('Hell');
   }, "Delete single char from 'Hello' → 'Hell'");
 
   runner.it('should delete multiple characters', () => {
     fixture.type('Hello');
     fixture.press(Key.Backspace).times(3);
-    expect(fixture.wb.Model.lines[0]).toBe('He');
+    expect(fixture).toHaveLines('He');
   }, "Delete 3 chars from 'Hello' → 'He'");
 
   runner.it('should delete all characters', () => {
     fixture.type('Hi');
     fixture.press(Key.Backspace).times(2);
-    expect(fixture.wb.Model.lines[0]).toBe('');
+    expect(fixture).toHaveLines('');
   }, "Delete all chars from 'Hi' → ''");
 
   runner.it('should delete from middle of line', () => {
     fixture.type('Hello');
     fixture.press(Key.ArrowLeft).times(2); // Position at 'l' (col 3)
     fixture.press(Key.Backspace).once(); // Delete 'l'
-    expect(fixture.wb.Model.lines[0]).toBe('Helo');
+    expect(fixture).toHaveLines('Helo');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 2 });
     expect(SecondEdge).toEqual({ row: 0, col: 2 });
@@ -73,7 +73,7 @@ runner.describe('Backspace', () => {
     fixture.type('Hello World');
     fixture.press(Key.ArrowLeft).times(6); // Position at space (col 5)
     fixture.press(Key.Backspace).times(2); // Delete 'lo'
-    expect(fixture.wb.Model.lines[0]).toBe('Hel World');
+    expect(fixture).toHaveLines('Hel World');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 3 });
     expect(SecondEdge).toEqual({ row: 0, col: 3 });
@@ -82,7 +82,7 @@ runner.describe('Backspace', () => {
   runner.it('should handle Backspace beyond line start', () => {
     fixture.type('Hi');
     fixture.press(Key.Backspace).times(5); // Delete 2 chars + 3 extra
-    expect(fixture.wb.Model.lines[0]).toBe('');
+    expect(fixture).toHaveLines('');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 0 });
     expect(SecondEdge).toEqual({ row: 0, col: 0 });
@@ -100,9 +100,7 @@ runner.describe('Enter Key', () => {
   runner.it('should create new line', () => {
     fixture.type('Hello');
     fixture.press(Key.Enter).once();
-    expect(fixture.wb.Model.lines).toHaveLength(2);
-    expect(fixture.wb.Model.lines[0]).toBe('Hello');
-    expect(fixture.wb.Model.lines[1]).toBe('');
+    expect(fixture).toHaveLines('Hello', '');
   }, "Create new line: 'Hello'[Enter] → 2 lines");
 
   runner.it('should create multiple lines', () => {
@@ -111,10 +109,7 @@ runner.describe('Enter Key', () => {
     fixture.type('Line 2');
     fixture.press(Key.Enter).once();
     fixture.type('Line 3');
-    expect(fixture.wb.Model.lines).toHaveLength(3);
-    expect(fixture.wb.Model.lines[0]).toBe('Line 1');
-    expect(fixture.wb.Model.lines[1]).toBe('Line 2');
-    expect(fixture.wb.Model.lines[2]).toBe('Line 3');
+    expect(fixture).toHaveLines('Line 1', 'Line 2', 'Line 3');
   }, "Create multiple lines: 'Line 1'[Enter]'Line 2'[Enter]'Line 3' → 3 lines");
 
   runner.it('should split line with Enter', () => {
@@ -122,9 +117,7 @@ runner.describe('Enter Key', () => {
     fixture.press(Key.ArrowLeft).once();
     fixture.press(Key.ArrowLeft).once();
     fixture.press(Key.Enter).once();
-    expect(fixture.wb.Model.lines).toHaveLength(2);
-    expect(fixture.wb.Model.lines[0]).toBe('Hel');
-    expect(fixture.wb.Model.lines[1]).toBe('lo');
+    expect(fixture).toHaveLines('Hel', 'lo');
   }, "Split line: 'Hello'[ArrowLeft×2][Enter] → 'Hel' and 'lo'");
 
   runner.it('should add new line when pressing Enter at end of file', () => {
@@ -132,10 +125,7 @@ runner.describe('Enter Key', () => {
     fixture.press(Key.Enter).once();
     fixture.type('Second line');
     fixture.press(Key.Enter).once(); // At end of file
-    expect(fixture.wb.Model.lines).toHaveLength(3);
-    expect(fixture.wb.Model.lines[0]).toBe('First line');
-    expect(fixture.wb.Model.lines[1]).toBe('Second line');
-    expect(fixture.wb.Model.lines[2]).toBe('');
+    expect(fixture).toHaveLines('First line', 'Second line', '');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 2, col: 0 });
     expect(SecondEdge).toEqual({ row: 2, col: 0 });
@@ -143,13 +133,7 @@ runner.describe('Enter Key', () => {
 
   runner.it('should create multiple empty lines from empty document', () => {
     fixture.press(Key.Enter).times(5);
-    expect(fixture.wb.Model.lines).toHaveLength(6);
-    expect(fixture.wb.Model.lines[0]).toBe('');
-    expect(fixture.wb.Model.lines[1]).toBe('');
-    expect(fixture.wb.Model.lines[2]).toBe('');
-    expect(fixture.wb.Model.lines[3]).toBe('');
-    expect(fixture.wb.Model.lines[4]).toBe('');
-    expect(fixture.wb.Model.lines[5]).toBe('');
+    expect(fixture).toHaveLines('', '', '', '', '', '');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 5, col: 0 });
     expect(SecondEdge).toEqual({ row: 5, col: 0 });
@@ -168,7 +152,7 @@ runner.describe('Complex Sequences', () => {
     fixture.type('Hello');
     fixture.press(Key.Backspace).times(2);
     fixture.type('y there');
-    expect(fixture.wb.Model.lines[0]).toBe('Hely there');
+    expect(fixture).toHaveLines('Hely there');
   }, "Type, delete, retype");
 
   runner.it('should create line, delete line break', () => {
@@ -176,8 +160,7 @@ runner.describe('Complex Sequences', () => {
     fixture.press(Key.Enter).once();
     fixture.type('World');
     fixture.press(Key.Backspace).times(6);
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('Hello');
+    expect(fixture).toHaveLines('Hello');
   }, "Create/delete line breaks");
 
   runner.it('should type multi-line then edit first line', () => {
@@ -186,8 +169,7 @@ runner.describe('Complex Sequences', () => {
     fixture.type('Second');
     fixture.press(Key.ArrowUp).once();
     fixture.type(' Line');
-    expect(fixture.wb.Model.lines[0]).toBe('First Line');
-    expect(fixture.wb.Model.lines[1]).toBe('Second');
+    expect(fixture).toHaveLines('First Line', 'Second');
   }, "Multi-line editing");
 
   runner.it('should delete across line boundary', () => {
@@ -197,8 +179,7 @@ runner.describe('Complex Sequences', () => {
     fixture.press(Key.ArrowLeft).withMetaKey().once(); // Go to start of line
     fixture.press(Key.Backspace).once(); // Delete newline
 
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('HelloWorld');
+    expect(fixture).toHaveLines('HelloWorld');
     const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 5 });
     expect(SecondEdge).toEqual({ row: 0, col: 5 });
@@ -212,10 +193,7 @@ runner.describe('Complex Sequences', () => {
     fixture.type('Line 3');
     fixture.press(Key.ArrowUp).once();
     fixture.type(' edited');
-    expect(fixture.wb.Model.lines).toHaveLength(3);
-    expect(fixture.wb.Model.lines[0]).toBe('Line 1');
-    expect(fixture.wb.Model.lines[1]).toBe('Line 2 edited');
-    expect(fixture.wb.Model.lines[2]).toBe('Line 3');
+    expect(fixture).toHaveLines('Line 1', 'Line 2 edited', 'Line 3');
   }, "Edit at end of middle line");
 
   runner.it('should create paragraph and edit at middle of middle line', () => {
@@ -228,10 +206,7 @@ runner.describe('Complex Sequences', () => {
     fixture.press(Key.ArrowLeft).withMetaKey().once();
     fixture.press(Key.ArrowRight).times(3);
     fixture.type('X');
-    expect(fixture.wb.Model.lines).toHaveLength(3);
-    expect(fixture.wb.Model.lines[0]).toBe('Line 1');
-    expect(fixture.wb.Model.lines[1]).toBe('LinXe 2');
-    expect(fixture.wb.Model.lines[2]).toBe('Line 3');
+    expect(fixture).toHaveLines('Line 1', 'LinXe 2', 'Line 3');
   }, "Edit at middle of middle line");
 });
 
@@ -795,7 +770,7 @@ runner.describe('Deleting selections', () => {
     fixture.press(Key.Backspace).once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('World');
+    expect(fixture).toHaveLines('World');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 0 });
     expect(end).toEqual({ row: 0, col: 0 });
@@ -808,7 +783,7 @@ runner.describe('Deleting selections', () => {
     fixture.press(Key.Backspace).once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('');
+    expect(fixture).toHaveLines('');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 0 });
     expect(end).toEqual({ row: 0, col: 0 });
@@ -829,8 +804,7 @@ runner.describe('Deleting selections', () => {
     fixture.press(Key.Backspace).once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('hird line');
+    expect(fixture).toHaveLines('hird line');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 0 });
     expect(end).toEqual({ row: 0, col: 0 });
@@ -852,8 +826,7 @@ runner.describe('Deleting selections', () => {
     fixture.press(Key.Backspace).once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('First ine here');
+    expect(fixture).toHaveLines('First ine here');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 6 });
     expect(end).toEqual({ row: 0, col: 6 });
@@ -874,8 +847,7 @@ runner.describe('Deleting selections', () => {
     fixture.press(Key.Backspace).once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('First ');
+    expect(fixture).toHaveLines('First ');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 6 });
     expect(end).toEqual({ row: 0, col: 6 });
@@ -889,7 +861,7 @@ runner.describe('Deleting selections', () => {
     fixture.press(Key.Backspace).once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('Hello ');
+    expect(fixture).toHaveLines('Hello ');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 6 });
     expect(end).toEqual({ row: 0, col: 6 });
@@ -913,7 +885,7 @@ runner.describe('Replacing selections', () => {
     fixture.type('X');
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('XWorld');
+    expect(fixture).toHaveLines('XWorld');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 1 });
     expect(end).toEqual({ row: 0, col: 1 });
@@ -928,7 +900,7 @@ runner.describe('Replacing selections', () => {
     fixture.type('Goodbye');
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('GoodbyeWorld');
+    expect(fixture).toHaveLines('GoodbyeWorld');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 7 });
     expect(end).toEqual({ row: 0, col: 7 });
@@ -942,7 +914,7 @@ runner.describe('Replacing selections', () => {
     fixture.type('New');
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('New');
+    expect(fixture).toHaveLines('New');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 3 });
     expect(end).toEqual({ row: 0, col: 3 });
@@ -963,8 +935,7 @@ runner.describe('Replacing selections', () => {
     fixture.type('X');
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('Xhird line');
+    expect(fixture).toHaveLines('Xhird line');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 1 });
     expect(end).toEqual({ row: 0, col: 1 });
@@ -986,8 +957,7 @@ runner.describe('Replacing selections', () => {
     fixture.type('REPLACED');
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines).toHaveLength(1);
-    expect(fixture.wb.Model.lines[0]).toBe('First REPLACEDine');
+    expect(fixture).toHaveLines('First REPLACEDine');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 14 });
     expect(end).toEqual({ row: 0, col: 14 });
@@ -1001,7 +971,7 @@ runner.describe('Replacing selections', () => {
     fixture.type('Everyone');
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('Hello Everyone');
+    expect(fixture).toHaveLines('Hello Everyone');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 14 });
     expect(end).toEqual({ row: 0, col: 14 });
@@ -1016,7 +986,7 @@ runner.describe('Replacing selections', () => {
     fixture.press(' ').once();
 
     expect(fixture.wb.Selection.isSelection).toBe(false);
-    expect(fixture.wb.Model.lines[0]).toBe('Hello ');
+    expect(fixture).toHaveLines('Hello ');
     const [start, end] = fixture.wb.Selection.ordered;
     expect(start).toEqual({ row: 0, col: 6 });
     expect(end).toEqual({ row: 0, col: 6 });

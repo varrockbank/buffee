@@ -65,27 +65,6 @@ class TestRunner {
   }
 }
 
-// Assertion helpers
-function expect(actual) {
-  return {
-    toBe(expected) {
-      if (actual !== expected) {
-        throw new Error(`Expected: ${JSON.stringify(expected)}\nActual: ${JSON.stringify(actual)}`);
-      }
-    },
-    toEqual(expected) {
-      if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-        throw new Error(`Expected: ${JSON.stringify(expected)}\nActual: ${JSON.stringify(actual)}`);
-      }
-    },
-    toHaveLength(expected) {
-      if (actual.length !== expected) {
-        throw new Error(`Expected length: ${expected}\nActual length: ${actual.length}\nActual value: ${JSON.stringify(actual)}`);
-      }
-    }
-  };
-}
-
 // Low-level key dispatch utility
 function dispatchKey(node, key, modifiers = {}) {
   const event = new KeyboardEvent('keydown', {
