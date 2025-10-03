@@ -12,16 +12,19 @@ function WarrenBuf(node,
   this.version = "2.2.5-alpha.1";
 
   const $e = node.querySelector('.wb .wb-lines');
-  $e.style.lineHeight = `${lineHeight}px`;
-  $e.style.fontSize = `${lineHeight}px`;
-  // forces the selections to be relative to this rather than the parent container
-  $e.style.position = "relative";
-  $e.style.margin = `${editorPaddingPX}px`;
+  Object.assign($e.style, {
+    lineHeight: lineHeight+'px',
+    fontSize: lineHeight+'px',
+    position: 'relative',
+    margin: editorPaddingPX+'px'
+  });
 
   const $status = node.querySelector('.wb .wb-status');
-  $status.style.padding = "6px";
-  $status.style.background = colorSecondary;
-  $status.style.color = colorPrimary;
+  Object.assign($status.style, {
+    padding: '6px',
+    background: colorSecondary,
+    color: colorPrimary
+  });
   const $statusLineCoord = node.querySelector('.wb .wb-coordinate');
   const $lineCounter = node.querySelector('.wb .wb-linecount');
   const $indentation = node.querySelector('.wb .wb-indentation');
@@ -565,18 +568,18 @@ function WarrenBuf(node,
       if (i < Viewport.lines.length) { // TODO: this can be removed if selection is constrained to source content
         const content = Viewport.lines[i];
         if(content.length > 0 ) {
-          $selections[i].style.width = `${content.length}ch`;
+          $selections[i].style.width = content.length+'ch';
         } else {
           // For empty line, we still render 1 character selection
-          $selections[i].style.width = `1ch`;
+          $selections[i].style.width = '1ch';
         }
       }
     }
 
     // Render the leading and tailing selection line
-    $selections[firstEdge.row].style.left = `${firstEdge.col}ch`;
+    $selections[firstEdge.row].style.left = firstEdge.col+'ch';
     if (secondEdge.row === firstEdge.row) {
-      $selections[firstEdge.row].style.width = `${secondEdge.col - firstEdge.col + 1 }ch`;
+      $selections[firstEdge.row].style.width = secondEdge.col - firstEdge.col + 1 +'ch';
       $selections[firstEdge.row].style.visibility = 'visible';
     } else {
       if(firstEdge.row < Viewport.lines.length) { // TODO: this can be removed if selection is constrained to source content
@@ -585,7 +588,7 @@ function WarrenBuf(node,
         // There is edge case where text.length - firstEdge.col is 0. Namely, if the selection started
         // on the last cursor position, menaing the cursor is between the last char and new line.
         // We want to render 1 char to represent this new line.
-        $selections[firstEdge.row].style.width = `${Math.max(1, text.length - firstEdge.col)}ch`;
+        $selections[firstEdge.row].style.width = Math.max(1, text.length - firstEdge.col)+'ch';
         $selections[firstEdge.row].style.visibility = 'visible';
       }
       if(secondEdge.row < Viewport.lines.length) {
@@ -593,7 +596,7 @@ function WarrenBuf(node,
         if(secondEdge.col >= text.length) {
           console.warn(`secondEdge's column ${secondEdge.col} is too far beyond the text with length: `, text.length);
         }
-        $selections[secondEdge.row].style.width = `${Math.min(secondEdge.col + 1, text.length)}ch`;
+        $selections[secondEdge.row].style.width = Math.min(secondEdge.col + 1, text.length)+'ch';
         $selections[secondEdge.row].style.visibility = 'visible';
       }
     }
