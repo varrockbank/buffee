@@ -784,3 +784,135 @@ runner.describe('Multi-line selections', () => {
     expect(end).toEqual({ row: 4, col: 8 });
   }, "Select from middle down 4 rows then right 3 columns");
 });
+
+// Deleting selections with Backspace
+runner.describe('Deleting selections', () => {
+  let wb, node;
+
+  runner.beforeEach(() => {
+    const editor = createTestEditor();
+    wb = editor.wb;
+    node = editor.node;
+  });
+
+  runner.it('should delete single line selection with Backspace', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Start at col 0
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 1
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 2
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 3
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 4
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 5
+
+    dispatchKey(node, 'Backspace');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('World');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 0 });
+  }, "Delete 'Hello ' from 'Hello World'");
+
+  runner.it('should delete entire line with Backspace', () => {
+    type(node, 'Delete me');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Select all
+
+    dispatchKey(node, 'Backspace');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 0 });
+  }, "Delete entire line");
+
+  runner.it('should delete multi-line selection with Backspace', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Third line');
+
+    // Select from beginning of first to col 0 of third (includes 'T')
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    dispatchKey(node, 'ArrowDown', { shift: true });
+    dispatchKey(node, 'ArrowDown', { shift: true });
+
+    dispatchKey(node, 'Backspace');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines).toHaveLength(1);
+    expect(wb.Model.lines[0]).toBe('hird line');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 0 });
+  }, "Delete two full lines plus first character");
+
+  runner.it('should delete partial multi-line selection with Backspace', () => {
+    type(node, 'First line here');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line here');
+    dispatchKey(node, 'Enter');
+    type(node, 'Third line here');
+
+    // Select from middle of first (col 6) to middle of third (col 6)
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    for (let i = 0; i < 6; i++) dispatchKey(node, 'ArrowRight');
+    dispatchKey(node, 'ArrowDown', { shift: true });
+    dispatchKey(node, 'ArrowDown', { shift: true });
+
+    dispatchKey(node, 'Backspace');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines).toHaveLength(1);
+    expect(wb.Model.lines[0]).toBe('First ine here');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 6 });
+    expect(end).toEqual({ row: 0, col: 6 });
+  }, "Delete partial multi-line selection");
+
+  runner.it('should delete from middle to end across lines with Backspace', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line');
+
+    // Select from middle of first line to end of second
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    for (let i = 0; i < 6; i++) dispatchKey(node, 'ArrowRight');
+    dispatchKey(node, 'ArrowDown', { shift: true });
+    dispatchKey(node, 'ArrowRight', { shift: true, meta: true });
+
+    dispatchKey(node, 'Backspace');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines).toHaveLength(1);
+    expect(wb.Model.lines[0]).toBe('First ');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 6 });
+    expect(end).toEqual({ row: 0, col: 6 });
+  }, "Delete from middle to end across lines");
+
+  runner.it('should delete backward selection with Backspace', () => {
+    type(node, 'Hello World');
+    // Select backward from col 11 to col 6
+    dispatchKey(node, 'ArrowLeft', { shift: true });
+    dispatchKey(node, 'ArrowLeft', { shift: true });
+    dispatchKey(node, 'ArrowLeft', { shift: true });
+    dispatchKey(node, 'ArrowLeft', { shift: true });
+    dispatchKey(node, 'ArrowLeft', { shift: true });
+
+    dispatchKey(node, 'Backspace');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('Hello ');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 6 });
+    expect(end).toEqual({ row: 0, col: 6 });
+  }, "Delete backward selection");
+});
