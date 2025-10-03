@@ -314,3 +314,64 @@ runner.describe('Selection', () => {
     expect(tail).toEqual({ row: 0, col: 5 });
   }, "Extend selection with multiple Shift+Arrow");
 });
+
+// Cursor movement between lines of varying length
+runner.describe('Cursor movement - varying line lengths', () => {
+  let wb, node;
+
+  runner.beforeEach(() => {
+    const editor = createTestEditor();
+    wb = editor.wb;
+    node = editor.node;
+  });
+
+  runner.it('should preserve column when moving from long to short line', () => {
+    type(node, 'Short');
+    dispatchKey(node, 'Enter');
+    type(node, 'Much longer line');
+    dispatchKey(node, 'ArrowUp');
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 5 });
+    expect(tail).toEqual({ row: 0, col: 5 });
+  }, "Long to short: cursor at end of short line");
+
+  runner.it('should restore column when moving back to long line', () => {
+    type(node, 'Short');
+    dispatchKey(node, 'Enter');
+    type(node, 'Much longer line');
+    // Assert cursor position after typing
+    let [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 1, col: 16 }); // One past last char
+    expect(tail).toEqual({ row: 1, col: 16 });
+
+    dispatchKey(node, 'ArrowUp');  // Move to "Short", col clamped to 5
+    dispatchKey(node, 'ArrowDown'); // Move back to "Much longer line"
+    [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 1, col: 16 }); // Should restore to col 16
+    expect(tail).toEqual({ row: 1, col: 16 });
+  }, "Should restore original column when moving back");
+
+  runner.it('should clamp column to line end on shorter line', () => {
+    type(node, 'A');
+    dispatchKey(node, 'Enter');
+    type(node, 'Very long line here');
+    dispatchKey(node, 'ArrowUp');
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 1 }); // Clamped to end of "A"
+    expect(tail).toEqual({ row: 0, col: 1 });
+  }, "Clamp to shorter line end");
+
+  runner.it('should handle moving through multiple lines of varying length', () => {
+    type(node, 'Line one');
+    dispatchKey(node, 'Enter');
+    type(node, 'Two');
+    dispatchKey(node, 'Enter');
+    type(node, 'Line three is longest');
+    // Cursor at (2, 20)
+    dispatchKey(node, 'ArrowUp'); // to "Two", clamped to (1, 3)
+    dispatchKey(node, 'ArrowUp'); // to "Line one", should restore toward original col
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 8 }); // End of "Line one"
+    expect(tail).toEqual({ row: 0, col: 8 });
+  }, "Multiple lines with varying lengths");
+});
