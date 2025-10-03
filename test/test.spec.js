@@ -48,6 +48,12 @@ function type(node, text) {
   }
 }
 
+function repeatKey(node, key, count, modifiers = {}) {
+  for (let i = 0; i < count; i++) {
+    dispatchKey(node, key, modifiers);
+  }
+}
+
 // Test definitions
 const runner = new TestRunner();
 
@@ -106,16 +112,13 @@ runner.describe('Backspace', () => {
 
   runner.it('should delete multiple characters', () => {
     type(node, 'Hello');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
+    repeatKey(node, 'Backspace', 3);
     expect(wb.Model.lines[0]).toBe('He');
   }, "Delete 3 chars from 'Hello' → 'He'");
 
   runner.it('should delete all characters', () => {
     type(node, 'Hi');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
+    repeatKey(node, 'Backspace', 2);
     expect(wb.Model.lines[0]).toBe('');
   }, "Delete all chars from 'Hi' → ''");
 });
@@ -173,8 +176,7 @@ runner.describe('Complex Sequences', () => {
 
   runner.it('should type, delete, and retype', () => {
     type(node, 'Hello');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
+    repeatKey(node, 'Backspace', 2);
     type(node, 'y there');
     expect(wb.Model.lines[0]).toBe('Hely there');
   }, "Type, delete, retype");
@@ -183,12 +185,7 @@ runner.describe('Complex Sequences', () => {
     type(node, 'Hello');
     dispatchKey(node, 'Enter');
     type(node, 'World');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
-    dispatchKey(node, 'Backspace');
+    repeatKey(node, 'Backspace', 6);
     expect(wb.Model.lines).toHaveLength(1);
     expect(wb.Model.lines[0]).toBe('Hello');
   }, "Create/delete line breaks");
@@ -303,11 +300,7 @@ runner.describe('Selection', () => {
   runner.it('should extend selection with multiple Shift+Arrow', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Start
-    dispatchKey(node, 'ArrowRight', { shift: true }); // H
-    dispatchKey(node, 'ArrowRight', { shift: true }); // He
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Hel
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Hell
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Hello
+    repeatKey(node, 'ArrowRight', 5, { shift: true }); // Select "Hello"
     expect(wb.Selection.isSelection).toBe(true);
     const [firstEdge, SecondEdge] = wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 0 });
@@ -405,9 +398,7 @@ runner.describe('Meta+Arrow navigation', () => {
 
   runner.it('should move to start of line from middle', () => {
     type(node, 'Hello World');
-    dispatchKey(node, 'ArrowLeft'); // Move back one
-    dispatchKey(node, 'ArrowLeft');
-    dispatchKey(node, 'ArrowLeft');
+    repeatKey(node, 'ArrowLeft', 3);
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Jump to start
     const [firstEdge, SecondEdge] = wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 0 });
@@ -472,9 +463,7 @@ runner.describe('Shift+Meta+Arrow selection', () => {
 
   runner.it('should select from middle to end', () => {
     type(node, 'Hello World');
-    dispatchKey(node, 'ArrowLeft'); // Back 1
-    dispatchKey(node, 'ArrowLeft'); // Back 2
-    dispatchKey(node, 'ArrowLeft'); // Back 3 (at 'o')
+    repeatKey(node, 'ArrowLeft', 3); // Back 3 (at col 8)
     dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Select to end
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -484,9 +473,7 @@ runner.describe('Shift+Meta+Arrow selection', () => {
 
   runner.it('should select from middle to start', () => {
     type(node, 'Hello World');
-    dispatchKey(node, 'ArrowLeft'); // Back 1
-    dispatchKey(node, 'ArrowLeft'); // Back 2
-    dispatchKey(node, 'ArrowLeft'); // Back 3 (at col 8)
+    repeatKey(node, 'ArrowLeft', 3); // Back 3 (at col 8)
     dispatchKey(node, 'ArrowLeft', { shift: true, meta: true }); // Select to start
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -508,8 +495,7 @@ runner.describe('Shift+Meta+Arrow selection', () => {
   runner.it('should extend existing selection with Shift+Meta+Right', () => {
     type(node, 'Hello World Here');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // To start
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select 'H'
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select 'He'
+    repeatKey(node, 'ArrowRight', 2, { shift: true }); // Select 'He'
     dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Extend to end
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -538,16 +524,9 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Fourth line here');
 
     // Move to middle of first line (col 6, after "First ")
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 3);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
+    repeatKey(node, 'ArrowRight', 6);
 
     // Select down to third line, middle (col 6)
     dispatchKey(node, 'ArrowDown', { shift: true });
@@ -567,13 +546,11 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Third line here');
 
     // Move to beginning of first line
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowLeft', { meta: true });
 
     // Select to end of third line
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
     dispatchKey(node, 'ArrowRight', { shift: true, meta: true });
 
     expect(wb.Selection.isSelection).toBe(true);
@@ -590,13 +567,11 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Third line here');
 
     // Move to end of first line
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowRight', { meta: true });
 
     // Select down to middle of third line
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
 
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -612,19 +587,12 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Third line here');
 
     // Move to middle of first line (col 6)
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
+    repeatKey(node, 'ArrowRight', 6);
 
     // Select to beginning of third line
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
     dispatchKey(node, 'ArrowLeft', { shift: true, meta: true });
 
     expect(wb.Selection.isSelection).toBe(true);
@@ -641,8 +609,7 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Third');
 
     // Move to last character 't' of first line (col 4)
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowRight', { meta: true });
     dispatchKey(node, 'ArrowLeft');
 
@@ -670,18 +637,11 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Line 6');
 
     // Move to beginning of first line
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 5);
     dispatchKey(node, 'ArrowLeft', { meta: true });
 
     // Select down 4 rows
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 4, { shift: true });
 
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -699,9 +659,7 @@ runner.describe('Multi-line selections', () => {
     dispatchKey(node, 'ArrowLeft', { meta: true });
 
     // Select right 3 columns
-    dispatchKey(node, 'ArrowRight', { shift: true });
-    dispatchKey(node, 'ArrowRight', { shift: true });
-    dispatchKey(node, 'ArrowRight', { shift: true });
+    repeatKey(node, 'ArrowRight', 3, { shift: true });
 
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -721,22 +679,14 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Line 5 with more text');
 
     // Move to beginning of first line
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 4);
     dispatchKey(node, 'ArrowLeft', { meta: true });
 
     // Select down 4 rows
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 4, { shift: true });
 
     // Then right 3 columns
-    dispatchKey(node, 'ArrowRight', { shift: true });
-    dispatchKey(node, 'ArrowRight', { shift: true });
-    dispatchKey(node, 'ArrowRight', { shift: true });
+    repeatKey(node, 'ArrowRight', 3, { shift: true });
 
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -756,27 +706,15 @@ runner.describe('Multi-line selections', () => {
     type(node, 'Line 5 with more text');
 
     // Move to col 5 of first line (after "Line ")
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 4);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowRight');
+    repeatKey(node, 'ArrowRight', 5);
 
     // Select down 4 rows
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 4, { shift: true });
 
     // Then right 3 columns
-    dispatchKey(node, 'ArrowRight', { shift: true });
-    dispatchKey(node, 'ArrowRight', { shift: true });
-    dispatchKey(node, 'ArrowRight', { shift: true });
+    repeatKey(node, 'ArrowRight', 3, { shift: true });
 
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -798,11 +736,7 @@ runner.describe('Deleting selections', () => {
   runner.it('should delete single line selection with Backspace', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Start at col 0
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 1
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 2
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 3
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 4
-    dispatchKey(node, 'ArrowRight', { shift: true }); // Select to col 5
+    repeatKey(node, 'ArrowRight', 5, { shift: true }); // Select to col 5
 
     dispatchKey(node, 'Backspace');
 
@@ -835,11 +769,9 @@ runner.describe('Deleting selections', () => {
     type(node, 'Third line');
 
     // Select from beginning of first to col 0 of third (includes 'T')
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
 
     dispatchKey(node, 'Backspace');
 
@@ -859,12 +791,10 @@ runner.describe('Deleting selections', () => {
     type(node, 'Third line here');
 
     // Select from middle of first (col 6) to middle of third (col 6)
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    for (let i = 0; i < 6; i++) dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowRight', 6);
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
 
     dispatchKey(node, 'Backspace');
 
@@ -884,7 +814,7 @@ runner.describe('Deleting selections', () => {
     // Select from middle of first line to end of second
     dispatchKey(node, 'ArrowUp');
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    for (let i = 0; i < 6; i++) dispatchKey(node, 'ArrowRight');
+    repeatKey(node, 'ArrowRight', 6);
     dispatchKey(node, 'ArrowDown', { shift: true });
     dispatchKey(node, 'ArrowRight', { shift: true, meta: true });
 
@@ -901,11 +831,7 @@ runner.describe('Deleting selections', () => {
   runner.it('should delete backward selection with Backspace', () => {
     type(node, 'Hello World');
     // Select backward from col 11 to col 6
-    dispatchKey(node, 'ArrowLeft', { shift: true });
-    dispatchKey(node, 'ArrowLeft', { shift: true });
-    dispatchKey(node, 'ArrowLeft', { shift: true });
-    dispatchKey(node, 'ArrowLeft', { shift: true });
-    dispatchKey(node, 'ArrowLeft', { shift: true });
+    repeatKey(node, 'ArrowLeft', 5, { shift: true });
 
     dispatchKey(node, 'Backspace');
 
@@ -931,7 +857,7 @@ runner.describe('Replacing selections', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true });
     // Select "Hello " (6 characters, positions 0-5)
-    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight', { shift: true });
+    repeatKey(node, 'ArrowRight', 5, { shift: true });
 
     type(node, 'X');
 
@@ -946,7 +872,7 @@ runner.describe('Replacing selections', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true });
     // Select "Hello " (6 characters, positions 0-5)
-    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight', { shift: true });
+    repeatKey(node, 'ArrowRight', 5, { shift: true });
 
     type(node, 'Goodbye');
 
@@ -979,11 +905,9 @@ runner.describe('Replacing selections', () => {
     type(node, 'Third line');
 
     // Select from start of first to start of third
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
 
     type(node, 'X');
 
@@ -1003,12 +927,10 @@ runner.describe('Replacing selections', () => {
     type(node, 'Third line');
 
     // Select from middle of first (col 6) to middle of third (col 6)
-    dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowUp');
+    repeatKey(node, 'ArrowUp', 2);
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    for (let i = 0; i < 6; i++) dispatchKey(node, 'ArrowRight');
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowRight', 6);
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
 
     type(node, 'REPLACED');
 
@@ -1023,7 +945,7 @@ runner.describe('Replacing selections', () => {
   runner.it('should replace backward selection with typed text', () => {
     type(node, 'Hello World');
     // Select "World" backward
-    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowLeft', { shift: true });
+    repeatKey(node, 'ArrowLeft', 5, { shift: true });
 
     type(node, 'Everyone');
 
@@ -1037,8 +959,8 @@ runner.describe('Replacing selections', () => {
   runner.it('should replace selection with space', () => {
     type(node, 'HelloWorld');
     dispatchKey(node, 'ArrowLeft', { meta: true });
-    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight');
-    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight', { shift: true });
+    repeatKey(node, 'ArrowRight', 5);
+    repeatKey(node, 'ArrowRight', 5, { shift: true });
 
     dispatchKey(node, ' ');
 
