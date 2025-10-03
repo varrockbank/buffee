@@ -182,7 +182,7 @@ function WarrenBuf(node,
     moveCursorEndOfLine() {
       const row = tail.row;
       const realRow = Viewport.start + row;
-      maxCol = tail.col = Model.lines[realRow].length - (this.isSelection ? 1 : 0);
+      maxCol = tail.col = Model.lines[realRow].length;
       render(true);
     },
     // Inserts list of string lines into the selection

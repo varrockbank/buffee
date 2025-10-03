@@ -375,3 +375,145 @@ runner.describe('Cursor movement - varying line lengths', () => {
     expect(tail).toEqual({ row: 0, col: 8 });
   }, "Multiple lines with varying lengths");
 });
+
+// Meta+Arrow navigation (Cmd/Ctrl+Left/Right)
+runner.describe('Meta+Arrow navigation', () => {
+  let wb, node;
+
+  runner.beforeEach(() => {
+    const editor = createTestEditor();
+    wb = editor.wb;
+    node = editor.node;
+  });
+
+  runner.it('should move to end of line with Meta+Right', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
+    dispatchKey(node, 'ArrowRight', { meta: true }); // Move to end
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 11 });
+    expect(tail).toEqual({ row: 0, col: 11 });
+  }, "Meta+Right moves to end of line");
+
+  runner.it('should move to start of line with Meta+Left', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 0 });
+    expect(tail).toEqual({ row: 0, col: 0 });
+  }, "Meta+Left moves to start of line");
+
+  runner.it('should move to start of line from middle', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft'); // Move back one
+    dispatchKey(node, 'ArrowLeft');
+    dispatchKey(node, 'ArrowLeft');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Jump to start
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 0 });
+    expect(tail).toEqual({ row: 0, col: 0 });
+  }, "Meta+Left from middle of line");
+
+  runner.it('should work on multi-line document', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line here');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Start of line 2
+    let [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 1, col: 0 });
+    expect(tail).toEqual({ row: 1, col: 0 });
+
+    dispatchKey(node, 'ArrowRight', { meta: true }); // End of line 2
+    [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 1, col: 16 });
+    expect(tail).toEqual({ row: 1, col: 16 });
+  }, "Meta+Left/Right on second line");
+
+  runner.it('should work when navigating between lines', () => {
+    type(node, 'Short');
+    dispatchKey(node, 'Enter');
+    type(node, 'Much longer line');
+    dispatchKey(node, 'ArrowUp'); // Move to line 1
+    dispatchKey(node, 'ArrowRight', { meta: true }); // End of line 1
+    const [head, tail] = wb.Selection.ordered;
+    expect(head).toEqual({ row: 0, col: 5 });
+    expect(tail).toEqual({ row: 0, col: 5 });
+  }, "Meta+Right after moving between lines");
+});
+
+// Shift+Meta+Arrow selection
+runner.describe('Shift+Meta+Arrow selection', () => {
+  let wb, node;
+
+  runner.beforeEach(() => {
+    const editor = createTestEditor();
+    wb = editor.wb;
+    node = editor.node;
+  });
+
+  runner.it('should select to end of line with Shift+Meta+Right', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
+    dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Select to end
+    expect(wb.Selection.isSelection).toBe(true);
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 11 });
+  }, "Shift+Meta+Right selects to end of line");
+
+  runner.it('should select to start of line with Shift+Meta+Left', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { shift: true, meta: true }); // Select to start
+    expect(wb.Selection.isSelection).toBe(true);
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 11 });
+  }, "Shift+Meta+Left selects to start of line");
+
+  runner.it('should select from middle to end', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft'); // Back 1
+    dispatchKey(node, 'ArrowLeft'); // Back 2
+    dispatchKey(node, 'ArrowLeft'); // Back 3 (at 'o')
+    dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Select to end
+    expect(wb.Selection.isSelection).toBe(true);
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 8 });
+    expect(end).toEqual({ row: 0, col: 11 });
+  }, "Shift+Meta+Right from middle selects to end");
+
+  runner.it('should select from middle to start', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft'); // Back 1
+    dispatchKey(node, 'ArrowLeft'); // Back 2
+    dispatchKey(node, 'ArrowLeft'); // Back 3 (at col 8)
+    dispatchKey(node, 'ArrowLeft', { shift: true, meta: true }); // Select to start
+    expect(wb.Selection.isSelection).toBe(true);
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 8 });
+  }, "Shift+Meta+Left from middle selects to start");
+
+  runner.it('should select on second line of multi-line document', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line here');
+    dispatchKey(node, 'ArrowLeft', { shift: true, meta: true }); // Select to start of line 2
+    expect(wb.Selection.isSelection).toBe(true);
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 1, col: 0 });
+    expect(end).toEqual({ row: 1, col: 16 });
+  }, "Shift+Meta+Left on second line");
+
+  runner.it('should extend existing selection with Shift+Meta+Right', () => {
+    type(node, 'Hello World Here');
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // To start
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select 'H'
+    dispatchKey(node, 'ArrowRight', { shift: true }); // Select 'He'
+    dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Extend to end
+    expect(wb.Selection.isSelection).toBe(true);
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 0 });
+    expect(end).toEqual({ row: 0, col: 16 });
+  }, "Extend selection to end with Shift+Meta+Right");
+});

@@ -2,3 +2,7 @@
 
 - At last character of last last line. Behaviors such as move next row, move next col should add new line to buffer
 - tab character messes up the rendering
+
+* Rendering improvements
+
+- When on the last position of the last line of a selection, render the cursor position with a different color. Vim uses one color for the selection and a special color for the actual cursor.
