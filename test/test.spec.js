@@ -916,3 +916,136 @@ runner.describe('Deleting selections', () => {
     expect(end).toEqual({ row: 0, col: 6 });
   }, "Delete backward selection");
 });
+
+// Replacing selections by typing
+runner.describe('Replacing selections', () => {
+  let wb, node;
+
+  runner.beforeEach(() => {
+    const editor = createTestEditor();
+    wb = editor.wb;
+    node = editor.node;
+  });
+
+  runner.it('should replace single line selection with typed character', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    // Select "Hello " (6 characters, positions 0-5)
+    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight', { shift: true });
+
+    type(node, 'X');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('XWorld');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 1 });
+    expect(end).toEqual({ row: 0, col: 1 });
+  }, "Replace 'Hello ' with 'X'");
+
+  runner.it('should replace selection with multiple characters', () => {
+    type(node, 'Hello World');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    // Select "Hello " (6 characters, positions 0-5)
+    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight', { shift: true });
+
+    type(node, 'Goodbye');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('GoodbyeWorld');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 7 });
+    expect(end).toEqual({ row: 0, col: 7 });
+  }, "Replace 'Hello ' with 'Goodbye'");
+
+  runner.it('should replace entire line with typed text', () => {
+    type(node, 'Old text');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    dispatchKey(node, 'ArrowRight', { shift: true, meta: true });
+
+    type(node, 'New');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('New');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 3 });
+    expect(end).toEqual({ row: 0, col: 3 });
+  }, "Replace entire line");
+
+  runner.it('should replace multi-line selection with single character', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Third line');
+
+    // Select from start of first to start of third
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    dispatchKey(node, 'ArrowDown', { shift: true });
+    dispatchKey(node, 'ArrowDown', { shift: true });
+
+    type(node, 'X');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines).toHaveLength(1);
+    expect(wb.Model.lines[0]).toBe('Xhird line');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 1 });
+    expect(end).toEqual({ row: 0, col: 1 });
+  }, "Replace multi-line selection with 'X'");
+
+  runner.it('should replace multi-line selection with multiple characters', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Third line');
+
+    // Select from middle of first (col 6) to middle of third (col 6)
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    for (let i = 0; i < 6; i++) dispatchKey(node, 'ArrowRight');
+    dispatchKey(node, 'ArrowDown', { shift: true });
+    dispatchKey(node, 'ArrowDown', { shift: true });
+
+    type(node, 'REPLACED');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines).toHaveLength(1);
+    expect(wb.Model.lines[0]).toBe('First REPLACEDine');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 14 });
+    expect(end).toEqual({ row: 0, col: 14 });
+  }, "Replace partial multi-line with text");
+
+  runner.it('should replace backward selection with typed text', () => {
+    type(node, 'Hello World');
+    // Select "World" backward
+    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowLeft', { shift: true });
+
+    type(node, 'Everyone');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('Hello Everyone');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 14 });
+    expect(end).toEqual({ row: 0, col: 14 });
+  }, "Replace backward selection");
+
+  runner.it('should replace selection with space', () => {
+    type(node, 'HelloWorld');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight');
+    for (let i = 0; i < 5; i++) dispatchKey(node, 'ArrowRight', { shift: true });
+
+    dispatchKey(node, ' ');
+
+    expect(wb.Selection.isSelection).toBe(false);
+    expect(wb.Model.lines[0]).toBe('Hello ');
+    const [start, end] = wb.Selection.ordered;
+    expect(start).toEqual({ row: 0, col: 6 });
+    expect(end).toEqual({ row: 0, col: 6 });
+  }, "Replace 'World' with space");
+});
