@@ -6,7 +6,9 @@ function WarrenBuf(node,
     editorPaddingPX = 4 ,
     indentation = 4,
     colorPrimary = "#B2B2B2",
-    colorSecondary = "#212026") {
+    colorSecondary = "#212026",
+    gutterSize = 2,
+    gutterPadding = 1) {
   this.version = "2.2.5-alpha.1";
 
   const $e = node.querySelector('.wb .wb-lines');
@@ -26,17 +28,16 @@ function WarrenBuf(node,
 
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
 
-  const $gutter = Object.assign(node.querySelector('.wb .wb-gutter'), {
-    style: `
-            font-size: ${lineHeight}px;
-            line-height: ${lineHeight}px;
-            text-align: right;
-            padding-top: ${editorPaddingPX}px;
-            padding-right: ${editorPaddingPX * 2}px;
-            background-color: ${colorSecondary};
-            color: ${colorPrimary};
-            width: ${3}ch;
-          `
+  const $gutter = node.querySelector('.wb .wb-gutter');
+  Object.assign($gutter.style, {
+    fontSize: lineHeight+'px',
+    lineHeight: lineHeight+'px',
+    textAlign: 'right',
+    paddingTop: editorPaddingPX+'px',
+    paddingRight: editorPaddingPX*2+'px',
+    backgroundColor: colorSecondary,
+    color: colorPrimary,
+    width: gutterSize+gutterPadding+'ch'
   });
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
@@ -467,9 +468,9 @@ function WarrenBuf(node,
 
     // TODO: nit: we don't reclaim and shrink the gutter if the text get smaller.
     const digitsInLargestLineNumber = Viewport.end.toString().length;
-    const shouldIncreaseSizeOfGutter = digitsInLargestLineNumber > 2;
-    if(shouldIncreaseSizeOfGutter) {
-      $gutter.style.width = `${ digitsInLargestLineNumber +  1 }ch`;
+    if(digitsInLargestLineNumber > gutterSize) {
+      gutterSize = digitsInLargestLineNumber;
+      $gutter.style.width = gutterSize + gutterPadding + 'ch';
     }
 
     $gutter.textContent = null;
