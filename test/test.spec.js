@@ -121,6 +121,35 @@ runner.describe('Backspace', () => {
     repeatKey(node, 'Backspace', 2);
     expect(wb.Model.lines[0]).toBe('');
   }, "Delete all chars from 'Hi' → ''");
+
+  runner.it('should delete from middle of line', () => {
+    type(node, 'Hello');
+    repeatKey(node, 'ArrowLeft', 2); // Position at 'l' (col 3)
+    dispatchKey(node, 'Backspace'); // Delete 'l'
+    expect(wb.Model.lines[0]).toBe('Helo');
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 2 });
+    expect(SecondEdge).toEqual({ row: 0, col: 2 });
+  }, "Delete from middle: 'Hello' → 'Helo'");
+
+  runner.it('should delete multiple characters from middle', () => {
+    type(node, 'Hello World');
+    repeatKey(node, 'ArrowLeft', 6); // Position at space (col 5)
+    repeatKey(node, 'Backspace', 2); // Delete 'lo'
+    expect(wb.Model.lines[0]).toBe('Hel World');
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 3 });
+    expect(SecondEdge).toEqual({ row: 0, col: 3 });
+  }, "Delete 2 chars from middle");
+
+  runner.it('should handle Backspace beyond line start', () => {
+    type(node, 'Hi');
+    repeatKey(node, 'Backspace', 5); // Delete 2 chars + 3 extra
+    expect(wb.Model.lines[0]).toBe('');
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 0, col: 0 });
+  }, "Backspace beyond line start");
 });
 
 // Enter/Newline Tests
@@ -162,6 +191,34 @@ runner.describe('Enter Key', () => {
     expect(wb.Model.lines[0]).toBe('Hel');
     expect(wb.Model.lines[1]).toBe('lo');
   }, "Split line: 'Hello'[ArrowLeft×2][Enter] → 'Hel' and 'lo'");
+
+  runner.it('should add new line when pressing Enter at end of file', () => {
+    type(node, 'First line');
+    dispatchKey(node, 'Enter');
+    type(node, 'Second line');
+    dispatchKey(node, 'Enter'); // At end of file
+    expect(wb.Model.lines).toHaveLength(3);
+    expect(wb.Model.lines[0]).toBe('First line');
+    expect(wb.Model.lines[1]).toBe('Second line');
+    expect(wb.Model.lines[2]).toBe('');
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 2, col: 0 });
+    expect(SecondEdge).toEqual({ row: 2, col: 0 });
+  }, "Enter at end of file creates new line");
+
+  runner.it('should create multiple empty lines from empty document', () => {
+    repeatKey(node, 'Enter', 5);
+    expect(wb.Model.lines).toHaveLength(6);
+    expect(wb.Model.lines[0]).toBe('');
+    expect(wb.Model.lines[1]).toBe('');
+    expect(wb.Model.lines[2]).toBe('');
+    expect(wb.Model.lines[3]).toBe('');
+    expect(wb.Model.lines[4]).toBe('');
+    expect(wb.Model.lines[5]).toBe('');
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 5, col: 0 });
+    expect(SecondEdge).toEqual({ row: 5, col: 0 });
+  }, "Create multiple empty lines from empty document");
 });
 
 // Complex Sequences
@@ -195,7 +252,6 @@ runner.describe('Complex Sequences', () => {
     dispatchKey(node, 'Enter');
     type(node, 'Second');
     dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowRight', { meta: true });
     type(node, ' Line');
     expect(wb.Model.lines[0]).toBe('First Line');
     expect(wb.Model.lines[1]).toBe('Second');
@@ -217,20 +273,35 @@ runner.describe('Complex Sequences', () => {
     expect(SecondEdge).toEqual({ row: 0, col: 5 });
   }, "Delete across boundaries");
 
-  runner.it('should create paragraph and edit middle', () => {
+  runner.it('should create paragraph and edit at end of middle line', () => {
     type(node, 'Line 1');
     dispatchKey(node, 'Enter');
     type(node, 'Line 2');
     dispatchKey(node, 'Enter');
     type(node, 'Line 3');
     dispatchKey(node, 'ArrowUp');
-    dispatchKey(node, 'ArrowRight', { meta: true });
     type(node, ' edited');
     expect(wb.Model.lines).toHaveLength(3);
     expect(wb.Model.lines[0]).toBe('Line 1');
     expect(wb.Model.lines[1]).toBe('Line 2 edited');
     expect(wb.Model.lines[2]).toBe('Line 3');
-  }, "Edit middle of paragraph");
+  }, "Edit at end of middle line");
+
+  runner.it('should create paragraph and edit at middle of middle line', () => {
+    type(node, 'Line 1');
+    dispatchKey(node, 'Enter');
+    type(node, 'Line 2');
+    dispatchKey(node, 'Enter');
+    type(node, 'Line 3');
+    dispatchKey(node, 'ArrowUp');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    repeatKey(node, 'ArrowRight', 3);
+    type(node, 'X');
+    expect(wb.Model.lines).toHaveLength(3);
+    expect(wb.Model.lines[0]).toBe('Line 1');
+    expect(wb.Model.lines[1]).toBe('LinXe 2');
+    expect(wb.Model.lines[2]).toBe('Line 3');
+  }, "Edit at middle of middle line");
 });
 
 // Selection Tests
@@ -367,6 +438,67 @@ runner.describe('Cursor movement - varying line lengths', () => {
     expect(firstEdge).toEqual({ row: 0, col: 8 }); // End of "Line one"
     expect(SecondEdge).toEqual({ row: 0, col: 8 });
   }, "Multiple lines with varying lengths");
+
+  runner.it('should move from middle of long line to end of shorter line', () => {
+    type(node, 'Short');
+    dispatchKey(node, 'Enter');
+    type(node, 'This is a much longer line');
+    dispatchKey(node, 'ArrowLeft', { meta: true });
+    repeatKey(node, 'ArrowRight', 10); // Position at middle of long line (col 10)
+    dispatchKey(node, 'ArrowUp'); // Move to "Short", should clamp to end (col 5)
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 }); // Clamped to end of "Short"
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
+  }, "Move from middle of long line to end of short line");
+
+  runner.it('should navigate between three lines: short, medium, long', () => {
+    type(node, 'Short'); // Length 5
+    dispatchKey(node, 'Enter');
+    type(node, 'Medium!!'); // Length 8
+    dispatchKey(node, 'Enter');
+    type(node, 'Longest!!!'); // Length 10
+    // Position at start of medium line (row 1)
+    dispatchKey(node, 'ArrowUp'); // Move to medium line
+    dispatchKey(node, 'ArrowLeft', { meta: true }); // Start of medium line
+    repeatKey(node, 'ArrowRight', 8); // End of medium line (col 8)
+
+    // Move up to short line - should clamp to col 5
+    dispatchKey(node, 'ArrowUp');
+    let [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 }); // Clamped to end of "Short"
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
+
+    // Move down twice to longest line - should restore to col 8
+    dispatchKey(node, 'ArrowDown'); // Back to medium
+    dispatchKey(node, 'ArrowDown'); // To longest
+    [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 2, col: 8 }); // Middle of "Longest!!!" (col 8)
+    expect(SecondEdge).toEqual({ row: 2, col: 8 });
+  }, "Navigate from medium line to short and long lines");
+
+  runner.it('should navigate between three lines: short, medium, long (natural typing)', () => {
+    type(node, 'Short'); // Length 5
+    dispatchKey(node, 'Enter');
+    type(node, 'Medium!!'); // Length 8
+    dispatchKey(node, 'Enter');
+    type(node, 'Longest!!!'); // Length 10
+    // Cursor at end of longest line (row 2, col 10)
+    dispatchKey(node, 'ArrowUp'); // Move to medium line (row 1, col 8)
+    dispatchKey(node, 'ArrowRight', { meta: true }); // Reset maxCol from 10 to 8
+
+    // Move up to short line - should clamp to col 5
+    dispatchKey(node, 'ArrowUp');
+    let [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 5 }); // Clamped to end of "Short"
+    expect(SecondEdge).toEqual({ row: 0, col: 5 });
+
+    // Move down twice to longest line - should restore to col 8
+    dispatchKey(node, 'ArrowDown'); // Back to medium
+    dispatchKey(node, 'ArrowDown'); // To longest
+    [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 2, col: 8 }); // Middle of "Longest!!!" (col 8)
+    expect(SecondEdge).toEqual({ row: 2, col: 8 });
+  }, "Navigate from medium line to short and long lines (natural typing)");
 });
 
 // Meta+Arrow navigation (Cmd/Ctrl+Left/Right)
@@ -382,19 +514,15 @@ runner.describe('Meta+Arrow navigation', () => {
   runner.it('should move to end of line with Meta+Right', () => {
     type(node, 'Hello World');
     dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
+    let [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 0 });
+    expect(SecondEdge).toEqual({ row: 0, col: 0 });
+
     dispatchKey(node, 'ArrowRight', { meta: true }); // Move to end
-    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    [firstEdge, SecondEdge] = wb.Selection.ordered;
     expect(firstEdge).toEqual({ row: 0, col: 11 });
     expect(SecondEdge).toEqual({ row: 0, col: 11 });
   }, "Meta+Right moves to end of line");
-
-  runner.it('should move to start of line with Meta+Left', () => {
-    type(node, 'Hello World');
-    dispatchKey(node, 'ArrowLeft', { meta: true }); // Move to start
-    const [firstEdge, SecondEdge] = wb.Selection.ordered;
-    expect(firstEdge).toEqual({ row: 0, col: 0 });
-    expect(SecondEdge).toEqual({ row: 0, col: 0 });
-  }, "Meta+Left moves to start of line");
 
   runner.it('should move to start of line from middle', () => {
     type(node, 'Hello World');
@@ -404,6 +532,15 @@ runner.describe('Meta+Arrow navigation', () => {
     expect(firstEdge).toEqual({ row: 0, col: 0 });
     expect(SecondEdge).toEqual({ row: 0, col: 0 });
   }, "Meta+Left from middle of line");
+
+  runner.it('should move to end of line from middle', () => {
+    type(node, 'Hello World');
+    repeatKey(node, 'ArrowLeft', 3);
+    dispatchKey(node, 'ArrowRight', { meta: true }); // Jump to end
+    const [firstEdge, SecondEdge] = wb.Selection.ordered;
+    expect(firstEdge).toEqual({ row: 0, col: 11 });
+    expect(SecondEdge).toEqual({ row: 0, col: 11 });
+  }, "Meta+Right from middle of line");
 
   runner.it('should work on multi-line document', () => {
     type(node, 'First line');
@@ -529,8 +666,7 @@ runner.describe('Multi-line selections', () => {
     repeatKey(node, 'ArrowRight', 6);
 
     // Select down to third line, middle (col 6)
-    dispatchKey(node, 'ArrowDown', { shift: true });
-    dispatchKey(node, 'ArrowDown', { shift: true });
+    repeatKey(node, 'ArrowDown', 2, { shift: true });
 
     expect(wb.Selection.isSelection).toBe(true);
     const [start, end] = wb.Selection.ordered;
@@ -610,7 +746,6 @@ runner.describe('Multi-line selections', () => {
 
     // Move to last character 't' of first line (col 4)
     repeatKey(node, 'ArrowUp', 2);
-    dispatchKey(node, 'ArrowRight', { meta: true });
     dispatchKey(node, 'ArrowLeft');
 
     // Select character and extend right (wraps to next line)
@@ -749,8 +884,7 @@ runner.describe('Deleting selections', () => {
 
   runner.it('should delete entire line with Backspace', () => {
     type(node, 'Delete me');
-    dispatchKey(node, 'ArrowLeft', { meta: true });
-    dispatchKey(node, 'ArrowRight', { shift: true, meta: true }); // Select all
+    dispatchKey(node, 'ArrowLeft', { shift: true, meta: true }); // Select all
 
     dispatchKey(node, 'Backspace');
 
