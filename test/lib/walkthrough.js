@@ -57,6 +57,24 @@ class Walkthrough {
     document.getElementById('walkthrough-test-name').textContent = test.name;
     document.getElementById('walkthrough-test-desc').textContent = test.description ? `(${test.description})` : '';
 
+    // Check for compilation errors for this test
+    const compileWarning = document.getElementById('walkthrough-compile-warning');
+    const compileWarningText = document.getElementById('walkthrough-compile-warning-text');
+    if (typeof lastCompileErrors !== 'undefined' && lastCompileErrors.length > 0) {
+      const testErrors = lastCompileErrors.filter(err =>
+        err.suite === suiteName && err.test === test.name
+      );
+      if (testErrors.length > 0) {
+        const lineText = testErrors.length === 1 ? '1 line omitted' : `${testErrors.length} lines omitted`;
+        compileWarningText.textContent = `Compilation error. ${lineText}`;
+        compileWarning.style.display = 'flex';
+      } else {
+        compileWarning.style.display = 'none';
+      }
+    } else {
+      compileWarning.style.display = 'none';
+    }
+
     // Display test code with inline step markers
     const codeView = document.getElementById('walkthrough-code-js');
 

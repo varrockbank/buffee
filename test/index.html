@@ -282,6 +282,174 @@
             padding: 1rem;
         }
 
+        /* Error warning in header */
+        #error-warning {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .error-warning-text {
+            font-size: 0.85rem;
+            color: #daa520;
+            font-weight: 600;
+        }
+
+        .error-details-btn {
+            background-color: #daa520;
+            color: #1e1e1e;
+            border: none;
+            border-radius: 3px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .error-details-btn:hover {
+            background-color: #c99000;
+        }
+
+        /* Test error banner */
+        .test-error-banner {
+            background-color: #3a2e1e;
+            border: 2px solid #daa520;
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .test-error-banner .warning-icon {
+            font-size: 1.5rem;
+            color: #daa520;
+        }
+
+        .test-error-banner #test-error-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #daa520;
+            flex: 1;
+        }
+
+        .test-error-banner .error-details-btn {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+
+        /* Yellow border for JS output when errors exist */
+        #js-output.has-errors {
+            border: 3px solid #daa520;
+        }
+
+        /* Modal styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .compile-errors-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            background: #1e1e1e;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .compile-errors-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            background: #2d2d30;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f44336;
+            font-weight: bold;
+            color: #f44336;
+        }
+
+        .modal-close {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .modal-close:hover {
+            background: #d32f2f;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .error-item {
+            background-color: #2d2d30;
+            border-left: 3px solid #f44336;
+            padding: 0.75rem;
+            margin: 0.75rem 0;
+            border-radius: 3px;
+        }
+
+        .error-location {
+            font-size: 0.9rem;
+            color: #4EC9B0;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .error-code {
+            font-family: 'Courier New', monospace;
+            background-color: #1e1e1e;
+            padding: 0.5rem;
+            border-radius: 3px;
+            margin: 0.5rem 0;
+            color: #f48771;
+            border: 1px solid #3e3e42;
+        }
+
+        .error-message {
+            font-size: 0.9rem;
+            color: #d4d4d4;
+            margin-top: 0.5rem;
+        }
+
         /* Test runner styles */
         .test-suite {
             margin-bottom: 20px;
@@ -324,6 +492,16 @@
             border-left: 3px solid #757575;
             opacity: 0.6;
         }
+        .test-case.has-compile-error {
+            border: 2px solid #daa520;
+            border-left: 3px solid #daa520;
+        }
+        .test-case.pass.has-compile-error {
+            border-left-color: #4CAF50;
+        }
+        .test-case.fail.has-compile-error {
+            border-left-color: #f44336;
+        }
         .test-icon {
             margin-right: 12px;
             font-weight: bold;
@@ -331,6 +509,11 @@
         .test-icon.pass { color: #4CAF50; }
         .test-icon.fail { color: #f44336; }
         .test-icon.skipped { color: #757575; }
+        .compile-error-icon {
+            color: #daa520;
+            font-weight: bold;
+            margin-left: 4px;
+        }
         .test-message {
             flex: 1;
         }
@@ -681,6 +864,26 @@
             border-bottom-color: #4EC9B0;
         }
 
+        .walkthrough-compile-warning {
+            background-color: #3a2e1e;
+            border-bottom: 2px solid #daa520;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .walkthrough-compile-warning .warning-icon {
+            font-size: 1rem;
+            color: #daa520;
+        }
+
+        .walkthrough-compile-warning #walkthrough-compile-warning-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #daa520;
+        }
+
         @media (max-width: 1300px) {
             .walkthrough-panel.active {
                 width: calc(100vw - 100px);
@@ -699,6 +902,11 @@
     </div>
     <div id="tab-tests" class="tab-content active">
         <main>
+            <div id="test-error-warning" class="test-error-banner" style="display: none;">
+                <span class="warning-icon">⚠</span>
+                <span id="test-error-text">Compilation errors. Some tests may have lines omitted</span>
+                <button id="test-error-details-btn" class="error-details-btn">Details</button>
+            </div>
             <div class="summary">
                 <div class="summary-item">
                     <div class="summary-number" id="total-tests">0</div>
@@ -711,6 +919,10 @@
                 <div class="summary-item">
                     <div class="summary-number" style="color: #f44336" id="failed-tests">0</div>
                     <div class="summary-label">Failed</div>
+                </div>
+                <div class="summary-item" id="compile-errors-summary" style="display: none;">
+                    <div class="summary-number" style="color: #daa520" id="compile-error-tests">0</div>
+                    <div class="summary-label">Compile Errors</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-number" style="color: #757575" id="skipped-tests">0</div>
@@ -759,6 +971,10 @@
             <div class="pane">
                 <div class="pane-header">
                     <span>Generated JavaScript</span>
+                    <div id="error-warning" style="display: none;">
+                        <span class="error-warning-text"></span>
+                        <button id="error-details-btn" class="error-details-btn">Details</button>
+                    </div>
                 </div>
                 <div class="pane-content">
                     <div id="js-output"></div>
@@ -800,6 +1016,16 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
         </main>
     </div>
 
+    <!-- Compile Errors Modal -->
+    <div id="compile-errors-backdrop" class="modal-backdrop"></div>
+    <div id="compile-errors-modal" class="compile-errors-modal">
+        <div class="modal-header">
+            <span>Compile Errors</span>
+            <button class="modal-close" onclick="closeCompileErrorsModal()">Close</button>
+        </div>
+        <div class="modal-body" id="compile-errors-content"></div>
+    </div>
+
     <!-- Walkthrough backdrop -->
     <div id="walkthrough-backdrop" class="walkthrough-backdrop"></div>
 
@@ -814,6 +1040,10 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
         </div>
         <div class="walkthrough-body">
             <div class="walkthrough-left">
+                <div id="walkthrough-compile-warning" class="walkthrough-compile-warning" style="display: none;">
+                    <span class="warning-icon">⚠</span>
+                    <span id="walkthrough-compile-warning-text">Compiled with errors</span>
+                </div>
                 <div style="background: #2d2d30; border-bottom: 1px solid #3e3e3e; display: flex; align-items: center;">
                     <button class="walkthrough-code-tab active" data-code-tab="js">Generated JavaScript</button>
                     <button class="walkthrough-code-tab" data-code-tab="dsl">Source DSL</button>
@@ -897,6 +1127,8 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
         let lastGeneratedSource = '';
         let testsCompiledSinceLastView = false;
+        let lastCompileHadErrors = false;
+        let lastCompileErrors = [];
 
         function updateUIState() {
             const currentSource = textarea.value;
@@ -919,23 +1151,98 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
         function transpileDSL() {
             const dslSource = textarea.value;
+            const errorWarning = document.getElementById('error-warning');
+            const errorWarningText = document.querySelector('.error-warning-text');
+            const errorsModalContent = document.getElementById('compile-errors-content');
 
             try {
-                const jsOutput = generator.generate(dslSource);
+                const result = generator.generate(dslSource);
+                const jsOutput = result.code;
+                const errors = result.errors;
+
+                // Display generated JavaScript
                 const highlighted = hljs.highlight(jsOutput, { language: 'javascript' }).value;
                 outputDiv.innerHTML = highlighted;
                 outputDiv.style.color = '';
                 outputDiv.dataset.plainJs = jsOutput; // Store plain JavaScript for eval
+
+                // Handle compile errors
+                if (errors && errors.length > 0) {
+                    lastCompileHadErrors = true;
+                    lastCompileErrors = errors;
+
+                    // Add yellow border to JS output
+                    outputDiv.classList.add('has-errors');
+
+                    // Show warning in header
+                    const errorCount = errors.length;
+                    const errorText = errorCount === 1 ? '1 error' : `${errorCount} errors`;
+                    errorWarningText.textContent = `⚠ Compiled with ${errorText}`;
+                    errorWarning.style.display = 'flex';
+
+                    // Populate modal content
+                    let errorHtml = '';
+                    errors.forEach(err => {
+                        const locationInfo = err.suite
+                            ? `Suite: ${err.suite}${err.test ? ' → Test: ' + err.test : ''}`
+                            : 'Line ' + err.line;
+                        errorHtml += `
+                            <div class="error-item">
+                                <div class="error-location">${locationInfo} (line ${err.line})</div>
+                                <div class="error-code">${err.code}</div>
+                                <div class="error-message">${err.message}</div>
+                            </div>
+                        `;
+                    });
+                    errorsModalContent.innerHTML = errorHtml;
+                } else {
+                    // No errors - clear styling
+                    lastCompileHadErrors = false;
+                    lastCompileErrors = [];
+                    outputDiv.classList.remove('has-errors');
+                    errorWarning.style.display = 'none';
+                    errorsModalContent.innerHTML = '';
+                }
+
                 lastGeneratedSource = dslSource;
                 updateUIState();
             } catch (error) {
+                lastCompileHadErrors = false;
+                lastCompileErrors = [];
                 outputDiv.textContent = `Error: ${error.message}`;
                 outputDiv.style.color = '#f48771';
                 delete outputDiv.dataset.plainJs;
+                outputDiv.classList.remove('has-errors');
+                errorWarning.style.display = 'none';
                 lastGeneratedSource = dslSource;
                 updateUIState();
             }
         }
+
+        function openCompileErrorsModal() {
+            document.getElementById('compile-errors-backdrop').classList.add('active');
+            document.getElementById('compile-errors-modal').classList.add('active');
+        }
+
+        function closeCompileErrorsModal() {
+            document.getElementById('compile-errors-backdrop').classList.remove('active');
+            document.getElementById('compile-errors-modal').classList.remove('active');
+        }
+
+        // Event listeners
+        document.getElementById('error-details-btn').addEventListener('click', openCompileErrorsModal);
+        document.getElementById('test-error-details-btn').addEventListener('click', openCompileErrorsModal);
+        document.getElementById('compile-errors-backdrop').addEventListener('click', closeCompileErrorsModal);
+
+        // ESC key to close modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('compile-errors-modal');
+                if (modal.classList.contains('active')) {
+                    closeCompileErrorsModal();
+                }
+            }
+        });
 
         async function loadDSL() {
             try {
@@ -978,6 +1285,16 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             const resultsContainer = document.getElementById('test-results');
             resultsContainer.innerHTML = '';
 
+            // Build set of tests with compilation errors
+            const testsWithCompileErrors = new Set();
+            if (lastCompileErrors && lastCompileErrors.length > 0) {
+                lastCompileErrors.forEach(err => {
+                    if (err.suite && err.test) {
+                        testsWithCompileErrors.add(`${err.suite}:${err.test}`);
+                    }
+                });
+            }
+
             runner.suites.forEach(suite => {
                 const suiteDiv = document.createElement('div');
                 suiteDiv.className = 'test-suite';
@@ -1002,15 +1319,18 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
                 suite.results.forEach((test, testIndex) => {
                     const testDiv = document.createElement('div');
-                    testDiv.className = `test-case ${test.status}`;
+                    const hasCompileError = testsWithCompileErrors.has(`${suite.name}:${test.name}`);
+                    const compileErrorClass = hasCompileError ? ' has-compile-error' : '';
+                    testDiv.className = `test-case ${test.status}${compileErrorClass}`;
 
                     const icon = test.status === 'pass' ? '✓' : test.status === 'fail' ? '✗' : '○';
+                    const compileErrorIcon = hasCompileError ? '<span class="compile-error-icon">⚠</span>' : '';
                     const walkthroughBtn = test.fixture && test.fixture.walkthrough
                         ? `<button class="walkthrough-btn" onclick="walkthrough.open('${suite.name}', ${testIndex})">Walkthrough</button>`
                         : '';
 
                     testDiv.innerHTML = `
-                        <span class="test-icon ${test.status}">${icon}</span>
+                        <span class="test-icon ${test.status}">${icon}${compileErrorIcon}</span>
                         <div class="test-message">
                             ${test.name}
                             ${test.description ? `<div class="test-description">${test.description}</div>` : ''}
@@ -1066,6 +1386,29 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 `;
 
                 renderResults(results);
+
+                // Show/hide test error warning based on compile status
+                const testErrorWarning = document.getElementById('test-error-warning');
+                const compileErrorsSummary = document.getElementById('compile-errors-summary');
+                const compileErrorTestsCount = document.getElementById('compile-error-tests');
+
+                if (lastCompileHadErrors && lastCompileErrors.length > 0) {
+                    // Count unique tests with errors (not total error count)
+                    const testsWithErrors = new Set();
+                    lastCompileErrors.forEach(err => {
+                        if (err.suite && err.test) {
+                            testsWithErrors.add(`${err.suite}:${err.test}`);
+                        }
+                    });
+
+                    const uniqueTestCount = testsWithErrors.size;
+                    compileErrorTestsCount.textContent = uniqueTestCount;
+                    compileErrorsSummary.style.display = 'flex';
+                    testErrorWarning.style.display = 'flex';
+                } else {
+                    compileErrorsSummary.style.display = 'none';
+                    testErrorWarning.style.display = 'none';
+                }
             } catch (error) {
                 const resultsContainer = document.getElementById('test-results');
                 resultsContainer.innerHTML = `<div style="padding: 20px; color: #f48771;">Error loading tests: ${error.message}</div>`;

@@ -12,6 +12,7 @@
 class SpecGenerator {
   constructor(transpiler) {
     this.transpiler = transpiler;
+    this.errors = [];
   }
 
   /**
@@ -31,9 +32,12 @@ class SpecGenerator {
   /**
    * Generate complete spec.js from DSL source
    * @param {string} dslSource - Complete DSL source
-   * @returns {string} Complete JavaScript spec file
+   * @returns {Object} { code: string, errors: Array } - Generated JavaScript and compile errors
    */
   generate(dslSource) {
+    // Clear previous errors
+    this.errors = [];
+
     const lines = dslSource.split('\n');
     const output = [];
 
@@ -143,6 +147,15 @@ class SpecGenerator {
               currentTestJsLineCount++;
             }
           } catch (error) {
+            // Store error for UI display
+            this.errors.push({
+              line: i + 1, // 1-indexed line number
+              code: trimmed,
+              message: error.message,
+              suite: currentSuite,
+              test: currentTest
+            });
+
             // Include error as comment
             output.push(`    // Error transpiling: ${trimmed}`);
             output.push(`    // ${error.message}`);
@@ -173,7 +186,10 @@ class SpecGenerator {
       output.push('');
     }
 
-    return output.join('\n');
+    return {
+      code: output.join('\n'),
+      errors: this.errors
+    };
   }
 }
 
