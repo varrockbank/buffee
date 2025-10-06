@@ -86,6 +86,16 @@ class DSLTranspiler {
       return this.transpilePRESS(cmd);
     }
 
+    // EXPECT cursor at command (case-insensitive)
+    if (cmd.toLowerCase().startsWith('expect cursor at ')) {
+      return this.transpileExpectCursorAt(cmd);
+    }
+
+    // EXPECT selection at command (case-insensitive)
+    if (cmd.toLowerCase().startsWith('expect selection at ')) {
+      return this.transpileExpectSelectionAt(cmd);
+    }
+
     // Special key commands (backspace, enter, arrow keys)
     return this.transpileSpecialKey(cmd);
   }
@@ -143,6 +153,38 @@ class DSLTranspiler {
     } else {
       return `fixture.press('${escaped}').once();`;
     }
+  }
+
+  /**
+   * Transpile EXPECT cursor at command
+   * Example: EXPECT cursor at 0,1 → expect(fixture).toHaveCursorAt(0, 1);
+   */
+  transpileExpectCursorAt(cmd) {
+    const match = cmd.match(/^expect cursor at (\d+),\s*(\d+)$/i);
+    if (!match) {
+      throw new Error(`Invalid EXPECT cursor at command: ${cmd}`);
+    }
+
+    const row = match[1];
+    const col = match[2];
+    return `expect(fixture).toHaveCursorAt(${row}, ${col});`;
+  }
+
+  /**
+   * Transpile EXPECT selection at command
+   * Example: EXPECT selection at 1,2-4,5 → expect(fixture).toHaveSelectionAt(1, 2, 4, 5);
+   */
+  transpileExpectSelectionAt(cmd) {
+    const match = cmd.match(/^expect selection at (\d+),\s*(\d+)\s*-\s*(\d+),\s*(\d+)$/i);
+    if (!match) {
+      throw new Error(`Invalid EXPECT selection at command: ${cmd}`);
+    }
+
+    const startRow = match[1];
+    const startCol = match[2];
+    const endRow = match[3];
+    const endCol = match[4];
+    return `expect(fixture).toHaveSelectionAt(${startRow}, ${startCol}, ${endRow}, ${endCol});`;
   }
 
   /**

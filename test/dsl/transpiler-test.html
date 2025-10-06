@@ -215,6 +215,62 @@ expect(fixture.wb.Selection.isSelection).toBe(true);
 fixture.type('X');
 expect(fixture.wb.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('XWorld');`
+      },
+      {
+        name: 'EXPECT cursor at command',
+        input: 'EXPECT cursor at 0,1',
+        expected: 'expect(fixture).toHaveCursorAt(0, 1);'
+      },
+      {
+        name: 'EXPECT cursor at with spaces',
+        input: 'EXPECT cursor at 2, 5',
+        expected: 'expect(fixture).toHaveCursorAt(2, 5);'
+      },
+      {
+        name: 'EXPECT cursor at in context',
+        input: `TYPE "Hello"
+EXPECT cursor at 0,5`,
+        expected: `fixture.type('Hello');
+expect(fixture).toHaveCursorAt(0, 5);`
+      },
+      {
+        name: 'EXPECT cursor at with non-numeric row (should fail)',
+        input: 'EXPECT cursor at foobar,1',
+        expectedError: 'Invalid EXPECT cursor at command: expect cursor at foobar,1'
+      },
+      {
+        name: 'EXPECT cursor at with non-numeric col (should fail)',
+        input: 'EXPECT cursor at 0,abc',
+        expectedError: 'Invalid EXPECT cursor at command: expect cursor at 0,abc'
+      },
+      {
+        name: 'EXPECT selection at command',
+        input: 'EXPECT selection at 1,2-4,5',
+        expected: 'expect(fixture).toHaveSelectionAt(1, 2, 4, 5);'
+      },
+      {
+        name: 'EXPECT selection at with spaces',
+        input: 'EXPECT selection at 0, 1 - 2, 3',
+        expected: 'expect(fixture).toHaveSelectionAt(0, 1, 2, 3);'
+      },
+      {
+        name: 'EXPECT selection at in context',
+        input: `TYPE "Hello World"
+left 5 times with shift
+EXPECT selection at 0,6-0,11`,
+        expected: `fixture.type('Hello World');
+fixture.press(Key.ArrowLeft).withShiftKey().times(5);
+expect(fixture).toHaveSelectionAt(0, 6, 0, 11);`
+      },
+      {
+        name: 'EXPECT selection at with invalid format (should fail)',
+        input: 'EXPECT selection at 1,2',
+        expectedError: 'Invalid EXPECT selection at command: expect selection at 1,2'
+      },
+      {
+        name: 'EXPECT selection at with non-numeric values (should fail)',
+        input: 'EXPECT selection at a,b-c,d',
+        expectedError: 'Invalid EXPECT selection at command: expect selection at a,b-c,d'
       }
     ];
 
@@ -227,10 +283,20 @@ expect(fixture).toHaveLines('XWorld');`
       let output, passed, error;
       try {
         output = transpiler.transpile(test.input);
-        passed = output === test.expected;
+        if (test.expectedError) {
+          // Expected an error but didn't get one
+          passed = false;
+        } else {
+          passed = output === test.expected;
+        }
       } catch (e) {
-        passed = false;
         error = e.message;
+        if (test.expectedError) {
+          // Expected an error
+          passed = error === test.expectedError;
+        } else {
+          passed = false;
+        }
       }
 
       div.innerHTML = `
@@ -238,7 +304,7 @@ expect(fixture).toHaveLines('XWorld');`
         <div><strong>Input:</strong></div>
         <pre>${test.input || '(empty)'}</pre>
         <div><strong>Expected:</strong></div>
-        <pre>${test.expected || '(empty)'}</pre>
+        <pre>${test.expectedError ? `Error: ${test.expectedError}` : test.expected || '(empty)'}</pre>
         <div><strong>Output:</strong></div>
         <pre>${error ? `Error: ${error}` : output || '(empty)'}</pre>
       `;
