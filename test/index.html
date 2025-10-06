@@ -810,9 +810,10 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
         </div>
         <div class="walkthrough-body">
             <div class="walkthrough-left">
-                <div style="background: #2d2d30; border-bottom: 1px solid #3e3e3e; display: flex;">
+                <div style="background: #2d2d30; border-bottom: 1px solid #3e3e3e; display: flex; align-items: center;">
                     <button class="walkthrough-code-tab active" data-code-tab="js">Generated JavaScript</button>
                     <button class="walkthrough-code-tab" data-code-tab="dsl">Source DSL</button>
+                    <button id="copy-dsl-btn" style="margin-left: auto; margin-right: 12px; display: none; padding: 4px 12px; font-size: 12px;" onclick="copyDSLSource()">Copy to clipboard</button>
                 </div>
                 <div class="code-view active" id="walkthrough-code-js"></div>
                 <div class="code-view" id="walkthrough-code-dsl" style="display: none;"></div>
@@ -1097,6 +1098,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
         const walkthroughCodeTabs = document.querySelectorAll('.walkthrough-code-tab');
         const walkthroughCodeJsView = document.getElementById('walkthrough-code-js');
         const walkthroughCodeDslView = document.getElementById('walkthrough-code-dsl');
+        const copyDslBtn = document.getElementById('copy-dsl-btn');
 
         walkthroughCodeTabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -1110,12 +1112,48 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 if (tabName === 'js') {
                     walkthroughCodeJsView.style.display = 'block';
                     walkthroughCodeDslView.style.display = 'none';
+                    copyDslBtn.style.display = 'none';
                 } else if (tabName === 'dsl') {
                     walkthroughCodeJsView.style.display = 'none';
                     walkthroughCodeDslView.style.display = 'block';
+                    copyDslBtn.style.display = 'block';
                 }
             });
         });
+
+        // Copy DSL source to clipboard
+        function copyDSLSource() {
+            const dslView = document.getElementById('walkthrough-code-dsl');
+            const codeLines = dslView.querySelectorAll('.code-line');
+
+            // Extract text from each line, removing HTML markers
+            const lines = Array.from(codeLines).map(line => {
+                // Clone the line to avoid modifying the DOM
+                const clone = line.cloneNode(true);
+                // Remove marker elements
+                const markers = clone.querySelectorAll('.step-marker, .error-marker, .success-marker');
+                markers.forEach(marker => marker.remove());
+                // Get the text content
+                return clone.textContent.trim();
+            });
+
+            const dslText = lines.join('\n');
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(dslText).then(() => {
+                // Visual feedback
+                const originalText = copyDslBtn.textContent;
+                copyDslBtn.textContent = 'Copied!';
+                copyDslBtn.style.backgroundColor = '#4CAF50';
+                setTimeout(() => {
+                    copyDslBtn.textContent = originalText;
+                    copyDslBtn.style.backgroundColor = '';
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
     </script>
 </body>
 </html>
