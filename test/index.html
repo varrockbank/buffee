@@ -185,8 +185,13 @@
         #tab-tests main {
             flex-direction: column;
             overflow-y: auto;
+            width: 100%;
+        }
+
+        #tab-tests main > * {
             max-width: 1200px;
-            margin: 0 auto;
+            margin-left: auto;
+            margin-right: auto;
             width: 100%;
         }
 
@@ -279,7 +284,7 @@
 
         /* Test runner styles */
         .test-suite {
-            margin: 20px 0;
+            margin-bottom: 20px;
             border: 1px solid #3e3e3e;
             border-radius: 4px;
             overflow: hidden;
@@ -374,7 +379,6 @@
         .summary {
             background: #252526;
             padding: 10px 16px;
-            margin-bottom: 16px;
             border-radius: 4px;
             border: 1px solid #3e3e3e;
             display: flex;
@@ -764,7 +768,7 @@
     </div>
     <div id="tab-grammar" class="tab-content">
         <main>
-            <div style="width: 100%; flex: 1; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.6; background: #1e1e1e; color: #d4d4d4; padding: 20px; overflow-y: auto; white-space: pre;">## DSL Grammar (v3.1.0)
+            <div style="width: 100%; flex: 1; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.6; background: #1e1e1e; color: #d4d4d4; overflow-y: auto; white-space: pre;">## DSL Grammar (v3.1.0)
 <span style="color: #81C784;">&lt;command&gt;</span>        ::= <span style="color: #81C784;">&lt;press-command&gt;</span> | <span style="color: #81C784;">&lt;type&gt;</span>
 <span style="color: #81C784;">&lt;type&gt;</span>           ::= <span style="color: #FFB74D;">TYPE</span> <span style="color: #64B5F6;">"text"</span>
 <span style="color: #81C784;">&lt;press-command&gt;</span>  ::= <span style="color: #81C784;">&lt;press&gt;</span> <span style="color: #9575CD;">[quantification]</span> [<span style="color: #F48FB1;">with</span> <span style="color: #F48FB1;">&lt;modifiers&gt;</span>]
@@ -785,8 +789,10 @@
 <span style="color: #64B5F6;">left</span> <span style="color: #9575CD;">3 times</span> <span style="color: #F48FB1;">with meta</span>          <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">Key.ArrowLeft</span>).<span style="color: #F48FB1;">withMetaKey()</span>.<span style="color: #9575CD;">once()</span>;
 <span style="color: #64B5F6;">right</span> <span style="color: #F48FB1;">with meta, shift</span>          <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">Key.ArrowRight</span>).<span style="color: #F48FB1;">withMetaKey()</span>.<span style="color: #F48FB1;">withShiftKey()</span>.<span style="color: #9575CD;">once()</span>;
 
-<span style="opacity: 0.7;">Lines ending with `;` or starting with `//` are passed through as JavaScript.
-Empty lines are preserved.</span></div>
+<span style="opacity: 0.7;">JavaScript pass-through for lines ending with ";", starting with "//" and empty lines:</span>
+expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect(3+5).toBe(8);
+// This is a comment            <span style="color: #4CAF50;">→</span>  // This is a comment
+(empty line)                    <span style="color: #4CAF50;">→</span>  (empty line)</div>
         </main>
     </div>
 
@@ -859,6 +865,20 @@ Empty lines are preserved.</span></div>
                 // Add active class to clicked tab and corresponding content
                 tab.classList.add('active');
                 document.getElementById(`tab-${tabName}`).classList.add('active');
+
+                // Shake timer if switching to tests tab and tests were compiled since last view
+                if (tabName === 'tests') {
+                    const timingDiv = document.getElementById('test-timing');
+                    if (testsCompiledSinceLastView) {
+                        timingDiv.classList.remove('shake');
+                        void timingDiv.offsetWidth; // Force reflow
+                        timingDiv.classList.add('shake');
+                        testsCompiledSinceLastView = false;
+                    } else {
+                        // Ensure shake class is removed if we're not shaking
+                        timingDiv.classList.remove('shake');
+                    }
+                }
             });
         });
 
@@ -871,6 +891,7 @@ Empty lines are preserved.</span></div>
         const statusUpToDate = document.getElementById('status-uptodate');
 
         let lastGeneratedSource = '';
+        let testsCompiledSinceLastView = false;
 
         function updateUIState() {
             const currentSource = textarea.value;
@@ -932,7 +953,11 @@ Empty lines are preserved.</span></div>
         }
 
         // Generate button
-        generateBtn.addEventListener('click', transpileDSL);
+        generateBtn.addEventListener('click', async () => {
+            transpileDSL();
+            await runAllTests();
+            testsCompiledSinceLastView = true;
+        });
 
         // Check for changes on input
         textarea.addEventListener('input', updateUIState);
@@ -1035,11 +1060,6 @@ Empty lines are preserved.</span></div>
                     <span class="details">(Started: ${startTime.toLocaleTimeString()} • Ended: ${endTime.toLocaleTimeString()})</span>
                 `;
 
-                // Trigger shake animation on timer
-                timingDiv.classList.remove('shake');
-                void timingDiv.offsetWidth; // Force reflow
-                timingDiv.classList.add('shake');
-
                 renderResults(results);
             } catch (error) {
                 const resultsContainer = document.getElementById('test-results');
@@ -1048,17 +1068,6 @@ Empty lines are preserved.</span></div>
             }
         }
 
-        // Auto-run tests when switching to Tests tab
-        tabs.forEach(tab => {
-            const originalClickHandler = tab.onclick;
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                if (tabName === 'tests' && typeof runner !== 'undefined') {
-                    // Small delay to allow tab to switch first
-                    setTimeout(runAllTests, 100);
-                }
-            });
-        });
 
         // Global walkthrough instance
         const walkthrough = new Walkthrough();
