@@ -210,6 +210,7 @@ function WarrenBuf(node, config = {}) {
     },
     // Inserts the string s into the selection
     insert(s) {
+      const t0 = performance.now();
       if (this.isSelection) {
         // Sort tail and head by order of appearance ( depends on chirality )
         const [first, second] = this.ordered;
@@ -227,6 +228,9 @@ function WarrenBuf(node, config = {}) {
         maxCol = head.col += s.length;
       }
       render(true);
+      const t1 = performance.now();
+      const millis = parseFloat(t1 - t0);
+      console.log(`Took ${millis.toFixed(2)} millis to insert with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
     delete() {
       // TODO: Possibly, insert can be defined in terms of delete.
@@ -234,6 +238,8 @@ function WarrenBuf(node, config = {}) {
         return this.insert('');
       }
 
+      const t0 = performance.now();
+      let type = "character";
       const { index, left, right } = this.partitionLine(tail);
       if (tail.col > 0) {
         Model.lines[index] = left.slice(0, left.length - 1) + right;
@@ -243,13 +249,18 @@ function WarrenBuf(node, config = {}) {
         head.row--;
         Model.lines[index - 1] += Model.lines[index];
         Model.delete(index);
+        type = "line";
       }
       render(true);
+      const t1 = performance.now();
+      const millis = parseFloat(t1 - t0);
+      console.log(`Took ${millis.toFixed(2)} millis to delete ${type} with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
     newLine() {
       // TODO: handle redundant rendering
       if (this.isSelection) Selection.insert('');
 
+      const t0 = performance.now();
       const { index, left, right } = this.partitionLine(tail);
       Model.lines[index] = left;
       Model.splice(index + 1, [right]);
@@ -260,6 +271,9 @@ function WarrenBuf(node, config = {}) {
         Viewport.scroll(1);
       }
       render(true);
+      const t1 = performance.now();
+      const millis = parseFloat(t1 - t0);
+      console.log(`Took ${millis.toFixed(2)} millis to insert new line with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
     moveBackWord() {
       const s = Model.lines[head.row];
@@ -423,6 +437,10 @@ function WarrenBuf(node, config = {}) {
     delete(i) {
       this.lines.splice(i, 1);
     },
+    appendLines(newLines) {
+      this.lines.push(...newLines);
+      render();
+    },
   }
   const Viewport = {
     start: 0, // 0-indexed line number in Model buffer.
@@ -432,12 +450,16 @@ function WarrenBuf(node, config = {}) {
     },
     // @param i, amount to scroll viewport by.
     scroll(i) {
+      const t0 = performance.now();
       this.start += i;
       this.start = $clamp(this.start, 0, Model.lastIndex);
       render();
+      const t1 = performance.now();
+      const millis = parseFloat(t1 - t0);
+      console.log(`Took ${millis.toFixed(2)} millis to scroll viewport with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
     set(start, size) {
-      this.start = $clamp(start, 0, Model.lastIndex);
+      this.start = $clamp(start-1, 0, Model.lastIndex);
       if(this.size !== size) {
         this.size = size;
         render(true );

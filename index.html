@@ -250,6 +250,16 @@
     background: none;
     max-width: 100%;
   }
+  
+  #file-loader-options {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #file-loader-options button {
+    margin: 10px;
+
+  }
 </style>
 </head>
 
@@ -281,16 +291,14 @@
       </div>
   </blockquote>
   <details>
-    <summary>Diagnostics tools for loading large files</summary>
+    <summary>File loader</summary>
     <fieldset>
       <legend>Viewport:</legend>
       <label for="viewport-start">Start:</label>
-      <input id="viewport-start" value="0"></input>
+      <input id="viewport-start" value="1"></input>
       <label for="viewport-size">Window size:</label>
       <input id="viewport-size" value="10"></input>
       <button id="viewport-update">Set</button>
-      <!-- <button id="viewport-scroll-up-1">Scroll Up</button>
-      <button id="viewport-scroll-down-1">Scroll Down</button> -->
     </fieldset>
     <fieldset>
       <legend>File Loader:</legend>
@@ -300,9 +308,13 @@
         
         <div id="file-loader-buttons" class="hidden" style="margin-top: 10px;">
           <label for="append-at-line">At line: </label><input id="append-at-line" value="1" ></input>
-          <div style="margin: 10px">
-            <button id="load-file">Load File</button>
-           <button id="append-file">Append File (workaround for lack of chunk-loader)</button><br />
+          <div style="margin: 10px" id="file-loader-options">
+            <button id="load-file-naive">Naive file loader (&lt;10 million line of code files. Fast)</button>
+            <button id="load-file-chunked">File.slice byte chunk loader (&lt;70 million LOC. Faster)</button>
+            <button id="load-file-filereader">FileReader chunk loader (&lt;70 million LOC. Faster)</button>
+            <button id="load-file-stream">ReadableStream (&lt;70 million LOC. Faster)</button>
+            <button id="load-file-stream-materialized">ReadableStream w/ materialized strings (&lt;75M LOC. Slow)</button>
+            <button id="load-file-stream-materialized-gc">ReadableStream w/ materialized strings + force GC (&lt;70-90M LOC. Non-deterministic; depends on mood of GC. Slower)</button>
           </div>
         </div>
       </div>
@@ -500,12 +512,6 @@
       const viewportSize = parseInt(document.getElementById('viewport-size').value);
       primary.Viewport.set(viewportStart, viewportSize);
     });
-    // document.getElementById('viewport-scroll-up-1').addEventListener('click', () => {
-    //   primary.Viewport.scroll(-1);
-    // });
-    // document.getElementById('viewport-scroll-down-1').addEventListener('click', () => {
-    //   primary.Viewport.scroll(1);
-    // });
     document.getElementById("file-input").addEventListener("change", () => {
       const file = document.getElementById("file-input").files[0];
       const nBytes = file.size;
@@ -517,27 +523,345 @@
       document.getElementById("fileSize").innerHTML = "File size: " + (sOutput || (nBytes + " bytes"));
       document.getElementById("file-loader-buttons").classList.remove('hidden');
     }, false);
-    document.getElementById('load-file').addEventListener('click', () => {
+    document.getElementById('load-file-naive').addEventListener('click', async () => {
       const f = document.getElementById("file-input").files[0];
       if (!f) {
         alert("No file selected");
-      } else {
-        f.text().then(text => primary.Model.text = text);
+        return;
+      }
+
+      const t0 = performance.now();
+      const text = await f.text();
+      const t1 = performance.now();
+      console.log(`[Naive] Read file to text: ${(t1 - t0).toFixed(2)}ms`);
+
+      const t2 = performance.now();
+      primary.Model.text = text;
+      const t3 = performance.now();
+      const lineCount = primary.Model.lines.length;
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      console.log(`[Naive] Set Model.text (split + render): ${(t3 - t2).toFixed(2)}ms`);
+      console.log(`[Naive] Loaded ${lineCount.toLocaleString()} lines in ${(t3 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+    });
+
+    document.getElementById('load-file-chunked').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+        return;
+      }
+
+      const t0 = performance.now();
+
+      // Reset the model to start fresh
+      primary.Model.lines = [];
+
+      const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB byte chunks
+      let offset = 0;
+      let remainder = '';
+      let totalLines = 0;
+
+      while (offset < f.size) {
+        // Slice file into chunks
+        const blob = f.slice(offset, offset + CHUNK_SIZE);
+        const text = await blob.text();
+
+        // Prepend any partial line from the previous chunk
+        const fullText = remainder + text;
+
+        // Find the last newline in this chunk
+        const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+        if (lastNewlineIndex !== -1) {
+          // Extract complete lines
+          const completeText = fullText.substring(0, lastNewlineIndex);
+          const lines = completeText.split('\n');
+
+          // Append to model
+          primary.Model.appendLines(lines);
+          totalLines += lines.length;
+
+          // Save the remainder for next iteration
+          remainder = fullText.substring(lastNewlineIndex + 1);
+        } else {
+          // No newline found, accumulate to remainder
+          remainder = fullText;
+        }
+
+        offset += CHUNK_SIZE;
+      }
+
+      // Don't forget the last line if there's a remainder
+      if (remainder.length > 0) {
+        primary.Model.appendLines([remainder]);
+        totalLines++;
+      }
+
+      const t1 = performance.now();
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      console.log(`[Chunked] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+    });
+
+    document.getElementById('load-file-filereader').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+        return;
+      }
+
+      const t0 = performance.now();
+
+      // Reset the model to start fresh
+      primary.Model.lines = [];
+
+      const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB byte chunks
+      let offset = 0;
+      let remainder = '';
+      let totalLines = 0;
+
+      // Helper to read blob using FileReader (callback-based API)
+      function readBlobAsText(blob) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = (e) => reject(e);
+          reader.readAsText(blob);
+        });
+      }
+
+      while (offset < f.size) {
+        // Slice file into chunks
+        const blob = f.slice(offset, offset + CHUNK_SIZE);
+        const text = await readBlobAsText(blob);
+
+        // Prepend any partial line from the previous chunk
+        const fullText = remainder + text;
+
+        // Find the last newline in this chunk
+        const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+        if (lastNewlineIndex !== -1) {
+          // Extract complete lines
+          const completeText = fullText.substring(0, lastNewlineIndex);
+          const lines = completeText.split('\n');
+
+          // Append to model
+          primary.Model.appendLines(lines);
+          totalLines += lines.length;
+
+          // Save the remainder for next iteration
+          remainder = fullText.substring(lastNewlineIndex + 1);
+        } else {
+          // No newline found, accumulate to remainder
+          remainder = fullText;
+        }
+
+        offset += CHUNK_SIZE;
+      }
+
+      // Don't forget the last line if there's a remainder
+      if (remainder.length > 0) {
+        primary.Model.appendLines([remainder]);
+        totalLines++;
+      }
+
+      const t1 = performance.now();
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      console.log(`[FileReader] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+    });
+
+    document.getElementById('load-file-stream').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+        return;
+      }
+
+      const t0 = performance.now();
+
+      // Reset the model to start fresh
+      primary.Model.lines = [];
+
+      let remainder = '';
+      let totalLines = 0;
+      const decoder = new TextDecoder('utf-8');
+
+      // Use ReadableStream to process file chunks
+      const stream = f.stream();
+      const reader = stream.getReader();
+
+      let chunkCount = 0;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          // Decode the Uint8Array chunk to text
+          const text = decoder.decode(value, { stream: true });
+
+          // Prepend any partial line from the previous chunk
+          const fullText = remainder + text;
+
+          // Find the last newline in this chunk
+          const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            // Extract complete lines
+            const completeText = fullText.substring(0, lastNewlineIndex);
+            const lines = completeText.split('\n');
+
+            // Append to model
+            primary.Model.appendLines(lines);
+            totalLines += lines.length;
+
+            // Save the remainder for next iteration
+            remainder = fullText.substring(lastNewlineIndex + 1);
+          } else {
+            // No newline found, accumulate to remainder
+            remainder = fullText;
+          }
+
+          // Yield to browser every 10 chunks to allow UI updates
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        // Don't forget the last line if there's a remainder
+        if (remainder.length > 0) {
+          primary.Model.appendLines([remainder]);
+          totalLines++;
+        }
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        console.log(`[Stream] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+      } finally {
+        reader.releaseLock();
       }
     });
-    document.getElementById('append-file').addEventListener('click', () => {
-      const lineNumber = parseInt(document.getElementById('append-at-line').value);
+
+    document.getElementById('load-file-stream-materialized').addEventListener('click', async () => {
       const f = document.getElementById("file-input").files[0];
       if (!f) {
         alert("No file selected");
-      } else {
-        f.text().then(text => {
-          const s = text.split("\n");
-          const t0 = performance.now();
-          primary.Model.splice(lineNumber, s);
-          const t1 = performance.now();
-          console.log(`Took ${parseFloat(t1 - t0).toFixed(2)} millis to splice ${s.length.toLocaleString()} elements at ${index.toLocaleString()} w/ ${primary.Model.lc.toLocaleString()} lines.`);
-        });
+        return;
+      }
+      const reader = f.stream().getReader();
+      try {
+        primary.Model.lines = [];
+        const decoder = new TextDecoder('utf-8');
+        let chunkCount = 0;
+
+        const t0 = performance.now();
+
+        let remainder = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          // Decode the Uint8Array chunk to text
+          const text = decoder.decode(value, { stream: true });
+
+          // Find the last newline in this chunk
+          const lastNewlineIndex = text.lastIndexOf('\n');
+          if (lastNewlineIndex !== -1) {
+            // Split everything - last element is the incomplete line
+            const allLines = text.split('\n');
+            const slicedLines = allLines.slice(0, -1);  // All complete lines
+            slicedLines[0] = remainder + [0];
+            remainder = allLines[allLines.length - 1];  // Incomplete line (remainder)
+
+            // Force materialization using Array.from to break sliced string references
+            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
+            // Append to model WITHOUT rendering (massive speedup)
+            primary.Model.appendLines(materializedLines, true);
+          } else {
+            remainder += text;
+          }
+
+          // Yield to browser every 10 chunks to allow UI updates
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            primary.Model.appendLines([], false);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        // Final render
+        primary.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        console.log(`[Stream+Mat] Loaded ${primary.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+      } finally {
+        reader.releaseLock();
+      }
+    });
+
+   document.getElementById('load-file-stream-materialized-gc').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+        return;
+      }
+      const reader = f.stream().getReader();
+      try {
+        primary.Model.lines = [];
+        const decoder = new TextDecoder('utf-8');
+        let chunkCount = 0;
+
+        const t0 = performance.now();
+
+        let remainder = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) break;
+
+          // Decode the Uint8Array chunk to text
+          const text = decoder.decode(value, { stream: true });
+
+          // Find the last newline in this chunk
+          const lastNewlineIndex = text.lastIndexOf('\n');
+          if (lastNewlineIndex !== -1) {
+            // Split everything - last element is the incomplete line
+            const allLines = text.split('\n');
+            const slicedLines = allLines.slice(0, -1);  // All complete lines
+            slicedLines[0] = remainder + [0];
+            remainder = allLines[allLines.length - 1];  // Incomplete line (remainder)
+
+            // Force materialization using Array.from to break sliced string references
+            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
+            // Append to model WITHOUT rendering (massive speedup)
+            primary.Model.appendLines(materializedLines, chunkCount % 10 == 5 ? false : true);
+          } else {
+            remainder += text;
+          }
+
+          // Yield to browser every 10 chunks to allow UI updates
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            // Create temporary memory pressure to hint GC
+            const _ = new Array(100000);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        // Final render
+        primary.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        console.log(`[Stream+Mat] Loaded ${primary.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+      } finally {
+        reader.releaseLock();
       }
     });
 
@@ -606,7 +930,6 @@
           }
         }
 
-        console.log(`Loaded ${frames.length} frames from Star Wars movie`);
         document.getElementById('frame-slider').max = frames.length - 1;
         currentFrame = 750;
         showFrame(750);
