@@ -1,4 +1,4 @@
-function WarrenBuf(node, config = {}) {
+function Vbuf(node, config = {}) {
   this.version = "4.1.0-alpha.1";
 
   // Extract configuration with defaults

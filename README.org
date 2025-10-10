@@ -1,28 +1,30 @@
-WarrenBuf is an overpowered text buffer for the web, managing billions^{[1]} of lines without bottleneck. It's ~3KB /(gzip+min)/ and zero-dependency but punches above its weight with editor features 
+vbuf is an overpowered text buffer for the web, handling billions of lines without bottleneck[1]. It's ~3KB /(gzip+min)/ and zero-dependency but punches above its weight with editor features. 
 
 [[resources/preview.png]]
 
-[[https://varrockbank.github.io/warrenbuf/][Live Demo]] ( Tree-sitter disabled in demo )
+[[https://varrockbank.github.io/vbuf/][Live Demo]] ( Tree-sitter disabled in demo )
 
-[[https://varrockbank.github.io/warrenbuf/test/][Interactive Test Playground]] 
+[[https://varrockbank.github.io/vbuf/test/][Interactive Test Playground]] 
 
 [1]: /Tested on cheapest Macbook Air M4 with incremental file loader. Key is that capacity scales O(n) of RAM with low overhead and no bottleneck. Compare vs libraries that mount whole file to DOM being unresponsive by O(100K) lines. VDOM has other scaling issues./
 
-** Ethos
+** Tenets
 
 *Avoid JS fatigue:* no compilation, no NPM, no building. Just vendor the VanillaJS function.
 
 *Inspired by vim:* minimal, capable, fast
 
-*Embedded:*  the features and tiny footprint uniquely positions this project to be a building block for larger apps (e.g. IDEs and other enriched plaintext environments). In fact, this is heuristic in scoping features. The endstate of this warrenbuf is to be barebones and handoff complex editor logic. Aiming for "headless" mode is a good way to think about the surface. 
+*Embedded:*  the features and tiny footprint uniquely positions this project to be a building block for larger apps (e.g. IDEs and other enriched plaintext environments). In fact, this is heuristic in scoping features. Perhaps the endstate of Vbuf is to be barebones or "headless", externalizing more complex editor features.
+
+The project ethos is being unburdened. V is for virtual and vanilla...
 
 ** How? 
 
-At its core, WarrenBuf is a rendering engine. In fact, it started out as read-only log viewer and no editing capabilities. Its innovation is a technique loaned from game dev: clipping. i.e. render a Viewport containing only the source lines in view. There's always a small fixed set of elements to update. This sidesteps the DOM bottleneck. 
+At its core, vbuf is a rendering engine. In fact, it started out as read-only log viewer and no editing capabilities. Its innovation is a technique loaned from game dev: clipping. i.e. render a Viewport containing only the source lines in view. There's always a small fixed set of elements to update. This sidesteps the DOM bottleneck. 
 
-Arrays are the dark horse of text editor data structures — inefficient for common editing operations since they involve shifting line numbers. This project embraces the fact that it’s web-bound, leaning on V8 for the computer-science heavy lifting. JavaScript’s array-like performance rival far more complex rope or piece-table structures while staying true to the problem domain. Consider that Monaco's robust piece table implementation is more than 10x WarrenBuf's entire footprint.
+Arrays are the dark horse of text editor data structures — inefficient for common editing operations since they involve shifting line numbers. This project embraces the fact that it’s web-bound, leaning on V8 for the computer-science heavy lifting. JavaScript’s array-like performance rival far more complex rope or piece-table structures while staying true to the problem domain. Consider that Monaco's robust piece table implementation is more than 10x Vbuf's entire footprint.
 
-Ultra-high-capacity-mode does something a bit more sophisticated than a fully materialized buffer, with a sliding materialized window and the rest out of heap. 
+Ultra-high-capacity-mode does something a wee bit more involved than a fully materialized buffer, involving a sliding window of materialized data around the viewport.
 
 ** Usage 
 
@@ -47,10 +49,10 @@ Editor instances are instantiated by specifying a DOM node having the following 
     </div>
   </div>
 </blockquote>
-const editorInstance = new WarrenBuf(document.getElementById("playground"), {});
+const editorInstance = new vbuf(document.getElementById("playground"), {});
 #+end_src
 
-It was decided against WarrenBuf creating this DOM structure. 
+It was decided against Vbuf creating this DOM structure. 
 
 *** Model-view-controller
 
@@ -68,11 +70,11 @@ Extensibility is currently achieved by the MVC APIs.
 
 iOS support is currently provided as an extension which maps iOS events to keyboard events. see: index.html for example. 
 
-Tree-sitter support is still experimental. Integration is tightly coupled until the right abstraction is solidified. Likely, the WarrenBuf core will be agnostic to custom rendering and simply ask for a callback to generate HTML. At that point Tree-sitter can be made an extension.
+Tree-sitter support is still experimental. Integration is tightly coupled until the right abstraction is solidified. Likely, Vbuf core will be agnostic to custom rendering and simply ask for a callback to generate HTML. At that point Tree-sitter can be made an extension.
 
 ** Distributable
 
-There is no build process needed to vendor =WarrenBuf= global function. However, the minified distributable is created with =Terser=. This is done by a pre-commit hook ensuring =dist/warrenbuf.min.js= is updated in sync. Symlink to =git=: 
+There is no build process needed to vendor =vbuf= global function. However, the minified distributable is created with =Terser=. This is done by a pre-commit hook ensuring =dist/vbuf.min.js= is updated in sync. Symlink to =git=: 
 
 #+begin_src sh
 ln -s ../../hooks/pre-commit .git/hooks/pre-commit
@@ -86,9 +88,9 @@ To test the hook manually without creating a commit:
 
 ** Why? 
 
-This section discusses why Warrenbuf exists and its competitive advantage.
+This section discusses why Vbuf exists and its competitive advantage.
 
-Monaco is bloated. Ace is great but 10x larger and still not barebones enough. Libraries in the same weigh class as WarrenBuf are not suitable building blocks for performant plaintext editor experiences. 
+Monaco is bloated. Ace is great but 10x larger and still not barebones enough. Libraries in the same weight class are not suitable building blocks for performant plaintext editor experiences. 
 
 *** =<textarea>=
 
@@ -102,7 +104,7 @@ In brief, =<textarea>= is idiosyncratic, inflexible and low-capacity.
 
 *** Other microlibraries
 
-Libraries in the same weight class as WarrenBuf achieve a small footprint by being clever codegolf hacks of =<textarea>=. This means they are restrictive in their functionalities they add. These solutions put lipstick on a pig and is a non-starter for anything beyond a toy.
+Libraries in the same weight class as Vbuf achieve a small footprint by being clever codegolf hacks of =<textarea>=. This means they are restrictive in their functionalities they add. These solutions put lipstick on a pig and is a non-starter for anything beyond a toy.
 
 Granted, these libraries are focused on the WYSIWYG case rather than plaintext editing.
 
@@ -122,15 +124,15 @@ Also, the WASM toolchain still felt like "death by a thousand cuts". All things 
 
 *** Leveraging the web platform
 
-The DOM is slow. Other text editor libraries mount the entire source text to the DOM. 10^5 elements can be enough to make the browser tab unresponsive. WarrenBuf loans the technique of "clipping" from graphics programming to render only the segment of the world that are in view. aside: occlusion culling extends this idea.
+The DOM is slow. Other text editor libraries mount the entire source text to the DOM. 10^5 elements can be enough to make the browser tab unresponsive. Vbuf loans the technique of "clipping" from graphics programming to render only the segment of the world that are in view. aside: occlusion culling extends this idea.
 
-V8 is brilliant. Premier text editors use ropes, gap buffers, piece tables, and some combination in between to achieve performance. These data structures are hard to get right and their sourcecode is necessarily complex. A naive array implementation is intuitive as it matches the problem domain of indexed lines of text. Arrays are infeasible because text editor operations including line deletes and additions involve O(n) shifts. JavaScript Arrays are not actual arrays. V8 handles splices, the generalization of shift, instantaneously for even the largest of buffers. For once the web platform is a development luxury where we can have cake and eat it too. WarrenBuf reaps the simplicity of arrays without sacrificing performance.
+V8 is brilliant. Premier text editors use ropes, gap buffers, piece tables, and some combination in between to achieve performance. These data structures are hard to get right and their sourcecode is necessarily complex. A naive array implementation is intuitive as it matches the problem domain of indexed lines of text. Arrays are infeasible because text editor operations including line deletes and additions involve O(n) shifts. JavaScript Arrays are not actual arrays. V8 handles splices, the generalization of shift, instantaneously for even the largest of buffers. For once the web platform is a development luxury where we can have cake and eat it too. Vbuf reaps the simplicity of arrays without sacrificing performance.
 
 *** Surgical DOM rendering
 
-WarrenBuf couples buffer state with surgical DOM updates. The endstate of the project is towards updating only the DIFFed DOM segments. This is idealistic because redundancy in cheap DOM updates may be preferable to the overhead of corner-case management having too many branching pathways.
+Buffer state is coupled with surgical DOM updates. The endstate of the project is towards updating only the DIFFed DOM segments. This is idealistic because redundancy in cheap DOM updates may be preferable to the overhead of corner-case management having too many branching pathways.
 
-It's virtuous that WarrenBuf remain a microlibrary. The webdev Zeitgest is a declarative library that reactively alter DIFFs/changed subtrees. This does not come free. A trustworthy barebones React-like library is larger than WarrenBuf in its entirety. UI libraries are useful for managing a complex UI with a large component tree where it is impossible to manage otherwise. WarrenBuffer's minimalism culminates in a handful of visual elements and a dozen operations. In this scenario, a few precision DOM mutations is superior to the overhead of a presumably smart and efficient DOM rendering library, especially as the DIFFs do not involve "complete"/full trees. WarrenBuffer's adhoc rendering avoids introducing a dependency, managing a state tree, run a change-tracking loop, defining a declarative DSL, merging in a virtual DOM tree, smoothing-out browser compatibility, needing a build process or other complexities, The surface space is small enough to reasonably expect WarrenBuffer's implementer carefully consider the effects of every operation. Plus, it's fun being close to the "DOM metal"
+It's virtuous that Vbuf remain a microlibrary. The webdev Zeitgest is a declarative library that reactively alter DIFFs/changed subtrees. This does not come free. A trustworthy barebones React-like library is larger than Vbuf in its entirety. UI libraries are useful for managing a complex UI with a large component tree where it is impossible to manage otherwise. Vbuf's minimalism culminates in a handful of visual elements and a dozen operations. In this scenario, a few precision DOM mutations is superior to the overhead of a presumably smart and efficient DOM rendering library, especially as the DIFFs do not involve "complete"/full trees. Vbuf's adhoc rendering avoids introducing a dependency, managing a state tree, run a change-tracking loop, defining a declarative DSL, merging in a virtual DOM tree, smoothing-out browser compatibility, needing a build process or other complexities, The surface space is small enough to reasonably expect Vbuf's implementer carefully consider the effects of every operation. Plus, it's fun being close to the "DOM metal"
 
 Correctness is prioritized over performance micro-optimizations. Currently, there may be cases where the entire viewport is unnecessarily refreshed. For all intensive purposes this will not be detectable by the user. O(c) where c=30 surgical line updates is trivial compared to maintaining even the smallest of virtual DOM trees.
 
@@ -146,7 +148,7 @@ VSCode had already adopted a Piece Table combined with a balanced tree (see: htt
 
 By September 2025, VSCode appears to have fixed this bottleneck by detecting large files, short-circuiting preprocessing, and defaulting to plaintext editing. The issue may have been in syntax highlighting rather than buffer management—=vim= proves it's feasible to syntax highlight much larger files.
 
-VSCode's text buffer implementation is available at https://github.com/microsoft/vscode-textbuffer/tree/main. At ~50KB it's acceptable, though 50x WarrenBuf's footprint.
+VSCode's text buffer implementation is available at https://github.com/microsoft/vscode-textbuffer/tree/main. At ~50KB it's acceptable, though 50x Vbuf's footprint.
 
 Monaco, the web version of VSCode, follows the same implementation and has similar performance characteristics.
 
@@ -160,10 +162,10 @@ Most VSCode-based apps appear lazy and careless toward software craftsmanship. I
 
 *** Ace Editor
 
-Ace Editor stands out. Per their README (September 2025): "Handles huge documents (at last check, 4,000,000 lines is the upper limit)". This is orders magnitude better than the microlibraries in WarrenBuf's weight class. 
+Ace Editor stands out. Per their README (September 2025): "Handles huge documents (at last check, 4,000,000 lines is the upper limit)". This is orders magnitude better than the microlibraries in Vbuf's weight class. 
 
 It's a respectable library for building editor experiences. I'd recommend it.
 
-The codebase is also praiseworthy. Unavoidably, Ace carries legacy and compatibility baggage. It includes bells and whistles that, unless tree-shakeable, make it bloated compared to WarrenBuf. WarrenBuf enjoys the privilege of starting from a clean slate in 2025.
+The codebase is also praiseworthy. Unavoidably, Ace carries legacy and compatibility baggage. It includes bells and whistles that, unless tree-shakeable, make it bloated compared to Vbuf. Vbuf enjoys the privilege of starting fresh in 2025.
 
-Note that Ace instantiates a hidden =<textarea>= around the user's cursor to bind keyboard input. This isn't the same as a textarea for the entire source text—otherwise Ace would suffer the same bottlenecks as other editor libraries. Performance issues with =<textarea>= are less pronounced in Ace's approach. One caveat with Ace's "culled" textarea: large selections require proportionally large textareas, reintroducing the DOM bottleneck. WarrenBuf avoids this with virtual cursors.
+Note that Ace instantiates a hidden =<textarea>= around the user's cursor to bind keyboard input. This isn't the same as a textarea for the entire source text—otherwise Ace would suffer the same bottlenecks as other editor libraries. Performance issues with =<textarea>= are less pronounced in Ace's approach. One caveat with Ace's "culled" textarea: large selections require large textareas, bringing the DOM bottleneck into the fault. Vbuf avoids this with virtual carets.

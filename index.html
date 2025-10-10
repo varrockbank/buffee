@@ -1,7 +1,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<script src="warrenbuf.js"></script>
+<script src="vbuf.js"></script>
 <style>
   /************* "Atomic CSS" classes for Boxes *************/
   .💪 { display: flex }                                 /* Flex like muscles.   */
@@ -19,7 +19,7 @@
   }
 
   body {
-      background-color: #0d1117;
+      background-color: #0a0a0f;
       color: #c9d1d9;
       margin: 0;
       padding: 0;
@@ -43,6 +43,8 @@
   h2 {
       font-size: 24px;
       padding-bottom: 8px;
+      border-bottom: 1px solid #9d4edd;
+      margin-bottom: 16px;
   }
 
   p {
@@ -60,7 +62,7 @@
   blockquote {
       margin: 16px 0;
   }
-  /*** Classes for WarrenBuf ***/
+  /*** Classes for Vbuf ***/
   .wb {
       background-color: #282C34;
       color: #B2B2B2;
@@ -153,7 +155,7 @@
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    background-color: #58a6ff;
+    background-color: #00ff41;
     border-radius: 50%;
     height: 16px;
     width: 16px;
@@ -167,7 +169,7 @@
   }
 
   input[type="range"]::-moz-range-thumb {
-    background-color: #58a6ff;
+    background-color: #00ff41;
     border: none;
     border-radius: 50%;
     height: 16px;
@@ -191,15 +193,15 @@
   }
 
   a {
-    color: #58a6ff;
+    color: #9d4edd;
     text-decoration: none;
     transition: color 0.15s ease;
   }
   a:visited {
-    color: #58a6ff;
+    color: #9d4edd;
   }
   a:hover {
-    color: #79c0ff;
+    color: #c77dff;
     text-decoration: underline;
   }
 
@@ -222,7 +224,7 @@
   }
 
   summary:hover {
-    color: #58a6ff;
+    color: #9d4edd;
   }
 
   summary::marker {
@@ -263,7 +265,7 @@
 
   details button:hover, button:hover {
     background-color: #30363d;
-    border-color: #8b949e;
+    border-color: #ff6b35;
   }
 
   details input, input[type="text"], input[type="number"] {
@@ -277,7 +279,7 @@
   }
 
   details input:focus, input:focus {
-    outline: 2px solid #1f6feb;
+    outline: 2px solid #9d4edd;
     outline-offset: -1px;
   }
 
@@ -315,7 +317,7 @@
 
   input[type="file"]::file-selector-button:hover {
     background-color: #30363d;
-    border-color: #8b949e;
+    border-color: #ff6b35;
   }
 
   input[type="file"] {
@@ -338,7 +340,7 @@
   }
 
   .read-only-indicator {
-    background-color: #1f6feb;
+    background-color: #ff6b35;
     color: white;
     padding: 8px 16px;
     text-align: center;
@@ -346,12 +348,18 @@
     font-size: 14px;
     border-radius: 6px 6px 0 0;
     margin: 0 0 -1px 0;
-    border: 1px solid #1f6feb;
+    border: 1px solid #ff6b35;
   }
 
   @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
+    0%, 50% {
+      opacity: 1;
+      color: #00ff41;
+      text-shadow: 0 0 10px #00ff41;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
   }
 
   .blink {
@@ -362,16 +370,16 @@
 
 <body>
   <!-- Header -->
-  <header style="border-bottom: 1px solid #21262d; background-color: #010409;">
+  <header style="border-bottom: 2px solid #9d4edd; background-color: #010409;">
     <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding-top: 16px; padding-bottom: 16px;">
       <div style="display: flex; align-items: center; gap: 16px;">
-        <h1 style="font-size: 20px; margin: 0; font-weight: 600;">[ warrenbuf <span class="blink">_</span> ]</h1>
+        <h1 style="font-size: 20px; margin: 0; font-weight: 600;">[ vbuf <span class="blink">_</span> ]</h1>
         <span style="color: #8b949e; font-size: 14px;">v4.1.0-alpha.1</span>
       </div>
       <nav style="display: flex; gap: 24px; align-items: center;">
         <a href="test" style="font-size: 14px; font-weight: 500;">Tests</a>
         <a href="perf" style="font-size: 14px; font-weight: 500;">Performance</a>
-        <a href="https://github.com/varrockbank/warrenbuf" style="font-size: 14px; font-weight: 500;">GitHub →</a>
+        <a href="https://github.com/varrockbank/vbuf" style="font-size: 14px; font-weight: 500;">GitHub →</a>
       </nav>
     </div>
   </header>
@@ -381,19 +389,19 @@
     <div class="container">
       <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;">
         <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #58a6ff; font-weight: 700;">~4KB</h3>
+          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">~4KB</h3>
           <p style="margin: 0; font-size: 14px; color: #8b949e;">(gzip+min) distributable</p>
         </div>
         <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #58a6ff; font-weight: 700;">0</h3>
+          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">0</h3>
           <p style="margin: 0; font-size: 14px; color: #8b949e;">Dependencies</p>
         </div>
         <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #58a6ff; font-weight: 700;">~70m</h3>
+          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">~70m</h3>
           <p style="margin: 0; font-size: 14px; color: #8b949e;">LOC without bottleneck</p>
         </div>
         <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #58a6ff; font-weight: 700;">1B+</h3>
+          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">1B+</h3>
           <p style="margin: 0; font-size: 14px; color: #8b949e;">in ultra-high-capacity mode</p>
         </div>
       </div>
@@ -403,7 +411,8 @@
   <div class="container">
   <!-- Main Playground -->
   <section style="margin-bottom: 48px;">
-    <h2>A performant text editor for the web.</h2>
+    <h2 style="padding-top: 0; margin-top: 0">An overpowered text editor for the web — light, fast, unburdened</h2>
+    <!-- <h2>An overpowered text editor for the web — light, fast, capa</h2> -->
     <div id="read-only-indicator" class="read-only-indicator hidden">
       Read-Only Mode (Chunked+Compressed) - Navigation only, editing disabled
     </div>
@@ -647,7 +656,7 @@
   window.addEventListener("DOMContentLoaded", () => {
 
     const fileLoaderLoggerElement = document.getElementById('file-loader-logs');
-    const fileLoaderLogger = new WarrenBuf(fileLoaderLoggerElement, {
+    const fileLoaderLogger = new Vbuf(fileLoaderLoggerElement, {
       colorPrimary: "#87FF5F",
       colorSecondary: "#38274D",
       initialViewportSize: 5,
@@ -659,7 +668,7 @@
       fileLoaderLogger.appendLineAtEnd(s);
     };
     const mainElement = document.getElementById("playground");
-    const primary = new WarrenBuf(mainElement, {
+    const primary = new Vbuf(mainElement, {
       colorPrimary: "#87FF5F",
       colorSecondary: "#38274D",
       logger: compressedFileLoaderLogger
@@ -668,17 +677,17 @@
     window.primary = primary;
 
     const notesElement = document.getElementById('notes');
-    const notes = new WarrenBuf(notesElement);
+    const notes = new Vbuf(notesElement);
 
     const hackerNewsElement = document.getElementById('hackernews');
-    const hackernews = new WarrenBuf(hackerNewsElement, {
+    const hackernews = new Vbuf(hackerNewsElement, {
       colorPrimary: "black",
       colorSecondary: "#FF6602",
       showStatusLine: false,
     });
 
     const starWarsElement = document.getElementById('starwars');
-    const starwars = new WarrenBuf(starWarsElement, {
+    const starwars = new Vbuf(starWarsElement, {
       colorPrimary: "#FFD700",
       colorSecondary: "#000000",
       initialViewportSize: 13,
@@ -686,7 +695,7 @@
     });
 
     const matrixElement = document.getElementById('matrix');
-    const matrix = new WarrenBuf(matrixElement, {
+    const matrix = new Vbuf(matrixElement, {
       colorPrimary: "#00ff41",
       colorSecondary: "#000000",
       initialViewportSize: 20,
@@ -694,7 +703,7 @@
     });
 
     const conwayElement = document.getElementById('conway');
-    const conway = new WarrenBuf(conwayElement, {
+    const conway = new Vbuf(conwayElement, {
       colorPrimary: "black",
       colorSecondary: "white",
       initialViewportSize: 30,
