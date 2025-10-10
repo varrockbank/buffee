@@ -32,7 +32,7 @@ class SpecGenerator {
   /**
    * Generate complete spec.js from DSL source
    * @param {string} dslSource - Complete DSL source
-   * @returns {Object} { code: string, errors: Array } - Generated JavaScript and compile errors
+   * @returns {Object} { code: string, errors: Array, duplicates: Array } - Generated JavaScript, compile errors, and duplicate test names
    */
   generate(dslSource) {
     // Clear previous errors
@@ -40,6 +40,8 @@ class SpecGenerator {
 
     const lines = dslSource.split('\n');
     const output = [];
+    const testNames = new Map(); // Track suite:test -> line number for duplicate detection
+    const duplicates = [];
 
     // File header
     output.push('// Test definitions');
@@ -108,6 +110,20 @@ class SpecGenerator {
         }
 
         currentTest = trimmed.substring(3).trim();
+
+        // Check for duplicate test name
+        const testKey = `${currentSuite}:${currentTest}`;
+        if (testNames.has(testKey)) {
+          duplicates.push({
+            suite: currentSuite,
+            test: currentTest,
+            firstLine: testNames.get(testKey),
+            secondLine: i + 1
+          });
+        } else {
+          testNames.set(testKey, i + 1);
+        }
+
         currentTestDescription = null;
         currentTestDslLines = [];
         currentTestJsLineCount = 0;
@@ -186,9 +202,31 @@ class SpecGenerator {
       output.push('');
     }
 
+    // If duplicates found, generate error code instead
+    if (duplicates.length > 0) {
+      const errorOutput = [
+        '// DUPLICATE TEST NAMES DETECTED',
+        '// Cannot run tests with duplicate names',
+        '',
+        'throw new Error(`Duplicate test names detected:\\n' +
+        duplicates.map(d =>
+          `  - "${this.escapeString(d.suite)}" > "${this.escapeString(d.test)}" (lines ${d.firstLine} and ${d.secondLine})`
+        ).join('\\n') +
+        '`);',
+        ''
+      ];
+
+      return {
+        code: errorOutput.join('\n'),
+        errors: this.errors,
+        duplicates: duplicates
+      };
+    }
+
     return {
       code: output.join('\n'),
-      errors: this.errors
+      errors: this.errors,
+      duplicates: []
     };
   }
 }

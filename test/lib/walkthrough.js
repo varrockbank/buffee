@@ -12,8 +12,29 @@ class Walkthrough {
   constructor() {
     this.steps = [];
     this.currentTest = null;
+    this.currentSuiteName = null;
+    this.currentTestIndex = null;
     this.currentStep = 0;
     this.walkthroughHarness = null;
+  }
+
+  // Open walkthrough from URL hash (e.g., #walkthrough/SuiteName/TestName)
+  openFromHash(hash) {
+    const match = hash.match(/^#walkthrough\/([^/]+)\/(.+)$/);
+    if (!match) return false;
+
+    const suiteName = decodeURIComponent(match[1]);
+    const testName = decodeURIComponent(match[2]);
+
+    // Find suite and test
+    const suite = runner.suites.find(s => s.name === suiteName);
+    if (!suite) return false;
+
+    const testIndex = suite.results.findIndex(t => t.name === testName);
+    if (testIndex === -1) return false;
+
+    this.open(suiteName, testIndex);
+    return true;
   }
 
   // Record a step (called by EditorTestHarness)
@@ -50,6 +71,13 @@ class Walkthrough {
     if (!test || !test.fixture || !test.fixture.walkthrough) return;
 
     this.currentTest = test;
+    this.currentSuiteName = suiteName;
+    this.currentTestIndex = testIndex;
+
+    // Update URL hash for deeplink
+    const encodedSuite = encodeURIComponent(suiteName);
+    const encodedTest = encodeURIComponent(test.name);
+    history.replaceState(null, null, `#walkthrough/${encodedSuite}/${encodedTest}`);
     this.currentStep = 0;
     this.steps = test.fixture.walkthrough.steps;
 
@@ -266,8 +294,13 @@ class Walkthrough {
     document.getElementById('walkthrough-backdrop').classList.remove('active');
     document.getElementById('walkthrough-panel').classList.remove('active');
     this.currentTest = null;
+    this.currentSuiteName = null;
+    this.currentTestIndex = null;
     this.currentStep = 0;
     this.walkthroughHarness = null;
+
+    // Clear URL hash
+    history.replaceState(null, null, window.location.pathname + window.location.search);
   }
 
   renderCode() {

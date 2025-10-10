@@ -1126,7 +1126,7 @@
     </div>
     <div id="tab-grammar" class="tab-content">
         <main>
-            <div style="width: 100%; flex: 1; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.6; background: #1e1e1e; color: #d4d4d4; overflow-y: auto; white-space: pre;">## DSL Grammar (v4.2.0)
+            <div style="width: 100%; flex: 1; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.6; background: #1e1e1e; color: #d4d4d4; overflow-y: auto; white-space: pre;">A domain specific language for testing the text editor state
 <span style="color: #81C784;">&lt;command&gt;</span>          ::= <span style="color: #81C784;">&lt;press-command&gt;</span> | <span style="color: #81C784;">&lt;type&gt;</span> | <span style="color: #81C784;">&lt;expect-cursor&gt;</span> | <span style="color: #81C784;">&lt;expect-selection&gt;</span>
 <span style="color: #81C784;">&lt;type&gt;</span>             ::= <span style="color: #FFB74D;">TYPE</span> <span style="color: #64B5F6;">"text"</span>
 <span style="color: #81C784;">&lt;press-command&gt;</span>    ::= <span style="color: #81C784;">&lt;press&gt;</span> <span style="color: #9575CD;">[quantification]</span> [<span style="color: #FFB74D;">with</span> <span style="color: #64B5F6;">&lt;modifiers&gt;</span>]
@@ -1139,7 +1139,7 @@
 <span style="color: #81C784;">&lt;quantification&gt;</span>   ::= <span style="color: #9575CD;">once</span> | <span style="color: #9575CD;">N time(s)</span> <span style="opacity: 0.6;">(default: once)</span>
 <span style="color: #81C784;">&lt;modifiers&gt;</span>        ::= <span style="color: #64B5F6;">shift</span> | <span style="color: #64B5F6;">meta</span> | <span style="color: #64B5F6;">meta, shift</span>
 
-### Examples in Normalized Form <span style="color: #4CAF50;">  →</span>  Transpilation
+Examples in Normalized Form <span style="color: #4CAF50;">      →</span>  Transpilation
 <span style="color: #FFB74D;">TYPE</span> <span style="color: #64B5F6;">"Hello"</span>                      <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">type</span>(<span style="color: #64B5F6;">'Hello'</span>);
 <span style="color: #FFB74D;">PRESS</span> <span style="color: #64B5F6;">a</span> <span style="color: #9575CD;">once</span>                      <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">'a'</span>).<span style="color: #9575CD;">once()</span>;
 <span style="color: #FFB74D;">PRESS</span> <span style="color: #64B5F6;">";"</span>                         <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">';'</span>).<span style="color: #9575CD;">once()</span>;
@@ -1311,21 +1311,28 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             return div.innerHTML;
         }
 
-        // Tab switching
+        // Declare variables before they're used in functions
+        let testsCompiledSinceLastView = false;
+        let lastCompileHadErrors = false;
+        let lastCompileErrors = [];
+        let lastDuplicates = [];
+
+        // Tab switching with deeplink support
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
+        function switchToTab(tabName) {
+            // Remove active class from all tabs and content
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
 
-                // Remove active class from all tabs and content
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
+            // Add active class to specified tab and corresponding content
+            const targetTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+            const targetContent = document.getElementById(`tab-${tabName}`);
 
-                // Add active class to clicked tab and corresponding content
-                tab.classList.add('active');
-                document.getElementById(`tab-${tabName}`).classList.add('active');
+            if (targetTab && targetContent) {
+                targetTab.classList.add('active');
+                targetContent.classList.add('active');
 
                 // Shake timer if switching to tests tab and tests were compiled since last view
                 if (tabName === 'tests') {
@@ -1340,8 +1347,55 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                         timingDiv.classList.remove('shake');
                     }
                 }
+            }
+        }
+
+        // Handle tab clicks
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                // Update URL hash without triggering scroll
+                history.replaceState(null, null, `#${tabName}`);
+                switchToTab(tabName);
             });
         });
+
+        // Handle browser navigation (back/forward)
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash;
+
+            // Check if it's a walkthrough deeplink
+            if (hash.startsWith('#walkthrough/')) {
+                // Switch to tests tab first
+                switchToTab('tests');
+                // Open walkthrough from hash
+                setTimeout(() => walkthrough.openFromHash(hash), 100);
+            } else if (hash) {
+                // Regular tab deeplink
+                const tabName = hash.slice(1); // Remove the '#'
+                switchToTab(tabName);
+            }
+        });
+
+        // Initialize tab or walkthrough based on URL hash on page load
+        function initializeFromHash() {
+            const hash = window.location.hash;
+
+            if (hash.startsWith('#walkthrough/')) {
+                // Switch to tests tab first
+                switchToTab('tests');
+                // Defer walkthrough opening until tests are loaded
+                // This will be called after runAllTests() completes
+                window.deferredWalkthroughHash = hash;
+            } else if (hash) {
+                // Regular tab deeplink
+                const tabName = hash.slice(1);
+                switchToTab(tabName);
+            }
+        }
+
+        // Call after DOM is ready
+        initializeFromHash();
 
         // Source tab logic
         const transpiler = new DSLTranspiler();
@@ -1353,9 +1407,6 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
         const statusUpToDate = document.getElementById('status-uptodate');
 
         let lastGeneratedSource = '';
-        let testsCompiledSinceLastView = false;
-        let lastCompileHadErrors = false;
-        let lastCompileErrors = [];
 
         // Helper functions for overlay editor
         function getEditorContent() {
@@ -1402,15 +1453,50 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 const result = generator.generate(dslSource);
                 const jsOutput = result.code;
                 const errors = result.errors;
+                const duplicates = result.duplicates || [];
 
                 // Display generated JavaScript
                 const highlighted = hljs.highlight(jsOutput, { language: 'javascript' }).value;
                 outputDiv.innerHTML = highlighted;
                 outputDiv.style.color = '';
                 outputDiv.dataset.plainJs = jsOutput; // Store plain JavaScript for eval
+                outputDiv.dataset.hasDuplicates = duplicates.length > 0 ? 'true' : 'false';
 
+                // Handle duplicate test names (fatal error)
+                if (duplicates.length > 0) {
+                    lastCompileHadErrors = true;
+                    lastCompileErrors = [];
+                    lastDuplicates = duplicates;
+
+                    // Add red border to JS output for duplicates
+                    outputDiv.classList.add('has-errors');
+                    outputDiv.style.borderColor = '#f44336';
+
+                    // Show fatal error warning in header
+                    const dupCount = duplicates.length;
+                    const dupText = dupCount === 1 ? '1 duplicate test name' : `${dupCount} duplicate test names`;
+                    errorWarningText.textContent = `⚠ FATAL: ${dupText} detected`;
+                    errorWarning.style.display = 'flex';
+
+                    // Populate modal with duplicate details
+                    let errorHtml = '<div style="padding: 1rem; background: #3a1e1e; border-left: 4px solid #f44336; margin-bottom: 1rem;">';
+                    errorHtml += '<div style="font-size: 1.1rem; font-weight: bold; color: #f44336; margin-bottom: 0.5rem;">FATAL ERROR: Duplicate Test Names</div>';
+                    errorHtml += '<div style="margin-bottom: 0.5rem;">Tests cannot run when multiple tests have the same name within a suite.</div>';
+                    errorHtml += '</div>';
+
+                    duplicates.forEach(dup => {
+                        errorHtml += `
+                            <div class="error-item" style="border-left-color: #f44336;">
+                                <div class="error-location">Duplicate: "${dup.suite}" > "${dup.test}"</div>
+                                <div class="error-message">First defined on line ${dup.firstLine}</div>
+                                <div class="error-message">Duplicate found on line ${dup.secondLine}</div>
+                            </div>
+                        `;
+                    });
+                    errorsModalContent.innerHTML = errorHtml;
+                }
                 // Handle compile errors
-                if (errors && errors.length > 0) {
+                else if (errors && errors.length > 0) {
                     lastCompileHadErrors = true;
                     lastCompileErrors = errors;
 
@@ -1443,7 +1529,9 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                     // No errors - clear styling
                     lastCompileHadErrors = false;
                     lastCompileErrors = [];
+                    lastDuplicates = [];
                     outputDiv.classList.remove('has-errors');
+                    outputDiv.style.borderColor = '';
                     errorWarning.style.display = 'none';
                     errorsModalContent.innerHTML = '';
                 }
@@ -1503,6 +1591,14 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
                 // Run tests after loading and transpiling
                 await runAllTests();
+
+                // Open deferred walkthrough if URL had a walkthrough hash
+                if (window.deferredWalkthroughHash) {
+                    setTimeout(() => {
+                        walkthrough.openFromHash(window.deferredWalkthroughHash);
+                        window.deferredWalkthroughHash = null;
+                    }, 100);
+                }
             } catch (error) {
                 setEditorContent(`Error loading DSL file: ${error.message}`);
                 updateLineNumbers();
@@ -1676,7 +1772,59 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 }
             } catch (error) {
                 const resultsContainer = document.getElementById('test-results');
-                resultsContainer.innerHTML = `<div style="padding: 20px; color: #f48771;">Error loading tests: ${error.message}</div>`;
+
+                // Check if this is a duplicate test names error
+                if (error.message.includes('Duplicate test names detected')) {
+                    // Use stored duplicates information for detailed display
+                    let duplicatesHtml = '';
+
+                    if (lastDuplicates.length > 0) {
+                        lastDuplicates.forEach(dup => {
+                            duplicatesHtml += `
+                                <div style="background: #2d2d30; padding: 1rem; margin: 0.75rem 0; border-left: 3px solid #f44336; border-radius: 3px;">
+                                    <div style="font-size: 1rem; color: #4EC9B0; font-weight: 600; margin-bottom: 0.5rem;">
+                                        "${dup.suite}" > "${dup.test}"
+                                    </div>
+                                    <div style="font-size: 0.9rem; color: #d4d4d4;">
+                                        First defined on <strong style="color: #f48771;">line ${dup.firstLine}</strong>
+                                    </div>
+                                    <div style="font-size: 0.9rem; color: #d4d4d4;">
+                                        Duplicate found on <strong style="color: #f48771;">line ${dup.secondLine}</strong>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    resultsContainer.innerHTML = `
+                        <div style="padding: 20px; background: #3a1e1e; border: 2px solid #f44336; border-radius: 6px; margin-top: 20px;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #f44336; margin-bottom: 1rem;">
+                                ⚠ No Tests Ran: Duplicate Test Names Detected
+                            </div>
+                            <div style="font-size: 1rem; color: #d4d4d4; margin-bottom: 1rem;">
+                                Tests cannot run when multiple tests have the same name within a suite.
+                            </div>
+                            ${duplicatesHtml}
+                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #555;">
+                                <strong>To fix:</strong> Rename one of the duplicate tests to make them unique within the suite.
+                            </div>
+                        </div>
+                    `;
+
+                    // Update summary to show no tests ran
+                    document.getElementById('total-tests').textContent = '0';
+                    document.getElementById('passed-tests').textContent = '0';
+                    document.getElementById('failed-tests').textContent = '0';
+                    document.getElementById('skipped-tests').textContent = '0';
+                    document.getElementById('test-timing').innerHTML = '';
+
+                    // Hide the test error banner (details are shown in main results area)
+                    const testErrorWarning = document.getElementById('test-error-warning');
+                    testErrorWarning.style.display = 'none';
+                } else {
+                    resultsContainer.innerHTML = `<div style="padding: 20px; color: #f48771;">Error loading tests: ${error.message}</div>`;
+                }
+
                 console.error('Error executing generated tests:', error);
             }
         }
