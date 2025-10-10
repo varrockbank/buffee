@@ -1,5 +1,5 @@
 function WarrenBuf(node, config = {}) {
-  this.version = "2.2.6-alpha.1";
+  this.version = "3.1.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -12,7 +12,10 @@ function WarrenBuf(node, config = {}) {
     colorPrimary = "#B2B2B2",
     colorSecondary = "#212026",
     gutterSize: initialGutterSize = 2,
-    gutterPadding = 1
+    gutterPadding = 1,
+    logger = (s) => {
+      console.log(s);
+    },
   } = config;
 
   let gutterSize = initialGutterSize;
@@ -410,11 +413,41 @@ function WarrenBuf(node, config = {}) {
 
   const Model = {
     lines: [''],
+   
     byteCount: "",
     originalLineCount: 0,
     treeSitterTree: null,
     treeSitterCaptures: [],
-    get lastIndex() { return this.lines.length - 1 },
+
+    useChunkedMode: false,
+    chunks: [],
+    chunkSize: 50_000,
+    totalLines: 0,
+    buffer: [],           // Current chunk decompressed
+    currentChunkIndex: -1, // -1 = buffer is incomplete last chunk, 0+ = buffer holds chunks[currentChunkIndex] decompressed
+    prevBuffer: [],       // Previous chunk decompressed (currentChunkIndex - 1)
+    nextBuffer: [],       // Next chunk decompressed (currentChunkIndex + 1)
+    _textEncoder: new TextEncoder(),
+    _textDecoder: new TextDecoder(),
+    activateChunkMode(chunkSize = 50_000) {
+        // Ensure Viewport does not straddle more than 2 chunks.
+        // TODO: we don't enforce this invariant when setting Viewport.size
+        if (Viewport.size >= chunkSize) {
+          throw new Error(`Viewport ${Viewport.size} can't be larger than chunkSize ${chunkSize}`);
+        }
+        this.useChunkedMode = true;
+        this.chunks = [];
+        this.buffer = [];
+        this.totalLines = 0;
+        this.lines = [];
+        this.currentChunkIndex = -1;
+        this.prevBuffer = [];
+        this.nextBuffer = [];
+        this.chunkSize = chunkSize;
+    },
+
+    get lastIndex() { return this.useChunkedMode ? this.totalLines - 1 : this.lines.length - 1 },
+
     set text(text) {
       this.lines = text.split("\n");
       this.byteCount = new TextEncoder().encode(text).length
@@ -422,32 +455,155 @@ function WarrenBuf(node, config = {}) {
       if(treeSitterParser && treeSitterQuery) {
         this.treeSitterTree = treeSitterParser.parse(text);
         this.treeSitterCaptures = treeSitterQuery.captures(this.treeSitterTree.rootNode);
-        // for (const { name, node } of this.treeSitterCaptures) {
-        //   console.log(name, node.text); // e.g. "function greet"
-        //   console.log(node);
-        // }
       }
-
       render(true);
     },
+
     splice(i, lines, n = 0) {
       this.lines.splice(i , n, ...lines);
       render();
     },
+
     delete(i) {
       this.lines.splice(i, 1);
     },
-    appendLines(newLines) {
-      this.lines.push(...newLines);
-      render();
+
+    async appendLines(newLines, skipRender = false) {
+      if (this.useChunkedMode) {
+        // Calculate chunk indices based on totalLines
+        let startChunkIndex = Math.floor(this.totalLines / this.chunkSize);
+        let startPosInChunk = this.totalLines % this.chunkSize;
+
+        let remainingLines = newLines;
+        // Store some in current chunk
+        if(startChunkIndex == this.currentChunkIndex) {
+          const remainingSpace = this.chunkSize - this.buffer.length;
+          const linesToCurrentChunk = newLines.slice(0, remainingSpace);
+          remainingLines = newLines.slice(remainingSpace);
+          this.buffer.push(linesToCurrentChunk);
+          this.totalLines += remainingSpace;
+          startChunkIndex++;
+          startPosInChunk = 0;
+        }
+
+        while(remainingLines.length != 0) {
+          let remainingSpaceInChunk = this.chunkSize - startPosInChunk;
+            // All remaining lines fit in current chunk
+          if(remainingLines.length <= remainingSpaceInChunk) {
+            // Either new chunk or existing chunk
+            let chunkLines = [];
+            if (startChunkIndex < this.chunks.length) {
+              chunkLines = await this._decompressChunk(startChunkIndex);
+            }
+
+            chunkLines.push(...remainingLines);
+            this.totalLines += remainingLines.length;
+
+            await this._compressChunk(startChunkIndex, chunkLines);
+
+            remainingLines = [];
+          } else {
+            const linesInChunk = remainingLines.slice(0, remainingSpaceInChunk);
+            remainingLines = remainingLines.slice(remainingSpaceInChunk);
+
+            // 1. Read chunk out of compression (if it exists)
+            let chunkLines = [];
+            if (startChunkIndex < this.chunks.length) {
+              chunkLines = await this._decompressChunk(startChunkIndex);
+            }
+
+            // 2. Append linesInChunk to chunk
+            chunkLines.push(...linesInChunk);
+            this.totalLines += linesInChunk.length;
+
+            // 3. Recompress chunk
+            await this._compressChunk(startChunkIndex, chunkLines);
+
+            startChunkIndex++;
+            startPosInChunk = 0;
+          }
+        }
+      } else {
+        // Legacy mode for small files
+        this.lines.push(...newLines);
+      }
+      if (!skipRender) render();
+    },
+
+    // Compress chunk at given index using gzip
+    async _compressChunk(chunkIndex, lines) {
+      logger(`[Compress] Compressing chunk ${chunkIndex} (${lines.length} lines)`);
+      const text = lines.join('\n');
+      const data = this._textEncoder.encode(text);
+
+      // Use CompressionStream API (gzip)
+      const stream = new ReadableStream({ start(controller) { controller.enqueue(data); controller.close(); }});
+
+      const chunks = [];
+      const reader = stream.pipeThrough(new CompressionStream('gzip')).getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+
+      // Combine all Uint8Array chunks into one
+      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+      const result = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        result.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      if (chunkIndex < this.chunks.length) {
+        this.chunks[chunkIndex] = result;
+      } else {
+        this.chunks.push(result);
+      }
+      logger(`[Compress] Chunk ${chunkIndex} compressed: ${(result.length / 1024).toFixed(2)} KB`);
+    },
+
+    // Decompress chunk at given index
+    async _decompressChunk(chunkIndex) {
+      logger(`[Decompress] Decompressing chunk ${chunkIndex}`);
+      const compressed = this.chunks[chunkIndex];
+      const stream = new ReadableStream({ start(controller) { controller.enqueue(compressed); controller.close(); }});
+
+      const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip'));
+      const chunks = [];
+      const reader = decompressedStream.getReader();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+
+      // Efficiently concatenate Uint8Array chunks
+      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+      const result = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        result.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      const text = this._textDecoder.decode(result);
+      const lines = text.split('\n');
+      logger(`[Decompress] Chunk ${chunkIndex} decompressed: ${lines.length} lines`);
+      return lines;
     },
   }
   const Viewport = {
     start: 0, // 0-indexed line number in Model buffer.
     size: initialViewportSize,
+
     get end() {
       return Math.min(this.start + this.size - 1, Model.lastIndex);
     },
+
     // @param i, amount to scroll viewport by.
     scroll(i) {
       const t0 = performance.now();
@@ -456,18 +612,84 @@ function WarrenBuf(node, config = {}) {
       render();
       const t1 = performance.now();
       const millis = parseFloat(t1 - t0);
-      console.log(`Took ${millis.toFixed(2)} millis to scroll viewport with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
+      const lineCount = Model.useChunkedMode ? Model.totalLines : Model.lines.length;
+      console.log(`Took ${millis.toFixed(2)} millis to scroll viewport with ${lineCount} lines. That's ${1000/millis} FPS.`);
     },
+
     set(start, size) {
       this.start = $clamp(start-1, 0, Model.lastIndex);
       if(this.size !== size) {
         this.size = size;
-        render(true );
+        render(true);
       } else {
         render();
       }
     },
+
     get lines() {
+      if (Model.useChunkedMode) {
+        const startChunkIndex = Math.floor(this.start / Model.chunkSize);
+        const endChunkIndex = Math.floor(this.end / Model.chunkSize);
+
+        // Check if we need to load new chunks
+        if(Model.currentChunkIndex !== startChunkIndex) {
+          // Asynchronously load prev, current, and next chunks
+          const loadChunks = async () => {
+            const prevChunkIndex = startChunkIndex - 1;
+            const nextChunkIndex = startChunkIndex + 1;
+
+            logger(`[Buffer] Loading 3-chunk window:`);
+            logger(`  - Prev: ${prevChunkIndex >= 0 && prevChunkIndex < Model.chunks.length ? prevChunkIndex : 'none'}`);
+            logger(`  - Current: ${startChunkIndex}`);
+            logger(`  - Next: ${nextChunkIndex < Model.chunks.length ? nextChunkIndex : 'none'}`);
+
+            Model.currentChunkIndex = startChunkIndex;
+
+            // Load current chunk
+            Model.buffer = await Model._decompressChunk(startChunkIndex);
+
+            // Load previous chunk if it exists
+            if (prevChunkIndex >= 0 && prevChunkIndex < Model.chunks.length) {
+              Model.prevBuffer = await Model._decompressChunk(prevChunkIndex);
+            } else {
+              Model.prevBuffer = [];
+            }
+
+            // Load next chunk if it exists
+            if (nextChunkIndex < Model.chunks.length) {
+              Model.nextBuffer = await Model._decompressChunk(nextChunkIndex);
+            } else {
+              Model.nextBuffer = [];
+            }
+
+            logger(`[Buffer] 3-chunk window loaded successfully`);
+            render(); // Re-render once decompressed
+          };
+
+          loadChunks();
+          return Array(this.size).fill("..."); // Show placeholders while decompressing
+        }
+
+        // Build result from available chunks
+        const result = [];
+        for (let i = this.start; i <= this.end; i++) {
+          const chunkIndex = Math.floor(i / Model.chunkSize);
+          const lineInChunk = i % Model.chunkSize;
+
+          if (chunkIndex === startChunkIndex - 1 && Model.prevBuffer.length > 0) {
+            result.push(Model.prevBuffer[lineInChunk] || '');
+          } else if (chunkIndex === startChunkIndex) {
+            result.push(Model.buffer[lineInChunk] || '');
+          } else if (chunkIndex === startChunkIndex + 1 && Model.nextBuffer.length > 0) {
+            result.push(Model.nextBuffer[lineInChunk] || '');
+          } else {
+            result.push('');
+          }
+        }
+        return result;
+      }
+
+      // Legacy mode
       return Model.lines.slice(this.start, this.end + 1);
     },
   };
@@ -494,7 +716,8 @@ function WarrenBuf(node, config = {}) {
   }
   function render(renderLineContainers = false) {
     if (lastRender.lineCount !== Model.lastIndex + 1 ) {
-      $lineCounter.textContent = `${lastRender.lineCount = Model.lastIndex + 1}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
+      const lineCount = lastRender.lineCount = Model.lastIndex + 1;
+      $lineCounter.textContent = `${lineCount.toLocaleString()}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
     }
 
     // TODO: nit: we don't reclaim and shrink the gutter if the text get smaller.
@@ -640,6 +863,17 @@ function WarrenBuf(node, config = {}) {
   this.Viewport = Viewport;
   this.Model = Model;
   this.Selection = Selection;
+  // TODO: Needs rework. This temporary for the file-loader log viewer. 
+  this.appendLineAtEnd = (s) => {
+    if(Model.lines[0] == '') {
+      Model.lines[0] = s;
+    } else {
+      Model.lines[Model.lines.length] = s;
+    }
+   
+    Viewport.start = Math.max(0, Model.lines.length - Viewport.size - 1);
+    render(true);
+  };
 
   render(true);
 
@@ -725,6 +959,8 @@ function WarrenBuf(node, config = {}) {
           Selection.moveCol(1);
         }
       }
+    } else if (Model.useChunkedMode) { // navigation-only in chunked mode.
+      return;
     } else if (event.key === "Backspace") {
       Selection.delete();
     } else if (event.key === "Enter") {

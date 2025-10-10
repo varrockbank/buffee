@@ -260,6 +260,16 @@
     margin: 10px;
 
   }
+
+  .read-only-indicator {
+    background-color: #ff6b35;
+    color: white;
+    padding: 8px 15px;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 15px 15px 0 0;
+    margin: 15px 15px 0px 15px;
+  }
 </style>
 </head>
 
@@ -271,8 +281,13 @@
       <a href="https://github.com/varrockbank/warrenbuf">Github</a>
     </div>
   </div>
-  A performant text buffer for the web with editor functionality.
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="playground">
+  <div style="margin-bottom: 15px">
+    A performant text buffer for the web with editor functionality.
+  </div>
+  <div id="read-only-indicator" class="read-only-indicator hidden">
+    📖 Read-Only Mode (Chunked+Compressed) - Navigation only, editing disabled
+  </div>
+  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="playground" style="margin-top: 0;">
     <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="💪">
@@ -291,7 +306,7 @@
       </div>
   </blockquote>
   <details>
-    <summary>File loader</summary>
+    <summary>Large File Diagnostics</summary>
     <fieldset>
       <legend>Viewport:</legend>
       <label for="viewport-start">Start:</label>
@@ -310,12 +325,32 @@
           <label for="append-at-line">At line: </label><input id="append-at-line" value="1" ></input>
           <div style="margin: 10px" id="file-loader-options">
             <button id="load-file-naive">Naive file loader (&lt;10 million line of code files. Fast)</button>
-            <button id="load-file-chunked">File.slice byte chunk loader (&lt;70 million LOC. Faster)</button>
-            <button id="load-file-filereader">FileReader chunk loader (&lt;70 million LOC. Faster)</button>
-            <button id="load-file-stream">ReadableStream (&lt;70 million LOC. Faster)</button>
-            <button id="load-file-stream-materialized">ReadableStream w/ materialized strings (&lt;75M LOC. Slow)</button>
-            <button id="load-file-stream-materialized-gc">ReadableStream w/ materialized strings + force GC (&lt;70-90M LOC. Non-deterministic; depends on mood of GC. Slower)</button>
+            <button id="load-file-chunked">File.slice byte chunk loader (&lt;70 million CLOC. Faster)</button>
+            <button id="load-file-filereader">FileReader chunk loader (&lt;70 million CLOC. Faster)</button>
+            <button id="load-file-stream">ReadableStream (&lt;70 million CLOC. Faster)</button>
+            <button id="load-file-stream-materialized">ReadableStream w/ materialized strings (&lt;75M CLOC. Slow)</button>
+            <button id="load-file-stream-materialized-gc">ReadableStream w/ materialized strings + force GC (&lt;70-90M CLOC. Non-deterministic; depends on mood of GC. Slower)</button>
+            <button id="load-file-chunked-compressed">Ultra-high-capacity Mode (1 billion+ CLOC. Slowest. Read-only, for now.)</button>
           </div>
+          <h3>Logviewer for ultra-high-capacity-mode:</h3>
+          <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="file-loader-logs" style="margin-top: 0;">
+          <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
+          <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+            <div class="💪">
+                <div class="wb-gutter"></div>
+                <div class="wb-lines 🌳 🥷"></div>
+            </div>
+            <div class="💪 wb-status 🦠">
+                <div class="wb-status-left 💪">
+                    <span class="wb-linecount"></span>
+                </div>
+                <div class="wb-status-right 💪">
+                    <span class="wb-coordinate"></span>
+                    <span>|</span>
+                    <span class="wb-indentation"></span>
+                </div>
+            </div>
+          </blockquote>
         </div>
       </div>
     </fieldset>
@@ -468,10 +503,21 @@
 <script>
   window.addEventListener("DOMContentLoaded", () => {
 
+    const fileLoaderLoggerElement = document.getElementById('file-loader-logs');
+    const fileLoaderLogger = new WarrenBuf(fileLoaderLoggerElement, {
+      colorPrimary: "#87FF5F",
+      colorSecondary: "#38274D",
+      initialViewportSize: 5
+    });
+
     const mainElement = document.getElementById("playground");
     const primary = new WarrenBuf(mainElement, {
       colorPrimary: "#87FF5F",
       colorSecondary: "#38274D",
+      logger: s => {
+        console.log(s);
+        fileLoaderLogger.appendLineAtEnd(s);
+      },
     });
     mainElement.focus();
     window.primary = primary;
@@ -860,6 +906,78 @@
         const t1 = performance.now();
         const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
         console.log(`[Stream+Mat] Loaded ${primary.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
+      } finally {
+        reader.releaseLock();
+      }
+    });
+
+    document.getElementById('load-file-chunked-compressed').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) {
+        alert("No file selected");
+        return;
+      }
+
+      const reader = f.stream().getReader();
+      try {
+        primary.Model.activateChunkMode();
+        document.getElementById('read-only-indicator').classList.remove('hidden');
+
+        const decoder = new TextDecoder('utf-8');
+        let chunkCount = 0;
+        const t0 = performance.now();
+        let remainder = '';
+        let originalSize = 0;
+        let compressedSize = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const lastNewlineIndex = text.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            const allLines = text.split('\n');
+            const slicedLines = allLines.slice(0, -1);
+            slicedLines[0] = remainder + slicedLines[0];
+            remainder = allLines[allLines.length - 1];
+
+            // Materialize to break string references
+            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
+            originalSize += materializedLines.join('\n').length;
+            await primary.Model.appendLines(materializedLines, true);
+          } else {
+            remainder += text;
+          }
+
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            await primary.Model.appendLines([], false); // Trigger render
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        // Handle final remainder
+        if (remainder.length > 0) {
+          await primary.Model.appendLines([remainder], false);
+        }
+
+        // Calculate compressed size
+        for (const chunk of primary.Model.chunks) {
+          compressedSize += chunk.length;
+        }
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+
+        console.log(`[Chunked+Compressed] Stored ${primary.Model.totalLines.toLocaleString()} lines in ${primary.Model.chunks.length} gzipped chunks`);
+        console.log(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
+        console.log(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
+        console.log(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
+        console.log(`  Compression ratio: ${compressionRatio}% savings`);
+        console.log(`  Memory savings: ${primary.Model.chunks.length} chunks vs ${primary.Model.totalLines.toLocaleString()} array elements = ${(primary.Model.totalLines / primary.Model.chunks.length).toFixed(0)}x reduction`);
       } finally {
         reader.releaseLock();
       }

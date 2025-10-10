@@ -1,5 +1,13 @@
 * Project Devlog
 
+** 3.1.0-alpha.1 [2025-10-10]
+*** ✨ New Features
+- Ability to set a custom logger. 
+
+** 3.0.0-alpha.1 [2025-10-10]
+*** ✨ New Features
+- Ultra-high-capacity mode supports billion line files 
+
 ** 2.3.0-alpha.1 [2025-10-1]
 *** ✨ API 
 - Accept a configuration object for instantion 
