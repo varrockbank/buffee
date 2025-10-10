@@ -1,5 +1,13 @@
 * Project Devlog
 
+** 4.1.0-alpha.1 [2025-10-10]
+*** ✨ New Features
+- Ability to hide status line
+
+** 4.0.0-alpha.1 [2025-10-10]
+*** ✨ New Features
+- Ability to hide gutter
+
 ** 3.1.0-alpha.1 [2025-10-10]
 *** ✨ New Features
 - Ability to set a custom logger. 

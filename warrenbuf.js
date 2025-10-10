@@ -1,5 +1,5 @@
 function WarrenBuf(node, config = {}) {
-  this.version = "3.1.0-alpha.1";
+  this.version = "4.1.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -16,6 +16,8 @@ function WarrenBuf(node, config = {}) {
     logger = (s) => {
       console.log(s);
     },
+    showGutter = true,
+    showStatusLine = true,
   } = config;
 
   let gutterSize = initialGutterSize;
@@ -32,7 +34,8 @@ function WarrenBuf(node, config = {}) {
   Object.assign($status.style, {
     padding: '6px',
     background: colorSecondary,
-    color: colorPrimary
+    color: colorPrimary,
+    display: showStatusLine ? '' : 'none'
   });
   const $statusLineCoord = node.querySelector('.wb-coordinate');
   const $lineCounter = node.querySelector('.wb-linecount');
@@ -49,7 +52,8 @@ function WarrenBuf(node, config = {}) {
     paddingRight: editorPaddingPX*2+'px',
     backgroundColor: colorSecondary,
     color: colorPrimary,
-    width: gutterSize+gutterPadding+'ch'
+    width: gutterSize+gutterPadding+'ch',
+    display: showGutter ? '' : 'none'
   });
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.

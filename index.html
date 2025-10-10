@@ -277,7 +277,8 @@
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h1 style="margin: 0;">WarrenBuf Gallery</h1>
     <div style="margin-right: 5px">
-      <a href="test">Tests</a> |
+      <a href="test">Unit tests</a> |
+      <a href="perf">Perf Characterization</a> |
       <a href="https://github.com/varrockbank/warrenbuf">Github</a>
     </div>
   </div>
@@ -507,17 +508,19 @@
     const fileLoaderLogger = new WarrenBuf(fileLoaderLoggerElement, {
       colorPrimary: "#87FF5F",
       colorSecondary: "#38274D",
-      initialViewportSize: 5
+      initialViewportSize: 5,
+      showGutter: false
     });
 
+    function compressedFileLoaderLogger(s) {
+      console.log(s);
+      fileLoaderLogger.appendLineAtEnd(s);
+    };
     const mainElement = document.getElementById("playground");
     const primary = new WarrenBuf(mainElement, {
       colorPrimary: "#87FF5F",
       colorSecondary: "#38274D",
-      logger: s => {
-        console.log(s);
-        fileLoaderLogger.appendLineAtEnd(s);
-      },
+      logger: compressedFileLoaderLogger
     });
     mainElement.focus();
     window.primary = primary;
@@ -529,27 +532,32 @@
     const hackernews = new WarrenBuf(hackerNewsElement, {
       colorPrimary: "black",
       colorSecondary: "#FF6602",
+      showStatusLine: false,
     });
 
     const starWarsElement = document.getElementById('starwars');
     const starwars = new WarrenBuf(starWarsElement, {
       colorPrimary: "#FFD700",
       colorSecondary: "#000000",
-      initialViewportSize: 13
+      initialViewportSize: 13,
+      showGutter: false,
     });
 
     const matrixElement = document.getElementById('matrix');
     const matrix = new WarrenBuf(matrixElement, {
       colorPrimary: "#00ff41",
       colorSecondary: "#000000",
-      initialViewportSize: 20
+      initialViewportSize: 20,
+      showStatusLine: false,
     });
 
     const conwayElement = document.getElementById('conway');
     const conway = new WarrenBuf(conwayElement, {
       colorPrimary: "black",
       colorSecondary: "white",
-      initialViewportSize: 30
+      initialViewportSize: 30,
+      showStatusLine: false,
+      showGutter: false,
     });
 
     // Diagnostics -- Bind UI controls to move viewport
@@ -972,12 +980,12 @@
         const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
         const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
 
-        console.log(`[Chunked+Compressed] Stored ${primary.Model.totalLines.toLocaleString()} lines in ${primary.Model.chunks.length} gzipped chunks`);
-        console.log(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
-        console.log(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
-        console.log(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
-        console.log(`  Compression ratio: ${compressionRatio}% savings`);
-        console.log(`  Memory savings: ${primary.Model.chunks.length} chunks vs ${primary.Model.totalLines.toLocaleString()} array elements = ${(primary.Model.totalLines / primary.Model.chunks.length).toFixed(0)}x reduction`);
+        compressedFileLoaderLogger(`[Chunked+Compressed] Stored ${primary.Model.totalLines.toLocaleString()} lines in ${primary.Model.chunks.length} gzipped chunks`);
+        compressedFileLoaderLogger(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
+        compressedFileLoaderLogger(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
+        compressedFileLoaderLogger(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
+        compressedFileLoaderLogger(`  Compression ratio: ${compressionRatio}% savings`);
+        compressedFileLoaderLogger(`  Memory savings: ${primary.Model.chunks.length} chunks vs ${primary.Model.totalLines.toLocaleString()} array elements = ${(primary.Model.totalLines / primary.Model.chunks.length).toFixed(0)}x reduction`);
       } finally {
         reader.releaseLock();
       }

@@ -101,29 +101,29 @@ The unit of iteration however are in terms of bytes, i.e. 1mb at a time, rather 
 
 It works!
 
-[Chunked] Loaded 20,000,000 lines in 1348.00ms // 542.535 MiB (568888897 bytes)
-[Chunked] Loaded 50,000,001 lines in 5351.40ms // 1515.812 MiB (1589444040 bytes)
-[Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925.363 MiB (2018888931 bytes)
+- [Chunked] Loaded 20,000,000 lines in 1348.00ms // 542.535 MiB (568888897 bytes)
+- [Chunked] Loaded 50,000,001 lines in 5351.40ms // 1515.812 MiB (1589444040 bytes)
+- [Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925.363 MiB (2018888931 bytes)
 
 The browser tab crashes out at 72 million on a 100 million line file. 
 
 Naive is a little faster between 25-k5 million where performance starts bottoming out. 
 
-[Naive] Loaded 774 lines in 11.00ms // 0.028 MiB (29585 bytes)
-[Naive] Loaded 25,001 lines in 8.40ms // 0.895 MiB (938894 bytes)
-[Naive] Loaded 200,000 lines in 29.30ms // 5.044 MiB (5288894 bytes)
-[Naive] Loaded 500,001 lines in 41.60ms // 9.431 MiB (9888895 bytes)
-[Naive] Loaded 1,000,001 lines in 68.20ms // 18.968 MiB (19888896 bytes)
-[Naive] Loaded 5,000,001 lines in 295.60ms // 99.076 MiB (103888896 bytes)
-[Naive] Loaded 10,000,001 lines in 821.70ms // 265.969 MiB (278888897 bytes)
+- [Naive] Loaded 774 lines in 11.00ms // 0.028 MiB (29585 bytes)
+- [Naive] Loaded 25,001 lines in 8.40ms // 0.895 MiB (938894 bytes)
+- [Naive] Loaded 200,000 lines in 29.30ms // 5.044 MiB (5288894 bytes)
+- [Naive] Loaded 500,001 lines in 41.60ms // 9.431 MiB (9888895 bytes)
+- [Naive] Loaded 1,000,001 lines in 68.20ms // 18.968 MiB (19888896 bytes)
+- [Naive] Loaded 5,000,001 lines in 295.60ms // 99.076 MiB (103888896 bytes)
+- [Naive] Loaded 10,000,001 lines in 821.70ms // 265.969 MiB (278888897 bytes)
 
-[Chunked] Loaded 773 lines in 2.10ms // 0.028 MiB (29585 bytes)
-[Chunked] Loaded 25,000 lines in 11.80ms // 0.895 MiB (938894 bytes)
-[Chunked] Loaded 200,000 lines in 30.30ms // 5.044 MiB (5288894 bytes)
-[Chunked] Loaded 500,000 lines in 44.80ms // 9.431 MiB (9888895 bytes)
-[Chunked] Loaded 1,000,000 lines in 84.10ms // 18.968 MiB (19888896 bytes)
-[Chunked] Loaded 5,000,000 lines in 293.30ms // 99.076 MiB (103888896 bytes)
-[Chunked] Loaded 10,000,000 lines in 678.70ms // 265.969 MiB (278888897 bytes)
+- [Chunked] Loaded 773 lines in 2.10ms // 0.028 MiB (29585 bytes)
+- [Chunked] Loaded 25,000 lines in 11.80ms // 0.895 MiB (938894 bytes)
+- [Chunked] Loaded 200,000 lines in 30.30ms // 5.044 MiB (5288894 bytes)
+- [Chunked] Loaded 500,000 lines in 44.80ms // 9.431 MiB (9888895 bytes)
+- [Chunked] Loaded 1,000,000 lines in 84.10ms // 18.968 MiB (19888896 bytes)
+- [Chunked] Loaded 5,000,000 lines in 293.30ms // 99.076 MiB (103888896 bytes)
+- [Chunked] Loaded 10,000,000 lines in 678.70ms // 265.969 MiB (278888897 bytes)
 
 The chunked file byte reader implementation isn't too complex so it should be preferred for the robustness.  
 
@@ -131,7 +131,7 @@ Note: there is a slight off by 1 bug with the chunk-loader adding an implied new
 
 #### Memory Usage 
 
-[Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925.363 MiB (2018888931 bytes)
+- [Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925.363 MiB (2018888931 bytes)
 
 Consumed 3660MB of heap space, near the 4GB limit of Chrome's browser tab limit. 
 Running Chrome from the command line you can specify the flag "--js-flags="--max-old-space-size=8192" but this does not seem to increase the tab limit or heap size, otherwise we might have reached 140 million LOC with this approach alone.
@@ -139,42 +139,42 @@ Running Chrome from the command line you can specify the flag "--js-flags="--max
 #### Experimenting with other chunk sizes
 
 256kb 
-[Chunked] Loaded 200,000 lines in 44.80ms // 5.044 MiB (5288894 bytes)
-[Chunked] Loaded 500,000 lines in 50.40ms // 9.431 MiB (9888895 bytes)
-[Chunked] Loaded 1,000,000 lines in 97.20ms // 18.968 MiB (19888896 bytes)
-[Chunked] Loaded 5,000,000 lines in 365.80ms // 99.076 MiB (103888896 bytes)
-[Chunked] Loaded 10,000,000 lines in 872.80ms // 265.969 MiB (278888897 bytes)
-[Chunked] Loaded 20,000,000 lines in 1768.60ms // 542.535 MiB (568888897 bytes)
-[Chunked] Loaded 50,000,001 lines in 6921.20ms // 1515.812 MiB (1589444040 bytes)
+- [Chunked] Loaded 200,000 lines in 44.80ms // 5.044 MiB (5288894 bytes)
+- [Chunked] Loaded 500,000 lines in 50.40ms // 9.431 MiB (9888895 bytes)
+- [Chunked] Loaded 1,000,000 lines in 97.20ms // 18.968 MiB (19888896 bytes)
+- [Chunked] Loaded 5,000,000 lines in 365.80ms // 99.076 MiB (103888896 bytes)
+- [Chunked] Loaded 10,000,000 lines in 872.80ms // 265.969 MiB (278888897 bytes)
+- [Chunked] Loaded 20,000,000 lines in 1768.60ms // 542.535 MiB (568888897 bytes)
+- [Chunked] Loaded 50,000,001 lines in 6921.20ms // 1515.812 MiB (1589444040 bytes)
 
 512KB 
-[Chunked] Loaded 200,000 lines in 35.60ms // 5.044 MiB (5288894 bytes)
-[Chunked] Loaded 500,000 lines in 47.20ms // 9.431 MiB (9888895 bytes)
-[Chunked] Loaded 1,000,000 lines in 95.90ms // 18.968 MiB (19888896 bytes)
-[Chunked] Loaded 5,000,000 lines in 318.90ms // 99.076 MiB (103888896 bytes)
-[Chunked] Loaded 10,000,000 lines in 685.40ms // 265.969 MiB (278888897 bytes)
-[Chunked] Loaded 20,000,000 lines in 1394.80ms // 542.535 MiB (568888897 bytes)
-[Chunked] Loaded 50,000,001 lines in 4838.50ms // 1515.812 MiB (1589444040 bytes)
+- [Chunked] Loaded 200,000 lines in 35.60ms // 5.044 MiB (5288894 bytes)
+- [Chunked] Loaded 500,000 lines in 47.20ms // 9.431 MiB (9888895 bytes)
+- [Chunked] Loaded 1,000,000 lines in 95.90ms // 18.968 MiB (19888896 bytes)
+- [Chunked] Loaded 5,000,000 lines in 318.90ms // 99.076 MiB (103888896 bytes)
+- [Chunked] Loaded 10,000,000 lines in 685.40ms // 265.969 MiB (278888897 bytes)
+- [Chunked] Loaded 20,000,000 lines in 1394.80ms // 542.535 MiB (568888897 bytes)
+- [Chunked] Loaded 50,000,001 lines in 4838.50ms // 1515.812 MiB (1589444040 bytes)
 Crashed on 70,00,000 million @ 65,000,000
 
 1MB
-[Chunked] Loaded 200,000 lines in 30.30ms // 5.044 MiB (5288894 bytes)
-[Chunked] Loaded 500,000 lines in 44.80ms // 9.431 MiB (9888895 bytes)
-[Chunked] Loaded 1,000,000 lines in 84.10ms // 18.968 MiB (19888896 bytes)
-[Chunked] Loaded 5,000,000 lines in 293.30ms // 99.076 MiB (103888896 bytes)
-[Chunked] Loaded 10,000,000 lines in 678.70ms // 265.969 MiB (278888897 bytes)
-[Chunked] Loaded 20,000,000 lines in 1348.00ms // 542.535 MiB (568888897 bytes)
-[Chunked] Loaded 50,000,001 lines in 5351.40ms // 1515.812 MiB (1589444040 bytes)
-[Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925.363 MiB (2018888931 bytes)
+- [Chunked] Loaded 200,000 lines in 30.30ms // 5.044 MiB (5288894 bytes)
+- [Chunked] Loaded 500,000 lines in 44.80ms // 9.431 MiB (9888895 bytes)
+- [Chunked] Loaded 1,000,000 lines in 84.10ms // 18.968 MiB (19888896 bytes)
+- [Chunked] Loaded 5,000,000 lines in 293.30ms // 99.076 MiB (103888896 bytes)
+- [Chunked] Loaded 10,000,000 lines in 678.70ms // 265.969 MiB (278888897 bytes)
+- [Chunked] Loaded 20,000,000 lines in 1348.00ms // 542.535 MiB (568888897 bytes)
+- [Chunked] Loaded 50,000,001 lines in 5351.40ms // 1515.812 MiB (1589444040 bytes)
+- [Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925.363 MiB (2018888931 bytes)
 
 2MB
 
-[Chunked] Loaded 500,000 lines in 41.30ms // 9.431 MiB (9888895 bytes)
-[Chunked] Loaded 1,000,000 lines in 75.10ms // 18.968 MiB (19888896 bytes)
-[Chunked] Loaded 5,000,000 lines in 294.70ms // 99.076 MiB (103888896 bytes)
-[Chunked] Loaded 10,000,000 lines in 640.30ms // 265.969 MiB (278888897 bytes)
-[Chunked] Loaded 20,000,000 lines in 1316.30ms // 542.535 MiB (568888897 bytes)
-[Chunked] Loaded 50,000,001 lines in 5461.80ms // 1515.812 MiB (1589444040 bytes)
+- [Chunked] Loaded 500,000 lines in 41.30ms // 9.431 MiB (9888895 bytes)
+- [Chunked] Loaded 1,000,000 lines in 75.10ms // 18.968 MiB (19888896 bytes)
+- [Chunked] Loaded 5,000,000 lines in 294.70ms // 99.076 MiB (103888896 bytes)
+- [Chunked] Loaded 10,000,000 lines in 640.30ms // 265.969 MiB (278888897 bytes)
+- [Chunked] Loaded 20,000,000 lines in 1316.30ms // 542.535 MiB (568888897 bytes)
+- [Chunked] Loaded 50,000,001 lines in 5461.80ms // 1515.812 MiB (1589444040 bytes)
 
 3MB sometimes works 
 
@@ -182,8 +182,8 @@ Crashed on 70,00,000 million @ 65,000,000
 warrenbuf.js:441 Uncaught (in promise) RangeError: Maximum call stack size exceeded
     at Object.appendLines (warrenbuf.js:441:18)
     at HTMLButtonElement.<anonymous> (warrenbuf/:522:25)
-[Chunked] Loaded 10,000,000 lines in 663.20ms // 265.969 MiB (278888897 bytes)
-[Chunked] Loaded 50,000,001 lines in 5362.00ms // 1515.812 MiB (1589444040 bytes)
+- [Chunked] Loaded 10,000,000 lines in 663.20ms // 265.969 MiB (278888897 bytes)
+- [Chunked] Loaded 50,000,001 lines in 5362.00ms // 1515.812 MiB (1589444040 bytes)
 
 4MB
 Maximum call stack exceeded when calling appendLine. 
@@ -196,27 +196,27 @@ larger chunk sizes are more performant.
 
 There's a slight variation to this approach. Instead of blob.text(), we get a FileReader on the blob. It's maybe a few percentages faster but more complex dealing with async code.  
 
-[FileReader] Loaded 200,000 lines in 26.10ms // 5.044 MiB (5288894 bytes)
-[FileReader] Loaded 500,000 lines in 50.60ms // 9.431 MiB (9888895 bytes)
-[FileReader] Loaded 1,000,000 lines in 79.20ms // 18.968 MiB (19888896 bytes)
-[FileReader] Loaded 5,000,000 lines in 295.60ms // 99.076 MiB (103888896 bytes)
-[FileReader] Loaded 10,000,000 lines in 631.10ms // 265.969 MiB (278888897 bytes)
-[FileReader] Loaded 20,000,000 lines in 1388.80ms // 542.535 MiB (568888897 bytes)
-[FileReader] Loaded 50,000,001 lines in 5302.70ms // 1515.812 MiB (1589444040 bytes)
-[FileReader] Loaded 70,000,001 lines in 9702.10ms // 1925.363 MiB (2018888931 bytes)
+- [FileReader] Loaded 200,000 lines in 26.10ms // 5.044 MiB (5288894 bytes)
+- [FileReader] Loaded 500,000 lines in 50.60ms // 9.431 MiB (9888895 bytes)
+- [FileReader] Loaded 1,000,000 lines in 79.20ms // 18.968 MiB (19888896 bytes)
+- [FileReader] Loaded 5,000,000 lines in 295.60ms // 99.076 MiB (103888896 bytes)
+- [FileReader] Loaded 10,000,000 lines in 631.10ms // 265.969 MiB (278888897 bytes)
+- [FileReader] Loaded 20,000,000 lines in 1388.80ms // 542.535 MiB (568888897 bytes)
+- [FileReader] Loaded 50,000,001 lines in 5302.70ms // 1515.812 MiB (1589444040 bytes)
+- [FileReader] Loaded 70,000,001 lines in 9702.10ms // 1925.363 MiB (2018888931 bytes)
 
 ### Stream Loader 
 
 Stream API is the most modern. It is faster after 1 million then slows down after that.
 
-[Stream] Loaded 200,000 lines in 16.40ms // 5.044 MiB (5288894 bytes)
-[Stream] Loaded 500,000 lines in 50.40ms // 9.431 MiB (9888895 bytes)
-[Stream] Loaded 1,000,000 lines in 82.60ms // 18.968 MiB (19888896 bytes)
-[Stream] Loaded 5,000,000 lines in 249.60ms // 99.076 MiB (103888896 bytes)
-[Stream] Loaded 10,000,000 lines in 494.00ms // 265.969 MiB (278888897 bytes)
-[Stream] Loaded 20,000,000 lines in 1016.80ms // 542.535 MiB (568888897 bytes)
-[Stream] Loaded 50,000,001 lines in 4380.10ms // 1515.812 MiB (1589444040 bytes)
-[Stream] Loaded 70,000,001 lines in 12008.30ms // 1925.363 MiB (2018888931 bytes)
+- [Stream] Loaded 200,000 lines in 16.40ms // 5.044 MiB (5288894 bytes)
+- [Stream] Loaded 500,000 lines in 50.40ms // 9.431 MiB (9888895 bytes)
+- [Stream] Loaded 1,000,000 lines in 82.60ms // 18.968 MiB (19888896 bytes)
+- [Stream] Loaded 5,000,000 lines in 249.60ms // 99.076 MiB (103888896 bytes)
+- [Stream] Loaded 10,000,000 lines in 494.00ms // 265.969 MiB (278888897 bytes)
+- [Stream] Loaded 20,000,000 lines in 1016.80ms // 542.535 MiB (568888897 bytes)
+- [Stream] Loaded 50,000,001 lines in 4380.10ms // 1515.812 MiB (1589444040 bytes)
+- [Stream] Loaded 70,000,001 lines in 12008.30ms // 1925.363 MiB (2018888931 bytes)
 
 It crashed on 100m file. However, we don't have visibility where it failed between 
 70m and 100m. The implementation of Stream API loader blocks rendering until the entire file is loaded.
@@ -267,7 +267,14 @@ It merely has a non-zero chance of reaching meeting max capacity.
 
 This solution was unstable after 70 million LOC, however it would hit 88 million LOC often.
 
+### Ultra-High-capacity mode 
+
+This mode uses compression techniques. There's a secondary benefit that the compressed data lives in native C++ memory rather than the heap.
+
+Consequently, the editor breezed past the previous 88 million cap and 
+reached 1+ billion while consuming ~2.5GB of ram. This is contingent on the 
+specific file and its compression profile.
+
 ### Ideas
 
-Compression
 Index DB 
