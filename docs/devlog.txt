@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 5.2.0-alpha.1 [2025-12-11]
+*** ✨ New features
+- Prototype TUI API: Add nextElement method, can tab to next element
+
 ** 5.1.0-alpha.1 [2025-12-9]
 *** ✨ New features
 - Prototype TUI API: support multiple buttons on a row

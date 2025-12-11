@@ -428,6 +428,22 @@ function Vbuf(node, config = {}) {
     get enabled() { return tuiModeEnabled; },
     set enabled(value) {
       tuiModeEnabled = !!value;
+      // Move cursor to first element when enabling TUI mode
+      if (tuiModeEnabled && tuiElements.length > 0) {
+        // Find first element (sort by row, then col)
+        const sorted = [...tuiElements].sort((a, b) => a.row - b.row || a.col - b.col);
+        const first = sorted[0];
+        // Scroll only if element is not in view
+        if (first.row < Viewport.start) {
+          // Element is above viewport, scroll up so element is at top
+          Viewport.start = first.row;
+        } else if (first.row >= Viewport.start + Viewport.size) {
+          // Element is below viewport, scroll down so element is at bottom
+          Viewport.start = first.row - Viewport.size + 1;
+        }
+        // Set cursor to element position (viewport-relative)
+        Selection.setCursor({ row: first.row - Viewport.start, col: first.col });
+      }
       render(true);
     },
 
@@ -447,7 +463,7 @@ function Vbuf(node, config = {}) {
       }
 
       const id = ++tuiElementIdCounter;
-      const element = { id, row, col, content, highlighted: false };
+      const element = { id, row, col, content, highlighted: true };
       tuiElements.push(element);
 
       // Add to row map
@@ -515,6 +531,37 @@ function Vbuf(node, config = {}) {
     clear() {
       tuiElements.length = 0;
       tuiElementsByRow.clear();
+      render(true);
+    },
+
+    // Move cursor to first element after cursor position. If none, go to first element.
+    nextElement() {
+      if (tuiElements.length === 0) return;
+
+      // Sort elements by row, then col
+      const sorted = [...tuiElements].sort((a, b) => a.row - b.row || a.col - b.col);
+
+      // Get absolute cursor position
+      const cursorRow = Viewport.start + head.row;
+      const cursorCol = head.col;
+
+      // Find first element after cursor
+      let next = sorted.find(el => el.row > cursorRow || (el.row === cursorRow && el.col > cursorCol));
+
+      // If none found, wrap to first element
+      if (!next) {
+        next = sorted[0];
+      }
+
+      // Scroll if needed
+      if (next.row < Viewport.start) {
+        Viewport.start = next.row;
+      } else if (next.row >= Viewport.start + Viewport.size) {
+        Viewport.start = next.row - Viewport.size + 1;
+      }
+
+      // Move cursor
+      Selection.setCursor({ row: next.row - Viewport.start, col: next.col });
       render(true);
     }
   };

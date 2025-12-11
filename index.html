@@ -641,7 +641,7 @@
   <!-- TUI Mode Demo -->
   <section style="margin-bottom: 48px;">
     <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">TUI Mode</h3>
-    <p>Terminal UI mode placng interactive elements in the buffer</p>
+    <p>Terminal UI mode placing interactive elements in the buffer. Tab to next element.</p>
 
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
       <button id="tui-toggle-btn">Enable TUI Mode</button>
@@ -1533,12 +1533,32 @@
       initialViewportSize: 15,
     });
 
-    // Initialize with some placeholder content
-    tuiDemo.Model.text = Array(15).fill('').map((_, i) =>
-      ' '.repeat(80)
-    ).join('\n');
+    // Initialize with content
+    const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+Duis aute irure dolor in reprehenderit in voluptate velit esse.
+Excepteur sint occaecat cupidatat non proident, sunt in culpa.
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem.
+Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit.
+Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
+Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis.
+Quis autem vel eum iure reprehenderit qui in ea voluptate velit.`;
+    tuiDemo.Model.text = loremIpsum;
+
+    // Add demo elements on row 15
+    tuiDemo.TUI.addElement({ row: 15, col: 6, content: '[hello]' });
+    tuiDemo.TUI.addElement({ row: 15, col: 16, content: '[world]' });
+    tuiDemo.TUI.addElement({ row: 15, col: 26, content: '[exit]' });
+
+    // Enable TUI mode by default
+    tuiDemo.TUI.enabled = true;
+    document.getElementById('tui-toggle-btn').textContent = 'Disable TUI Mode';
+
     const tuiHighlightBtn = document.getElementById('tui-highlight-toggle-btn');
-    let tuiHighlighted = false;
+    tuiHighlightBtn.classList.remove('hidden');
+    tuiHighlightBtn.textContent = 'Unhighlight All';
+    let tuiHighlighted = true;
 
     document.getElementById('tui-toggle-btn').addEventListener('click', () => {
       tuiDemo.TUI.enabled = !tuiDemo.TUI.enabled;
@@ -1563,6 +1583,15 @@
       const content = document.getElementById('tui-content').value || 'Button';
       tuiDemo.TUI.addElement({ row, col, content });
     });
+
+    // Bind Tab to nextElement in TUI mode
+    tuiDemoElement.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab' && tuiDemo.TUI.enabled) {
+        e.preventDefault();
+        tuiDemo.TUI.nextElement();
+      }
+    });
+
     // Expose for debugging
     window.tuiDemo = tuiDemo;
 
