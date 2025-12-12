@@ -374,6 +374,15 @@
   #tui-demo.wb .wb-selection {
     background-color: #9d4edd;
   }
+
+  kbd {
+    background-color: #21262d;
+    border: 1px solid #3d444d;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
 </style>
 </head>
 
@@ -499,6 +508,43 @@
       </div>
     </fieldset>
   </details>
+  </section>
+
+  <!-- TUI Mode Demo -->
+  <section style="margin-bottom: 48px;">
+    <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">TUI Mode</h3>
+    <p>Terminal UI mode placing interactive elements in the buffer. <kbd>Tab</kbd> to next element. <kbd>Enter</kbd> to activate.</p>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+      <button id="tui-toggle-btn">Enable TUI Mode</button>
+      <button id="tui-highlight-toggle-btn" class="hidden">Highlight All</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+      <label>Row:</label>
+      <input type="number" id="tui-row" value="0" style="width: 60px;">
+      <label>Col:</label>
+      <input type="number" id="tui-col" value="0" style="width: 60px;">
+      <label>Content:</label>
+      <input type="text" id="tui-content" value="Foobar" style="width: 120px;">
+      <button id="tui-add-btn">Add Element</button>
+    </div>
+    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="tui-demo">
+      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+      <div class="💪">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines 🌳 🥷"></div>
+      </div>
+      <div class="💪 wb-status 🦠">
+        <div class="wb-status-left 💪">
+          <span class="wb-linecount"></span>
+        </div>
+        <div class="wb-status-right 💪">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
   </section>
 
   <!-- iOS Support Demo -->
@@ -636,43 +682,6 @@
       </div>
     </div>
   </blockquote>
-  </section>
-
-  <!-- TUI Mode Demo -->
-  <section style="margin-bottom: 48px;">
-    <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">TUI Mode</h3>
-    <p>Terminal UI mode placing interactive elements in the buffer. Tab to next element.</p>
-
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
-      <button id="tui-toggle-btn">Enable TUI Mode</button>
-      <button id="tui-highlight-toggle-btn" class="hidden">Highlight All</button>
-    </div>
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
-      <label>Row:</label>
-      <input type="number" id="tui-row" value="0" style="width: 60px;">
-      <label>Col:</label>
-      <input type="number" id="tui-col" value="0" style="width: 60px;">
-      <label>Content:</label>
-      <input type="text" id="tui-content" value="Foobar" style="width: 120px;">
-      <button id="tui-add-btn">Add Element</button>
-    </div>
-    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="tui-demo">
-      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="💪">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines 🌳 🥷"></div>
-      </div>
-      <div class="💪 wb-status 🦠">
-        <div class="wb-status-left 💪">
-          <span class="wb-linecount"></span>
-        </div>
-        <div class="wb-status-right 💪">
-          <span class="wb-coordinate"></span>
-          <span>|</span>
-          <span class="wb-indentation"></span>
-        </div>
-      </div>
-    </blockquote>
   </section>
 
   </div> <!-- End container -->
@@ -1546,10 +1555,10 @@ Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis.
 Quis autem vel eum iure reprehenderit qui in ea voluptate velit.`;
     tuiDemo.Model.text = loremIpsum;
 
-    // Add demo elements on row 15
-    tuiDemo.TUI.addElement({ row: 15, col: 6, content: '[hello]' });
-    tuiDemo.TUI.addElement({ row: 15, col: 16, content: '[world]' });
-    tuiDemo.TUI.addElement({ row: 15, col: 26, content: '[exit]' });
+    // Add demo elements on row 15 with callbacks
+    tuiDemo.TUI.addElement({ row: 15, col: 6, content: '[hello]', onActivate: () => alert('Hello!') });
+    tuiDemo.TUI.addElement({ row: 15, col: 16, content: '[world]', onActivate: () => alert('World!') });
+    tuiDemo.TUI.addElement({ row: 15, col: 26, content: '[exit]', onActivate: () => alert('Exit!') });
 
     // Enable TUI mode by default
     tuiDemo.TUI.enabled = true;
@@ -1584,11 +1593,15 @@ Quis autem vel eum iure reprehenderit qui in ea voluptate velit.`;
       tuiDemo.TUI.addElement({ row, col, content });
     });
 
-    // Bind Tab to nextElement in TUI mode
+    // Bind Tab to nextElement, Enter to activateElement in TUI mode
     tuiDemoElement.addEventListener('keydown', (e) => {
-      if (e.key === 'Tab' && tuiDemo.TUI.enabled) {
+      if (!tuiDemo.TUI.enabled) return;
+      if (e.key === 'Tab') {
         e.preventDefault();
         tuiDemo.TUI.nextElement();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        tuiDemo.TUI.activateElement();
       }
     });
 

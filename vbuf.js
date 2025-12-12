@@ -1,5 +1,5 @@
 function Vbuf(node, config = {}) {
-  this.version = "4.1.0-alpha.1";
+  this.version = "5.3.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -449,7 +449,8 @@ function Vbuf(node, config = {}) {
 
     // Add an element at the specified coordinate
     // Returns the element id, or throws if overlapping with existing element
-    addElement({ row, col, content }) {
+    // onActivate is an optional callback called when element is activated
+    addElement({ row, col, content, onActivate }) {
       const newStart = col;
       const newEnd = col + content.length;
 
@@ -463,7 +464,7 @@ function Vbuf(node, config = {}) {
       }
 
       const id = ++tuiElementIdCounter;
-      const element = { id, row, col, content, highlighted: true };
+      const element = { id, row, col, content, highlighted: true, onActivate: onActivate || null };
       tuiElements.push(element);
 
       // Add to row map
@@ -563,6 +564,35 @@ function Vbuf(node, config = {}) {
       // Move cursor
       Selection.setCursor({ row: next.row - Viewport.start, col: next.col });
       render(true);
+    },
+
+    // Get element at cursor position, or null if cursor is not on an element
+    currentElement() {
+      const cursorRow = Viewport.start + head.row;
+      const cursorCol = head.col;
+
+      for (const el of tuiElements) {
+        if (el.row === cursorRow && cursorCol >= el.col && cursorCol < el.col + el.content.length) {
+          return { ...el };
+        }
+      }
+      return null;
+    },
+
+    // Activate the element at cursor position (calls its onActivate callback)
+    activateElement() {
+      const cursorRow = Viewport.start + head.row;
+      const cursorCol = head.col;
+
+      for (const el of tuiElements) {
+        if (el.row === cursorRow && cursorCol >= el.col && cursorCol < el.col + el.content.length) {
+          if (el.onActivate) {
+            el.onActivate(el);
+          }
+          return true;
+        }
+      }
+      return false;
     }
   };
 

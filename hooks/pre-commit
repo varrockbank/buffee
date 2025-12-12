@@ -1,5 +1,20 @@
 #!/bin/sh
-# Pre-commit hook to generate minified dist file
+# Pre-commit hook to generate minified dist file and check version bump
+
+# Check if vbuf.js is staged for commit
+if git diff --cached --name-only | grep -q "^vbuf.js$"; then
+    # Get old version from HEAD
+    OLD_VERSION=$(git show HEAD:vbuf.js 2>/dev/null | grep 'this.version' | sed 's/.*"\(.*\)".*/\1/')
+    # Get new version from staged file
+    NEW_VERSION=$(git show :vbuf.js | grep 'this.version' | sed 's/.*"\(.*\)".*/\1/')
+
+    if [ "$OLD_VERSION" = "$NEW_VERSION" ] && [ -n "$OLD_VERSION" ]; then
+        echo "✗ Error: vbuf.js changed but version was not bumped"
+        echo "  Current version: $OLD_VERSION"
+        echo "  Please update this.version in vbuf.js"
+        exit 1
+    fi
+fi
 
 echo "Generating dist/vbuf.min.js..."
 
