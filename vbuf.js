@@ -1,5 +1,5 @@
 function Vbuf(node, config = {}) {
-  this.version = "5.3.0-alpha.1";
+  this.version = "5.3.1-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -421,15 +421,17 @@ function Vbuf(node, config = {}) {
   // and elements can be placed at coordinates
   let tuiModeEnabled = false;
   let tuiElementIdCounter = 0;
+  let tuiHighlightState = true;  // Global highlight state for new elements
   const tuiElements = [];  // Array of {id, row, col, content, highlighted}
   const tuiElementsByRow = new Map();  // Map from row to array of elements
 
   const TUI = {
     get enabled() { return tuiModeEnabled; },
     set enabled(value) {
+      const wasEnabled = tuiModeEnabled;
       tuiModeEnabled = !!value;
-      // Move cursor to first element when enabling TUI mode
-      if (tuiModeEnabled && tuiElements.length > 0) {
+      // Move cursor to first element only when transitioning to enabled
+      if (!wasEnabled && tuiModeEnabled && tuiElements.length > 0) {
         // Find first element (sort by row, then col)
         const sorted = [...tuiElements].sort((a, b) => a.row - b.row || a.col - b.col);
         const first = sorted[0];
@@ -464,7 +466,7 @@ function Vbuf(node, config = {}) {
       }
 
       const id = ++tuiElementIdCounter;
-      const element = { id, row, col, content, highlighted: true, onActivate: onActivate || null };
+      const element = { id, row, col, content, onActivate: onActivate || null };
       tuiElements.push(element);
 
       // Add to row map
@@ -514,17 +516,13 @@ function Vbuf(node, config = {}) {
 
     // Highlight all elements
     highlightAll() {
-      for (const el of tuiElements) {
-        el.highlighted = true;
-      }
+      tuiHighlightState = true;
       render(true);
     },
 
     // Unhighlight all elements
     unhighlightAll() {
-      for (const el of tuiElements) {
-        el.highlighted = false;
-      }
+      tuiHighlightState = false;
       render(true);
     },
 
@@ -1123,7 +1121,7 @@ function Vbuf(node, config = {}) {
       // Group highlighted elements by viewport row
       const highlightedByRow = new Map();
       for (const el of tuiElements) {
-        if (el.highlighted) {
+        if (tuiHighlightState) {
           const viewportRow = el.row - Viewport.start;
           if (viewportRow >= 0 && viewportRow < Viewport.size) {
             if (!highlightedByRow.has(viewportRow)) {
@@ -1217,6 +1215,7 @@ function Vbuf(node, config = {}) {
 
     if(event.key.startsWith("Arrow")) {
       event.preventDefault(); // prevents page scroll
+      if (tuiModeEnabled) return; // disable arrow keys in TUI mode
 
       if(event.metaKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();

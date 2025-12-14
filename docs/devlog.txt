@@ -1,5 +1,11 @@
 * Project Devlog
 
+** 5.3.1-alpha.1 [2025-12-14]
+*** ✨ New features
+- Demo TUI: layout for file navigator to demo tui buttons, file loader
+*** 🐞 Bug Fixes
+- TUI: Highlight state was reset when activating elements; now uses global highlight state
+
 ** 5.3.0-alpha.1 [2025-12-12]
 *** ✨ New features
 - TUI API: api to activate current element, triggering user callback
