@@ -1542,23 +1542,131 @@
       initialViewportSize: 15,
     });
 
-    // Initialize with content
-    const loremIpsum = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-Duis aute irure dolor in reprehenderit in voluptate velit esse.
-Excepteur sint occaecat cupidatat non proident, sunt in culpa.
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem.
-Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit.
-Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.
-Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis.
-Quis autem vel eum iure reprehenderit qui in ea voluptate velit.`;
-    tuiDemo.Model.text = loremIpsum;
+const fileTemplate = `
+                ║
+─┤░░░░Files░░░├─╠══════════════════════════════════════════════════
+════════════════╣       
+                ║
+                ║              
+                ║                   
+                ║              
+                ║        
+                ║
+                ║                    
+                ║
+`;
+    // File contents
+    const files = {
+      'main.js': [
+        'function main() {',
+        '  console.log("Hello");',
+        '  init();',
+        '}',
+        '',
+        'main();'
+      ],
+      'styles.css': [
+        'body {',
+        '  margin: 0;',
+        '  font-family: sans;',
+        '}',
+        '.btn { color: blue; }'
+      ],
+      'config.json': [
+        '{',
+        '  "name": "myapp",',
+        '  "version": "1.0",',
+        '  "port": 3000',
+        '}'
+      ],
+      'README.md': [
+        '# My Project',
+        '',
+        'A demo application.',
+        '',
+        '## Install',
+        'npm install'
+      ],
+      'index.html': [
+        '<!DOCTYPE html>',
+        '<html>',
+        '<head>',
+        '  <title>App</title>',
+        '</head>',
+        '<body></body>',
+        '</html>'
+      ],
+      'data.csv': [
+        'name,age,city',
+        'Alice,30,NYC',
+        'Bob,25,LA',
+        'Carol,35,Chicago'
+      ],
+      '.env': [
+        'API_KEY=sk-xxx',
+        'DEBUG=true',
+        'PORT=8080'
+      ],
+      'notes.txt': [
+        'TODO:',
+        '- Fix bug #42',
+        '- Add tests',
+        '- Update docs'
+      ]
+    };
 
-    // Add demo elements on row 15 with callbacks
-    tuiDemo.TUI.addElement({ row: 15, col: 6, content: '[hello]', onActivate: () => alert('Hello!') });
-    tuiDemo.TUI.addElement({ row: 15, col: 16, content: '[world]', onActivate: () => alert('World!') });
-    tuiDemo.TUI.addElement({ row: 15, col: 26, content: '[exit]', onActivate: () => alert('Exit!') });
+    // Track element IDs for each file
+    const fileElementIds = {};
+
+    // Function to load file content
+    function loadFile(name) {
+      // Update buttons: remove and re-add with updated content
+      const fileNames = Object.keys(files);
+      fileNames.forEach((fname, i) => {
+        if (fileElementIds[fname]) {
+          tuiDemo.TUI.removeElement(fileElementIds[fname]);
+        }
+        const content = fname === name ? '> ' + fname : '  ' + fname;
+        fileElementIds[fname] = tuiDemo.TUI.addElement({
+          row: i + 3,
+          col: 2,
+          content,
+          onActivate: () => loadFile(fname)
+        });
+      });
+
+      const lines = tuiDemo.Model.lines;
+      const content = files[name] || [];
+      for (let i = 0; i < lines.length; i++) {
+        // Skip rows 1-2 (header/separator rows)
+        if (i === 1 || i === 2) continue;
+
+        // Find the divider position dynamically
+        const dividerPos = lines[i].search(/[║╠╣]/);
+        if (dividerPos === -1) continue;
+
+        let right;
+        if (i === 0) {
+          // Show filename in header - preserve the 16 spaces before ║
+          lines[i] = '                ║' + ' ' + name;
+          continue;
+        }
+        const left = lines[i].slice(0, dividerPos + 1); // Keep left side + divider
+        if (i >= 3) {
+          // Content starts at row 3
+          right = ' ' + (content[i - 3] || '');
+        }
+        lines[i] = left + right;
+      }
+      // Trigger re-render
+      tuiDemo.TUI.enabled = true;
+    }
+
+    // Initialize with template
+    tuiDemo.Model.text = fileTemplate.trim();
+
+    // Show initial file (also creates the file list elements)
+    loadFile('main.js');
 
     // Enable TUI mode by default
     tuiDemo.TUI.enabled = true;
