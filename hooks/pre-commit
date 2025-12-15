@@ -1,13 +1,13 @@
 #!/bin/sh
 # Pre-commit hook to generate minified dist file
 
-echo "Generating dist/warrenbuf.min.js..."
+echo "Generating dist/vbuf.min.js..."
 
 # Get old sizes from HEAD (last committed version)
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
-    if git cat-file -e HEAD:dist/warrenbuf.min.js 2>/dev/null; then
-        OLD_SIZE=$(git show HEAD:dist/warrenbuf.min.js | wc -c | tr -d ' ')
-        OLD_GZIPPED=$(git show HEAD:dist/warrenbuf.min.js | gzip -c | wc -c)
+    if git cat-file -e HEAD:dist/vbuf.min.js 2>/dev/null; then
+        OLD_SIZE=$(git show HEAD:dist/vbuf.min.js | wc -c | tr -d ' ')
+        OLD_GZIPPED=$(git show HEAD:dist/vbuf.min.js | gzip -c | wc -c)
     else
         OLD_SIZE=0
         OLD_GZIPPED=0
@@ -17,11 +17,11 @@ else
     OLD_GZIPPED=0
 fi
 
-terser warrenbuf.js -c -m -o dist/warrenbuf.min.js
+terser vbuf.js -c -m -o dist/vbuf.min.js
 
 if [ $? -eq 0 ]; then
-    NEW_SIZE=$(wc -c < dist/warrenbuf.min.js | tr -d ' ')
-    NEW_GZIPPED=$(gzip -c dist/warrenbuf.min.js | wc -c)
+    NEW_SIZE=$(wc -c < dist/vbuf.min.js | tr -d ' ')
+    NEW_GZIPPED=$(gzip -c dist/vbuf.min.js | wc -c)
     MINIFIED_KB=$(echo "$NEW_SIZE" | awk '{printf "%.2f", $1/1024}')
     GZIPPED_KB=$(echo "$NEW_GZIPPED" | awk '{printf "%.2f", $1/1024}')
 
@@ -52,7 +52,7 @@ if [ $? -eq 0 ]; then
         fi
     fi
 
-    git add dist/warrenbuf.min.js
+    git add dist/vbuf.min.js
     exit 0
 else
     echo "✗ Minification failed"
