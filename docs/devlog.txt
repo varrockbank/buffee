@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 5.6.8-alpha.1 [2025-12-16]
+*** optimization 
+- only add/remove selection containers equal to delta in number of lines of viewport
+
 ** 5.6.7-alpha.1 [2025-12-16]
 *** Fix/Refactor 
 - Make selection absolute instead of viewport relative. Now handles larger selection.

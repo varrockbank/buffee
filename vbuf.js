@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.6.7-alpha.1
+ * @version 5.6.8-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.6.7-alpha.1";
+  this.version = "5.6.8-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -101,7 +101,8 @@ function Vbuf(node, config = {}) {
   });
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
-  
+  let lastViewportSize = 0; // Track viewport size for delta-based updates
+
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
   const fragmentGutters = document.createDocumentFragment();
@@ -990,11 +991,11 @@ function Vbuf(node, config = {}) {
   };
 
   /**
-   * Creates and appends selection overlay elements for each viewport line.
+   * Creates and appends selection overlay elements for viewport rows [fromIndex, toIndex).
    * @private
    */
-  function populateSelections() {
-    for (let i = 0; i < Viewport.size; i++) {
+  function addSelections(fromIndex, toIndex) {
+    for (let i = fromIndex; i < toIndex; i++) {
       const sel = document.createElement("div");
       sel.className = "wb-selection";
       Object.assign(sel.style, {
@@ -1041,16 +1042,26 @@ function Vbuf(node, config = {}) {
     $gutter.appendChild(fragmentGutters);
 
     // Renders the containers for the viewport lines, as well as selections and highlights
-    // TODO: can be made more efficient by only removing delta of selections
+    // Only adds/removes the delta of elements when viewport size changes
     if(renderLineContainers) {
-      $e.textContent = null;
-      for (let i = 0; i < Viewport.size; i++)
-        fragmentLines.appendChild(document.createElement("pre"));
-      $e.appendChild(fragmentLines);
+      const delta = Viewport.size - lastViewportSize;
 
-      // Remove all the selections
-      while($selections.length > 0) $selections.pop().remove();
-      populateSelections();
+      if (delta > 0) {
+        // Add new line containers and selections
+        for (let i = 0; i < delta; i++) {
+          fragmentLines.appendChild(document.createElement("pre"));
+        }
+        $e.appendChild(fragmentLines);
+        addSelections(lastViewportSize, Viewport.size);
+      } else if (delta < 0) {
+        // Remove excess line containers and selections
+        for (let i = 0; i < -delta; i++) {
+          $e.lastChild?.remove();
+          $selections.pop()?.remove();
+        }
+      }
+
+      lastViewportSize = Viewport.size;
 
       // Call extension hooks for container rebuild
       for (const hook of renderHooks.onContainerRebuild) {
