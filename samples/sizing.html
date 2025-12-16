@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Editor Sizing</title>
+  <script src="../vbuf.js"></script>
+  <style>
+    body {
+      background: #1a1a1a;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    h1 { color: #fff; font-size: 18px; }
+    h2 { color: #aaa; font-size: 14px; margin-top: 30px; }
+    p { color: #666; font-size: 13px; }
+    code { color: #0f0; }
+
+    /* Base editor styles */
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      font-size: 24px; /* Must match lineHeight for ch units to work */
+      border: 1px solid #444;
+      margin-bottom: 10px;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines > pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-status span { padding-right: 4px; }
+
+    /* 80 column editor */
+    #editor-80 { width: 80ch; }
+
+    /* 40 column editor */
+    #editor-40 { width: 40ch; }
+
+    /* 120 column editor */
+    #editor-120 { width: 120ch; }
+
+    /* Full width editor */
+    #editor-full { width: 100%; }
+
+    /* 40 column no ruler */
+    #editor-40-clean { width: 40ch; }
+
+    /* 1 line editor */
+    #editor-1line { width: 40ch; }
+
+    /* Thick border editor */
+    #editor-thick {
+      width: 60ch;
+      border: 3ch solid #ff6b35;
+    }
+  </style>
+</head>
+<body>
+  <h1>Editor Sizing with Character Units</h1>
+  <p>The editor uses monospace font. Set width on the container element (<code>.wb</code>) via CSS. Use <code>ch</code> units for predictable column counts, or <code>100%</code> to fill parent.</p>
+  <p>Height (number of lines) is set via the <code>initialViewportSize</code> option in the constructor.</p>
+
+  <h2>80 columns × 10 lines</h2>
+  <p>CSS: <code>#editor-80 { width: 80ch; }</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-80">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>1 line editor (no status)</h2>
+  <p>JS: <code>initialViewportSize: 1, showStatusLine: false</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-1line">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>40 columns (no gutter)</h2>
+  <p>CSS: <code>#editor-40-clean { width: 40ch; }</code> + <code>showGutter: false</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-40-clean">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>40 columns × 5 lines</h2>
+  <p>CSS: <code>#editor-40 { width: 40ch; }</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-40">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>120 columns × 15 lines</h2>
+  <p>CSS: <code>#editor-120 { width: 120ch; }</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-120">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>Thick border (3ch) × 6 lines</h2>
+  <p>CSS: <code>#editor-thick { width: 60ch; border: 3ch solid #ff6b35; }</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-thick">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>100% width × 8 lines</h2>
+  <p>CSS: <code>#editor-full { width: 100%; }</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-full">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    // Generate a ruler string: 01234567890123456789...
+    function ruler(n) {
+      let s = '';
+      for (let i = 0; i < n; i++) s += i % 10;
+      return s;
+    }
+
+    // 80 columns × 10 lines
+    const ed80 = new Vbuf(document.getElementById('editor-80'), {
+      initialViewportSize: 10,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    ed80.Model.text = ruler(80) + '\n// 80 column editor\nLine 3\nLine 4\nLine 5';
+
+    // 1 line editor
+    const ed1Line = new Vbuf(document.getElementById('editor-1line'), {
+      initialViewportSize: 1,
+      showStatusLine: false,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    ed1Line.Model.text = ruler(40);
+
+    // 40 columns no gutter
+    const ed40Clean = new Vbuf(document.getElementById('editor-40-clean'), {
+      initialViewportSize: 5,
+      showGutter: false,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    ed40Clean.Model.text = ruler(40) + '\n// No gutter\nLine 3';
+
+    // 40 columns × 5 lines
+    const ed40 = new Vbuf(document.getElementById('editor-40'), {
+      initialViewportSize: 5,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    ed40.Model.text = ruler(40) + '\n// 40 columns\nCompact editor';
+
+    // 120 columns × 15 lines
+    const ed120 = new Vbuf(document.getElementById('editor-120'), {
+      initialViewportSize: 15,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    ed120.Model.text = ruler(120) + '\n// 120 column editor\nLine 3';
+
+    // Thick border × 6 lines
+    const edThick = new Vbuf(document.getElementById('editor-thick'), {
+      initialViewportSize: 6,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edThick.Model.text = ruler(60) + '\n// 60ch with 3ch border\nLine 3';
+
+    // Full width × 8 lines
+    const edFull = new Vbuf(document.getElementById('editor-full'), {
+      initialViewportSize: 8,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edFull.Model.text = ruler(200) + '\n// Full width - resize window to test\nLine 3';
+  </script>
+</body>
+</html>

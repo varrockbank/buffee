@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Read-Only Mode</title>
+  <script src="../vbuf.js"></script>
+  <style>
+    body {
+      background: #1a1a1a;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    h1 { color: #fff; font-size: 18px; }
+    h2 { color: #aaa; font-size: 14px; margin-top: 30px; }
+    p { color: #666; font-size: 13px; }
+    code { color: #0f0; }
+
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      font-size: 24px;
+      border: 1px solid #444;
+      width: 80ch;
+      margin-bottom: 10px;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines > pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-status span { padding-right: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Read-Only Mode</h1>
+  <p>Two options for read-only editors. Try typing - editing is disabled, but arrow keys work.</p>
+
+  <h2>Option 1: TUI Mode (simpler)</h2>
+  <p>JS: <code>editor.TUI.enabled = true</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-tui">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>Option 2: Chunked Mode</h2>
+  <p>JS: <code>editor.Model.activateChunkMode()</code> + <code>appendLines()</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-chunked">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    const content = `// Read-only content
+// Try typing - it won't work!
+// Arrow keys still navigate
+
+function example() {
+  const message = "This is read-only";
+  return message;
+}
+
+example();`;
+
+    // Option 1: TUI mode
+    const edTui = new Vbuf(document.getElementById('editor-tui'), {
+      initialViewportSize: 10,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edTui.Model.text = content;
+    edTui.TUI.enabled = true;
+
+    // Option 2: Chunked mode
+    const edChunked = new Vbuf(document.getElementById('editor-chunked'), {
+      initialViewportSize: 10,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+
+    // Must use activateChunkMode + appendLines, NOT Model.text
+    edChunked.Model.activateChunkMode();
+    edChunked.Model.appendLines(content.split('\n'));
+  </script>
+</body>
+</html>

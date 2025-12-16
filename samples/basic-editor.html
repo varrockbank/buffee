@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Basic Editor</title>
+  <script src="../vbuf.js"></script>
+  <style>
+    body {
+      background: #1a1a1a;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    h1 { color: #fff; font-size: 18px; }
+
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      border: 1px solid #444;
+      width: 600px;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines > pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-status span { padding-right: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Basic Editor</h1>
+
+  <blockquote class="wb no-select" tabindex="0" id="editor">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left" style="display: flex;">
+        <span class="wb-linecount"></span>
+      </div>
+      <div class="wb-status-right" style="display: flex;">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    const el = document.getElementById('editor');
+    const editor = new Vbuf(el, {
+      initialViewportSize: 15,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+
+    editor.Model.text = `// Welcome to vbuf
+// Start typing...
+
+function hello() {
+  console.log("Hello, world!");
+}
+
+hello();`;
+
+    el.focus();
+  </script>
+</body>
+</html>

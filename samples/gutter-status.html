@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Gutter and Status Bar</title>
+  <script src="../vbuf.js"></script>
+  <style>
+    body {
+      background: #1a1a1a;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    h1 { color: #fff; font-size: 18px; }
+    h2 { color: #aaa; font-size: 14px; margin-top: 30px; }
+    p { color: #666; font-size: 13px; }
+    code { color: #0f0; }
+
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+      border: 1px solid #444;
+      width: 70ch;
+      margin-bottom: 10px;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines > pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-status span { padding-right: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Gutter (Line Numbers) and Status Bar</h1>
+  <p>Control visibility via constructor options: <code>showGutter</code> and <code>showStatusLine</code></p>
+
+  <h2>Default (gutter + status bar)</h2>
+  <p>JS: <code>new Vbuf(el, { showGutter: true, showStatusLine: true })</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-default">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>No gutter (line numbers hidden)</h2>
+  <p>JS: <code>new Vbuf(el, { showGutter: false })</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-no-gutter">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>No status bar</h2>
+  <p>JS: <code>new Vbuf(el, { showStatusLine: false })</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-no-status">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2>Minimal (no gutter, no status bar)</h2>
+  <p>JS: <code>new Vbuf(el, { showGutter: false, showStatusLine: false })</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-minimal">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    const content = `function hello() {
+  console.log("Hello, world!");
+}
+
+hello();`;
+
+    // Default
+    const edDefault = new Vbuf(document.getElementById('editor-default'), {
+      initialViewportSize: 6,
+      showGutter: true,
+      showStatusLine: true
+    });
+    edDefault.Model.text = content;
+
+    // No gutter
+    const edNoGutter = new Vbuf(document.getElementById('editor-no-gutter'), {
+      initialViewportSize: 6,
+      showGutter: false,
+      showStatusLine: true
+    });
+    edNoGutter.Model.text = content;
+
+    // No status bar
+    const edNoStatus = new Vbuf(document.getElementById('editor-no-status'), {
+      initialViewportSize: 6,
+      showGutter: true,
+      showStatusLine: false
+    });
+    edNoStatus.Model.text = content;
+
+    // Minimal
+    const edMinimal = new Vbuf(document.getElementById('editor-minimal'), {
+      initialViewportSize: 6,
+      showGutter: false,
+      showStatusLine: false
+    });
+    edMinimal.Model.text = content;
+  </script>
+</body>
+</html>
