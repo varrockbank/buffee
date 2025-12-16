@@ -1,5 +1,5 @@
 /**
- * Test DSL for WarrenBuf
+ * Test DSL for Vbuf
  *
  * Object-oriented test environment that encapsulates a node and provides
  * literate methods for user interactions.
@@ -78,7 +78,7 @@ function createEditorNode() {
 class EditorTestHarness {
   constructor(node, size = 10) {
     this.node = node;
-    this.wb = new WarrenBuf(node, { initialViewportSize: size });
+    this.wb = new Vbuf(node, { initialViewportSize: size });
     this.walkthrough = new Walkthrough();
 
     // Store reference for test framework

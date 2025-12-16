@@ -1,6 +1,6 @@
 * Overview
 
-WarrenBuf uses a native browser-based test suite with no dependencies on Jest or NPM.
+Vbuf uses a native browser-based test suite with no dependencies on Jest or NPM.
 
 * Running Tests
 
@@ -11,7 +11,7 @@ Open ~test.html~ in your browser. Tests run automatically on page load.
 Each test includes a *Walkthrough* button that opens an interactive step-by-step debugger:
 
 - *Left panel*: Test source code with inline step markers and expect highlighting
-- *Right panel*: Live WarrenBuf editor showing the test execution
+- *Right panel*: Live Vbuf editor showing the test execution
 - *Step navigation*: Previous/Next buttons to replay test actions one at a time
 
 ** How it works
@@ -55,13 +55,13 @@ runner.describe('Feature Name', () => {
 
 ** Test Isolation
 
-Each test gets a *fresh DOM node and WarrenBuf instance* via ~new EditorTestHarness()~. This ensures proper test isolation with no state leakage between tests.
+Each test gets a *fresh DOM node and Vbuf instance* via ~new EditorTestHarness()~. This ensures proper test isolation with no state leakage between tests.
 
 ** EditorTestHarness & Literate DSL
 
 The test harness serves three purposes:
 
-1. *Test isolation* - Provides an isolated editor instance (DOM node + WarrenBuf) for each test
+1. *Test isolation* - Provides an isolated editor instance (DOM node + Vbuf) for each test
 2. *Test execution* - Drives the editor with a literate DSL for user actions
 3. *Step recording* - Captures all actions as metadata for interactive walkthrough replay
 
@@ -71,8 +71,8 @@ The harness provides a literate, chainable DSL that reads like user actions:
 // Create harness
 const fixture = new EditorTestHarness();
 
-// Access WarrenBuf instance and DOM node
-fixture.wb    // WarrenBuf instance
+// Access Vbuf instance and DOM node
+fixture.wb    // Vbuf instance
 fixture.node  // DOM node
 
 // Type text

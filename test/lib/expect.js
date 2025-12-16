@@ -1,4 +1,4 @@
-// Assertion library for WarrenBuf tests
+// Assertion library for Vbuf tests
 
 function expect(actual) {
   // Check if actual is an EditorTestHarness instance
