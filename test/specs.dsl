@@ -827,3 +827,90 @@ left with shift
 enter
 expect(fixture).toHaveLines("", "C");
 EXPECT cursor at 1,0
+
+
+# Undo/Redo
+
+## should undo single character insert
+### Undo single character insert
+TYPE "A"
+expect(fixture).toHaveLines("A");
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("");
+
+## should redo single character insert
+### Redo single character insert
+TYPE "A"
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("");
+fixture.wb.History.redo();
+expect(fixture).toHaveLines("A");
+
+## should undo multiple characters
+### Undo multiple character inserts
+TYPE "ABC"
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("AB");
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("A");
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("");
+
+## should undo backspace
+### Undo backspace restores deleted character
+TYPE "AB"
+backspace
+expect(fixture).toHaveLines("A");
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("AB");
+
+## should undo newline
+### Undo newline joins lines back together
+TYPE "Hello"
+enter
+TYPE "World"
+expect(fixture).toHaveLines("Hello", "World");
+fixture.wb.History.undo();
+fixture.wb.History.undo();
+fixture.wb.History.undo();
+fixture.wb.History.undo();
+fixture.wb.History.undo();
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("Hello");
+
+## should undo delete at start of line (join lines)
+### Undo backspace at line start restores newline
+TYPE "AB"
+enter
+backspace
+expect(fixture).toHaveLines("AB");
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("AB", "");
+
+## should clear redo stack on new edit
+### New edit clears redo stack
+TYPE "A"
+fixture.wb.History.undo();
+expect(fixture.wb.History.redoStack.length).toBe(1);
+TYPE "B"
+expect(fixture.wb.History.redoStack.length).toBe(0);
+
+## should restore cursor position on undo
+### Undo restores cursor to position before edit
+TYPE "Hello"
+EXPECT cursor at 0,5
+fixture.wb.History.undo();
+EXPECT cursor at 0,4
+fixture.wb.History.undo();
+EXPECT cursor at 0,3
+
+## should restore cursor position on redo
+### Redo restores cursor to position after edit
+TYPE "AB"
+fixture.wb.History.undo();
+fixture.wb.History.undo();
+EXPECT cursor at 0,0
+fixture.wb.History.redo();
+EXPECT cursor at 0,1
+fixture.wb.History.redo();
+EXPECT cursor at 0,2

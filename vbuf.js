@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.9-alpha.1
+ * @version 5.6.0-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.9-alpha.1";
+  this.version = "5.6.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -316,18 +316,8 @@ function Vbuf(node, config = {}) {
      * @param {string[]} lines - Array of lines to insert
      */
     insertLines(lines) {
-      if(lines.length === 1) return this.insert(lines[0]);
-
-      const [firstEdge, secondEdge] = this.ordered
-      const { index, left, _ } = this.partitionLine(firstEdge);
-      const { index: secondIndex, right, rightExclusive } = this.partitionLine(secondEdge);
-
-      Model.lines[index] = left + lines[0];
-      Model.lines.splice(index+1, secondIndex - index - 1, ...lines.slice(1, -1));
-      Model.lines[index + lines.length - 1] = lines[lines.length-1] + (this.isSelection ? rightExclusive : right);
-
-      this.setCursor({row: index + lines.length - 1, col: lines[lines.length-1].length});
-      render(true);
+      // Delegate to insert() which handles multi-line via History primitives
+      this.insert(lines.join('\n'));
     },
 
     /**
@@ -338,20 +328,40 @@ function Vbuf(node, config = {}) {
     insert(s, skipRender = false) {
       const t0 = performance.now();
       if (this.isSelection) {
-        // Sort tail and head by order of appearance ( depends on chirality )
         const [first, second] = this.ordered;
-        const { index, left } = this.partitionLine(first);
-        const p = this.partitionLine({ row: second.row, col: second.col + 1 });
-        const {right} = p;
-        Model.splice(index, [left + s + right], second.row - first.row + 1);
+        const absRow = Viewport.start + first.row;
 
-        head.row = first.row;
-        head.col = first.col + s.length;
+        // Get selected text before deleting
+        const selectedText = this.lines.join('\n');
+
+        // Delete selection, then insert new text
+        History._delete(absRow, first.col, selectedText);
+        if (s.length > 0) {
+          History._insert(absRow, first.col, s);
+        }
+
+        // Update cursor to end of inserted text
+        const insertedLines = s.split('\n');
+        if (insertedLines.length === 1) {
+          head.row = first.row;
+          head.col = first.col + s.length;
+        } else {
+          head.row = first.row + insertedLines.length - 1;
+          head.col = insertedLines[insertedLines.length - 1].length;
+        }
         this.makeCursor();
       } else {
-        const { index, left, right } = this.partitionLine(tail);
-        Model.lines[index] = left + s + right;
-        maxCol = head.col += s.length;
+        const absRow = Viewport.start + tail.row;
+        History._insert(absRow, tail.col, s);
+
+        // Update cursor
+        const insertedLines = s.split('\n');
+        if (insertedLines.length === 1) {
+          maxCol = head.col += s.length;
+        } else {
+          head.row += insertedLines.length - 1;
+          maxCol = head.col = insertedLines[insertedLines.length - 1].length;
+        }
       }
       if (!skipRender) render(true);
       const t1 = performance.now();
@@ -363,28 +373,30 @@ function Vbuf(node, config = {}) {
      * Deletes the character before cursor or the current selection.
      */
     delete() {
-      // TODO: Possibly, insert can be defined in terms of delete.
       if (this.isSelection) {
         return this.insert('');
       }
 
       const t0 = performance.now();
-      let type = "character";
-      const { index, left, right } = this.partitionLine(tail);
+      const absRow = Viewport.start + tail.row;
+
       if (tail.col > 0) {
-        Model.lines[index] = left.slice(0, left.length - 1) + right;
+        // Delete character before cursor
+        const charToDelete = Model.lines[absRow][tail.col - 1];
+        History._delete(absRow, tail.col - 1, charToDelete);
         head.col--;
-      } else if (tail.row > 0) {
-        head.col = Model.lines[index - 1].length;
+      } else if (absRow > 0) {
+        // At start of line - delete newline (join with previous line)
+        const prevLineLen = Model.lines[absRow - 1].length;
+        History._delete(absRow - 1, prevLineLen, '\n');
+        head.col = prevLineLen;
         head.row--;
-        Model.lines[index - 1] += Model.lines[index];
-        Model.delete(index);
-        type = "line";
       }
+
       render(true);
       const t1 = performance.now();
       const millis = parseFloat(t1 - t0);
-      console.log(`Took ${millis.toFixed(2)} millis to delete ${type} with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
+      console.log(`Took ${millis.toFixed(2)} millis to delete with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
 
     /**
@@ -394,15 +406,19 @@ function Vbuf(node, config = {}) {
       if (this.isSelection) Selection.insert('', true); // skipRender - we render below
 
       const t0 = performance.now();
-      const { index, left, right } = this.partitionLine(tail);
-      Model.lines[index] = left;
-      Model.splice(index + 1, [right]);
+      const absRow = Viewport.start + tail.row;
+
+      // Insert newline character
+      History._insert(absRow, tail.col, '\n');
+
+      // Move cursor to start of new line
       head.col = 0;
       if (tail.row < Viewport.size - 1) {
         head.row++;
       } else {
         Viewport.scroll(1);
       }
+
       render(true);
       const t1 = performance.now();
       const millis = parseFloat(t1 - t0);
@@ -654,6 +670,165 @@ function Vbuf(node, config = {}) {
   }
 
   /**
+   * Edit history for undo/redo operations.
+   * Uses primitive insert/delete operations that can be inverted.
+   * @namespace History
+   */
+  const History = {
+    /** @type {Array} Stack of operations for undo */
+    undoStack: [],
+    /** @type {Array} Stack of undone operations for redo */
+    redoStack: [],
+
+    /** Capture current cursor state */
+    _captureCursor() {
+      return { row: head.row, col: head.col };
+    },
+
+    /** Restore cursor state */
+    _restoreCursor(cursor) {
+      head.row = cursor.row;
+      head.col = cursor.col;
+      tail.row = cursor.row;
+      tail.col = cursor.col;
+    },
+
+    /**
+     * Primitive insert operation. Inserts text at position, handling newlines.
+     * @param {number} row - Row index (absolute, not viewport-relative)
+     * @param {number} col - Column index
+     * @param {string} text - Text to insert (may contain newlines)
+     * @param {boolean} [recordHistory=true] - Whether to record in undo stack
+     */
+    _insert(row, col, text, recordHistory = true) {
+      if (text.length === 0) return;
+
+      const cursorBefore = recordHistory ? this._captureCursor() : null;
+
+      const lines = text.split('\n');
+
+      if (lines.length === 1) {
+        // Single line insert
+        Model.lines[row] = Model.lines[row].slice(0, col) + text + Model.lines[row].slice(col);
+      } else {
+        // Multi-line insert
+        const before = Model.lines[row].slice(0, col);
+        const after = Model.lines[row].slice(col);
+
+        // First line: before + first segment
+        Model.lines[row] = before + lines[0];
+
+        // Middle lines: insert as new lines
+        const middleLines = lines.slice(1, -1);
+
+        // Last line: last segment + after
+        const lastLine = lines[lines.length - 1] + after;
+
+        Model.lines.splice(row + 1, 0, ...middleLines, lastLine);
+      }
+
+      if (recordHistory) {
+        this.undoStack.push({ type: 'insert', row, col, text, cursorBefore });
+        this.redoStack = [];
+      }
+    },
+
+    /**
+     * Primitive delete operation. Deletes text at position, handling newlines.
+     * @param {number} row - Row index (absolute, not viewport-relative)
+     * @param {number} col - Column index
+     * @param {string} text - Text to delete (must match what's at position, may contain newlines)
+     * @param {boolean} [recordHistory=true] - Whether to record in undo stack
+     */
+    _delete(row, col, text, recordHistory = true) {
+      if (text.length === 0) return;
+
+      const cursorBefore = recordHistory ? this._captureCursor() : null;
+
+      const lines = text.split('\n');
+
+      if (lines.length === 1) {
+        // Single line delete
+        Model.lines[row] = Model.lines[row].slice(0, col) + Model.lines[row].slice(col + text.length);
+      } else {
+        // Multi-line delete
+        const before = Model.lines[row].slice(0, col);
+        const afterRow = row + lines.length - 1;
+        const afterCol = lines[lines.length - 1].length;
+        const after = Model.lines[afterRow].slice(afterCol);
+
+        // Join first and last line portions, remove middle lines
+        Model.lines[row] = before + after;
+        Model.lines.splice(row + 1, lines.length - 1);
+      }
+
+      if (recordHistory) {
+        this.undoStack.push({ type: 'delete', row, col, text, cursorBefore });
+        this.redoStack = [];
+      }
+    },
+
+    /**
+     * Undo the last operation.
+     * @returns {boolean} True if an operation was undone
+     */
+    undo() {
+      if (this.undoStack.length === 0) return false;
+
+      const op = this.undoStack.pop();
+      const cursorBefore = this._captureCursor();
+
+      // Apply inverse operation without recording to history
+      if (op.type === 'insert') {
+        this._delete(op.row, op.col, op.text, false);
+      } else {
+        this._insert(op.row, op.col, op.text, false);
+      }
+
+      // Restore cursor to before the original operation
+      this._restoreCursor(op.cursorBefore);
+
+      this.redoStack.push({ ...op, cursorAfter: cursorBefore });
+      render(true);
+      return true;
+    },
+
+    /**
+     * Redo the last undone operation.
+     * @returns {boolean} True if an operation was redone
+     */
+    redo() {
+      if (this.redoStack.length === 0) return false;
+
+      const op = this.redoStack.pop();
+
+      // Re-apply operation without recording to history
+      if (op.type === 'insert') {
+        this._insert(op.row, op.col, op.text, false);
+      } else {
+        this._delete(op.row, op.col, op.text, false);
+      }
+
+      // Restore cursor to after the original operation
+      if (op.cursorAfter) {
+        this._restoreCursor(op.cursorAfter);
+      }
+
+      this.undoStack.push(op);
+      render(true);
+      return true;
+    },
+
+    /**
+     * Clear all history.
+     */
+    clear() {
+      this.undoStack = [];
+      this.redoStack = [];
+    },
+  }
+
+  /**
    * Viewport management for virtual scrolling.
    * Controls which portion of the document is currently visible.
    * @namespace Viewport
@@ -873,6 +1048,12 @@ function Vbuf(node, config = {}) {
   this.Selection = Selection;
 
   /**
+   * Edit history for undo/redo operations.
+   * @type {Object}
+   */
+  this.History = History;
+
+  /**
    * Editor mode controlling input behavior.
    * - 'write': Full editing (default)
    * - 'navigate': View and navigate with arrow keys, no editing
@@ -961,10 +1142,24 @@ function Vbuf(node, config = {}) {
       return;
     }
 
-    // On Ctrl/⌘+C, *don’t* preventDefault. Just redirect selection briefly.
+    // On Ctrl/⌘+C, *don't* preventDefault. Just redirect selection briefly.
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
       $clipboardBridge.focus({ preventScroll: true }); // Prevent browser from scrolling to textarea
       $clipboardBridge.select();
+      return;
+    }
+
+    // Undo: Ctrl/⌘+Z
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      History.undo();
+      return;
+    }
+
+    // Redo: Ctrl/⌘+Shift+Z
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z' && event.shiftKey) {
+      event.preventDefault();
+      History.redo();
       return;
     }
 
@@ -1028,8 +1223,8 @@ function Vbuf(node, config = {}) {
       Selection.newLine();
     } else if (event.key === "Escape") {
     } else if (event.key === "Tab" ) {
-      // prevents tabbing to next item
-      // TODO: fix as it may break accessibility for some users
+      // Capture Tab for indentation (standard code editor behavior).
+      // Users needing keyboard navigation can use browser shortcuts or focus the editor container.
       event.preventDefault();
 
       if(Selection.isSelection) {
