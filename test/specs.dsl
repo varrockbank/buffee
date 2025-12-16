@@ -864,32 +864,66 @@ EXPECT cursor at 0,0
 
 # Gutter resizing
 
-## should grow gutter when scrolling to double-digit line numbers
-### Gutter grows from 1 to 2 digits when viewport.end reaches 10
-// Create fixture with viewport size 9
-fixture = FixtureFactory.forTest(9);
-// Add 11 lines (indices 0-10)
-fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11";
-// Initial: lines 0-8 visible, end=8 (1 digit), gutter = 2ch
+## should not resize gutter when typing from line 9 to line 10
+### Regression: Gutter stays stable when crossing single to double digit line count
+// Start with empty editor
 const $gutter = fixture.node.querySelector(".wb-gutter");
-expect($gutter.style.width).toBe("2ch");
-// Scroll down by 2: lines 2-10 visible, end=10 (2 digits), gutter = 3ch
-fixture.wb.Viewport.scroll(2);
+// Initial gutter is 2 digits minimum (3ch with padding)
+expect($gutter.style.width).toBe("3ch");
+// Type 9 lines
+TYPE "1"
+enter
+TYPE "2"
+enter
+TYPE "3"
+enter
+TYPE "4"
+enter
+TYPE "5"
+enter
+TYPE "6"
+enter
+TYPE "7"
+enter
+TYPE "8"
+enter
+TYPE "9"
+// Still 9 lines, gutter should still be 3ch (2 digit minimum)
+expect($gutter.style.width).toBe("3ch");
+// Add line 10
+enter
+TYPE "10"
+// Now 10 lines, gutter should still be 3ch (2 digits fits 10)
 expect($gutter.style.width).toBe("3ch");
 
-## should shrink gutter when scrolling back to single-digit line numbers
-### Gutter shrinks from 2 to 1 digit when viewport.end drops below 10
+## should not resize gutter when scrolling
+### Gutter based on total lines, not viewport position
 // Create fixture with viewport size 9
 fixture = FixtureFactory.forTest(9);
 // Add 11 lines (indices 0-10)
 fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11";
-// Scroll to double-digit first
-fixture.wb.Viewport.scroll(2);
 const $gutter = fixture.node.querySelector(".wb-gutter");
+// Gutter is 3ch (2 digits + 1 padding) for 11 lines
 expect($gutter.style.width).toBe("3ch");
-// Scroll back up: lines 0-8 visible, end=8 (1 digit), gutter = 2ch
+// Scroll down - gutter should NOT change
+fixture.wb.Viewport.scroll(2);
+expect($gutter.style.width).toBe("3ch");
+// Scroll back up - gutter should NOT change
 fixture.wb.Viewport.scroll(-2);
-expect($gutter.style.width).toBe("2ch");
+expect($gutter.style.width).toBe("3ch");
+
+## should grow gutter at 100 lines
+### Gutter grows from 2 to 3 digits at 100 lines
+fixture = FixtureFactory.forTest(5);
+// Create 99 lines
+fixture.wb.Model.text = Array(99).fill("x").join("\n");
+const $gutter = fixture.node.querySelector(".wb-gutter");
+// 99 lines = 2 digits, gutter = 3ch
+expect($gutter.style.width).toBe("3ch");
+// Add line 100
+fixture.wb.Model.text = Array(100).fill("x").join("\n");
+// 100 lines = 3 digits, gutter = 4ch
+expect($gutter.style.width).toBe("4ch");
 
 
 # Indentation property

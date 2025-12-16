@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.6.5-alpha.1
+ * @version 5.6.6-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.6.5-alpha.1";
+  this.version = "5.6.6-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -1024,7 +1024,9 @@ function Vbuf(node, config = {}) {
       $lineCounter.textContent = `${lineCount.toLocaleString()}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
     }
 
-    const digitsInLargestLineNumber = Viewport.end.toString().length;
+    // Use total line count so gutter doesn't resize while scrolling
+    // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
+    const digitsInLargestLineNumber = Math.max(2, Model.lines.length.toString().length);
     if(digitsInLargestLineNumber !== gutterSize) {
       gutterSize = digitsInLargestLineNumber;
       $gutter.style.width = gutterSize + gutterPadding + 'ch';
