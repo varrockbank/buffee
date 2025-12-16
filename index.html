@@ -1254,12 +1254,12 @@
       .then(text => hackernews.Model.text = text)
       .catch(err => console.error("Error fetching Hacker News:", err));
 
-    // Star Wars ASCII Movie Player - Load full movie from sw.txt
+    // Star Wars ASCII Movie Player - Load full movie from assets/sw.txt
     let movieData = null;
 
     async function loadStarWarsMovie() {
       try {
-        const response = await fetch('sw.txt');
+        const response = await fetch('assets/sw.txt');
         // TODO: We aren't escape the ' character correctly. so \' shows literally .
         movieData = await response.text();
         // Parse frames from movie data

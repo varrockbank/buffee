@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.2-alpha.1
+ * @version 5.5.3-alpha.1
  */
 
 /**
@@ -64,7 +64,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.2-alpha.1";
+  this.version = "5.5.3-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -604,6 +604,30 @@ function Vbuf(node, config = {}) {
   const tuiElements = [];
   /** @type {Map<number, TUIElement[]>} */
   const tuiElementsByRow = new Map();
+  /** @type {boolean} Dirty flag - when true, TUI needs re-rendering */
+  let tuiDirty = false;
+
+  /**
+   * Marks TUI as dirty, will be rendered on next frame.
+   * @private
+   */
+  function markTuiDirty() {
+    tuiDirty = true;
+  }
+
+  /**
+   * TUI render loop - runs at 60fps, renders if dirty.
+   * @private
+   */
+  function tuiRenderLoop() {
+    if (tuiDirty) {
+      tuiDirty = false;
+      render(true);
+    }
+    requestAnimationFrame(tuiRenderLoop);
+  }
+  // Start the render loop
+  requestAnimationFrame(tuiRenderLoop);
 
   /**
    * Adds a TUI element at the specified coordinate.
@@ -1009,14 +1033,14 @@ function Vbuf(node, config = {}) {
           if (currentEl.input.length > 0) {
             currentEl.input = currentEl.input.slice(0, -1);
             currentEl.contents = buildPromptContents(currentEl.width, currentEl.title, currentEl.input);
-            render(true);
+            markTuiDirty();
           }
           return true;
         } else if (key.length === 1 && key.charCodeAt(0) >= 32 && key.charCodeAt(0) < 127) {
           // Printable ASCII
           currentEl.input += key;
           currentEl.contents = buildPromptContents(currentEl.width, currentEl.title, currentEl.input);
-          render(true);
+          markTuiDirty();
           return true;
         }
       } else if (currentEl.type === 'scrollbox') {
@@ -1030,7 +1054,7 @@ function Vbuf(node, config = {}) {
               currentEl.width, currentEl.height, currentEl.title,
               currentEl.contentLines, currentEl.scrollOffset
             );
-            render(true);
+            markTuiDirty();
           }
           return true;
         } else if (key === 'ArrowUp' || key === 'k') {
@@ -1040,7 +1064,7 @@ function Vbuf(node, config = {}) {
               currentEl.width, currentEl.height, currentEl.title,
               currentEl.contentLines, currentEl.scrollOffset
             );
-            render(true);
+            markTuiDirty();
           }
           return true;
         } else if (key === 'Enter') {
