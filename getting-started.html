@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Getting Started</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="vbuf.js"></script>
+  <style>
+    /* Required vbuf styles */
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-cursor {
+      background-color: #FF6B6B;
+    }
+    .wb .wb-status span { padding-right: 4px; }
+  </style>
+</head>
+<body class="bg-neutral-900 p-8 font-sans">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-white text-2xl mb-2">Getting Started with vbuf</h1>
+    <p class="text-neutral-400 mb-8">
+      Minimal setup guide for creating a vbuf editor instance.
+    </p>
+
+    <h2 class="text-neutral-300 text-lg mt-8 mb-4 border-b border-neutral-700 pb-2">1. Include the Script</h2>
+    <pre class="bg-neutral-800 text-green-400 p-4 rounded mb-6 overflow-x-auto"><code>&lt;script src="vbuf.js"&gt;&lt;/script&gt;</code></pre>
+
+    <h2 class="text-neutral-300 text-lg mt-8 mb-4 border-b border-neutral-700 pb-2">2. Required HTML Structure</h2>
+    <p class="text-neutral-500 text-sm mb-4">
+      <strong class="text-yellow-400">Important:</strong> All these elements are required. Missing any will cause runtime errors.
+    </p>
+    <pre class="bg-neutral-800 text-green-400 p-4 rounded mb-6 overflow-x-auto text-sm"><code>&lt;blockquote class="wb no-select" tabindex="0" id="editor"&gt;
+    &lt;textarea class="wb-clipboard-bridge" aria-hidden="true"&gt;&lt;/textarea&gt;
+    &lt;div style="display: flex"&gt;
+        &lt;div class="wb-gutter"&gt;&lt;/div&gt;
+        &lt;div class="wb-lines" style="flex: 1; overflow: hidden;"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="wb-status" style="display: flex; justify-content: space-between;"&gt;
+        &lt;div class="wb-status-left"&gt;&lt;span class="wb-linecount"&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class="wb-status-right"&gt;
+            &lt;span class="wb-coordinate"&gt;&lt;/span&gt;
+            &lt;span&gt;|&lt;/span&gt;
+            &lt;span class="wb-indentation"&gt;&lt;/span&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/blockquote&gt;</code></pre>
+
+    <h3 class="text-neutral-400 text-sm mb-2">Required Elements Checklist:</h3>
+    <div class="text-neutral-500 text-sm mb-6 space-y-1">
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb</code> - Main container (blockquote)</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-clipboard-bridge</code> - Hidden textarea for clipboard</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-gutter</code> - Line numbers container</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-lines</code> - Text content container</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-status</code> - Status bar container</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-linecount</code> - Line count display</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-coordinate</code> - Cursor position display</label>
+      <label class="flex items-center gap-2"><input type="checkbox" disabled checked class="accent-green-500"> <code class="text-blue-400">.wb-indentation</code> - Indentation display</label>
+    </div>
+
+    <h2 class="text-neutral-300 text-lg mt-8 mb-4 border-b border-neutral-700 pb-2">3. Initialize the Editor</h2>
+    <pre class="bg-neutral-800 text-green-400 p-4 rounded mb-6 overflow-x-auto"><code>const element = document.getElementById('editor');
+const editor = new Vbuf(element, {
+    initialViewportSize: 15,
+    colorPrimary: "#B2B2B2",
+    colorSecondary: "#212026"
+});
+
+// Set initial content
+editor.Model.text = "Hello, World!";
+
+// Focus the editor
+element.focus();</code></pre>
+
+    <h2 class="text-neutral-300 text-lg mt-8 mb-4 border-b border-neutral-700 pb-2">4. Live Example</h2>
+    <p class="text-neutral-500 text-sm mb-2">JS:</p>
+    <p class="text-neutral-500 text-xs mb-4"><code class="text-green-400">new Vbuf(el, { initialViewportSize: 15 })</code></p>
+
+    <blockquote class="wb no-select border border-neutral-700 w-full" tabindex="0" id="demo-editor">
+      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+      <div style="display: flex">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+      </div>
+      <div class="wb-status" style="display: flex; justify-content: space-between; background: #212026; padding: 6px;">
+        <div class="wb-status-left"><span class="wb-linecount"></span></div>
+        <div class="wb-status-right" style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+
+    <p class="text-neutral-600 text-xs mt-4">
+      <a href="index.html" class="text-purple-400 hover:underline">Back to main page</a> |
+      <a href="samples/" class="text-purple-400 hover:underline">More samples</a> |
+      <a href="test/" class="text-purple-400 hover:underline">Tests</a>
+    </p>
+  </div>
+
+  <script>
+    const element = document.getElementById('demo-editor');
+    const editor = new Vbuf(element, {
+      initialViewportSize: 15,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+
+    editor.Model.text = `// Welcome to vbuf!
+// Start typing to edit this buffer.
+
+function greet(name) {
+    return "Hello, " + name + "!";
+}
+
+console.log(greet("World"));
+
+// Features:
+// - Virtual scrolling (handles millions of lines)
+// - Vim-style cursor model
+// - Selection and clipboard support
+// - Extensible via plugins`;
+
+    element.focus();
+  </script>
+</body>
+</html>

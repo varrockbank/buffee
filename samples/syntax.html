@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Syntax Highlighting</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../vbuf.js"></script>
+  <script src="../extensions/syntax.js"></script>
+  <style>
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-cursor {
+      background-color: #FF6B6B;
+    }
+    .wb .wb-status span { padding-right: 4px; }
+  </style>
+</head>
+<body class="bg-neutral-900 p-5 font-sans">
+  <h1 class="text-white text-lg mb-2">Syntax Highlighting</h1>
+  <p class="text-neutral-400 text-sm mb-4">
+    Regex-based tokenizer with incremental state caching.
+  </p>
+
+  <div class="flex items-center gap-3 mb-4 flex-wrap">
+    <label class="text-neutral-400 text-sm">Language:</label>
+    <select id="lang-select" class="bg-neutral-800 border border-neutral-600 text-white px-2 py-1 rounded">
+      <option value="javascript">JavaScript</option>
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="json">JSON</option>
+      <option value="python">Python</option>
+    </select>
+    <label class="flex items-center gap-2 text-neutral-400 text-sm cursor-pointer">
+      <input type="checkbox" id="syntax-checkbox" checked class="w-4 h-4 accent-green-500">
+      Syntax highlighting
+    </label>
+  </div>
+
+  <div class="flex items-center gap-3 mb-4 flex-wrap">
+    <label class="text-neutral-400 text-sm">Load file:</label>
+    <input type="file" id="file-input" class="text-neutral-400 text-sm">
+    <span id="file-size" class="text-neutral-500 text-xs"></span>
+  </div>
+
+  <div id="perf-stats" class="font-mono text-yellow-400 p-3 bg-neutral-950 border border-neutral-700 mb-4 w-[700px] text-xs hidden">
+  </div>
+
+  <h2 class="text-neutral-300 text-sm mt-6 mb-2">JavaScript</h2>
+  <p class="text-neutral-500 text-xs">JS:</p>
+  <p class="text-neutral-500 text-xs"><code class="text-green-400">VbufSyntax(editor)</code></p>
+  <p class="text-neutral-500 text-xs"><code class="text-green-400">editor.Syntax.setLanguage('javascript')</code></p>
+  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">editor.Syntax.enabled = true</code></p>
+  <blockquote class="wb no-select border border-neutral-700 w-[700px] mb-4" tabindex="0" id="editor">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div class="flex">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines flex-1 overflow-hidden"></div>
+    </div>
+    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right flex">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <h2 class="text-neutral-300 text-sm mt-8 mb-2">State Cache Visualization</h2>
+  <p class="text-neutral-500 text-xs mb-2">Shows the tokenizer state at the start of each visible line (0 = normal, 1+ = special states like multiline comment/string)</p>
+  <div id="state-display" class="font-mono text-green-400 p-3 bg-neutral-950 border border-neutral-700 min-h-[24px] w-[700px] text-xs overflow-x-auto">
+  </div>
+
+  <script>
+    const editorEl = document.getElementById('editor');
+    const langSelect = document.getElementById('lang-select');
+    const toggleBtn = document.getElementById('toggle-btn');
+    const stateDisplay = document.getElementById('state-display');
+
+    const editor = new Vbuf(editorEl, {
+      initialViewportSize: 20,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+
+    // Initialize syntax highlighting
+    VbufSyntax(editor);
+    editor.Syntax.setLanguage('javascript');
+    editor.Syntax.enabled = true;
+
+    // Sample code for each language
+    const samples = {
+      javascript: `// Syntax highlighting demo
+const greeting = "Hello, World!";
+let count = 42;
+
+/**
+ * A multiline comment
+ * spanning multiple lines
+ */
+async function fetchData(url) {
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
+}
+
+class Calculator {
+  constructor(value = 0) {
+    this.value = value;
+  }
+
+  add(n) {
+    this.value += n;
+    return this;
+  }
+
+  multiply(n) {
+    this.value *= n;
+    return this;
+  }
+}
+
+const calc = new Calculator(10);
+calc.add(5).multiply(2);
+console.log(\`Result: \${calc.value}\`);
+
+// Regex example
+const pattern = /\\b[A-Za-z]+\\b/gi;
+const matches = "Hello World".match(pattern);
+
+// Numbers
+const hex = 0xFF;
+const binary = 0b1010;
+const float = 3.14159;
+const scientific = 1.5e-10;`,
+
+      html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample Page</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #282C34;
+      color: #ABB2BF;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+  <\/style>
+<\/head>
+<body>
+  <!-- Main content -->
+  <div class="container">
+    <h1>Hello World</h1>
+    <p id="greeting">Welcome to the page!</p>
+    <button onclick="alert('Clicked!')">
+      Click Me
+    </button>
+  </div>
+
+  <script>
+    const el = document.getElementById('greeting');
+    el.textContent = 'Updated!';
+  <\/script>
+<\/body>
+<\/html>`,
+
+      css: `/* CSS Syntax Highlighting */
+:root {
+  --primary-color: #61AFEF;
+  --secondary-color: #98C379;
+  --background: #282C34;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--background);
+  color: #ABB2BF;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: #4a90d9;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}`,
+
+      json: `{
+  "name": "vbuf",
+  "version": "5.7.1",
+  "description": "Virtual buffer text editor",
+  "main": "vbuf.js",
+  "keywords": [
+    "editor",
+    "text",
+    "virtual-scroll",
+    "syntax-highlighting"
+  ],
+  "author": {
+    "name": "Developer",
+    "email": "dev@example.com"
+  },
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  },
+  "config": {
+    "port": 3000,
+    "debug": true,
+    "features": {
+      "syntax": true,
+      "lineNumbers": true,
+      "minimap": false
+    }
+  },
+  "scores": [100, 95.5, 88, null],
+  "active": true,
+  "deprecated": false
+}`,
+
+      python: `# Python Syntax Highlighting Demo
+import asyncio
+from typing import List, Optional
+
+PI = 3.14159
+DEBUG = True
+
+class Calculator:
+    """A simple calculator class."""
+
+    def __init__(self, value: float = 0):
+        self.value = value
+        self._history: List[float] = []
+
+    def add(self, n: float) -> 'Calculator':
+        """Add a number to the current value."""
+        self._history.append(self.value)
+        self.value += n
+        return self
+
+    def multiply(self, n: float) -> 'Calculator':
+        self._history.append(self.value)
+        self.value *= n
+        return self
+
+    @property
+    def history(self) -> List[float]:
+        return self._history.copy()
+
+
+async def fetch_data(url: str) -> Optional[dict]:
+    """Fetch data from a URL asynchronously."""
+    try:
+        # Simulated async operation
+        await asyncio.sleep(0.1)
+        return {"url": url, "status": "ok"}
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
+def main():
+    calc = Calculator(10)
+    result = calc.add(5).multiply(2).value
+    print(f"Result: {result}")
+
+    # Numbers
+    hex_val = 0xFF
+    binary = 0b1010
+    octal = 0o755
+    scientific = 1.5e-10
+
+    # String types
+    raw = r"raw\\nstring"
+    formatted = f"Value is {result}"
+
+
+if __name__ == "__main__":
+    main()
+`
+    };
+
+    // Load initial sample
+    editor.Model.text = samples.javascript;
+
+    // Language switcher
+    langSelect.addEventListener('change', () => {
+      const lang = langSelect.value;
+      editor.Syntax.setLanguage(lang);
+      editor.Model.text = samples[lang];
+      updateStateDisplay();
+    });
+
+    // Syntax checkbox
+    const syntaxCheckbox = document.getElementById('syntax-checkbox');
+    syntaxCheckbox.addEventListener('change', () => {
+      editor.Syntax.enabled = syntaxCheckbox.checked;
+      // Force re-render
+      editor.Viewport.scroll(0);
+    });
+
+    // File loader
+    const fileInput = document.getElementById('file-input');
+    const fileSizeSpan = document.getElementById('file-size');
+    const perfStats = document.getElementById('perf-stats');
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
+      if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+      return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+    }
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      fileSizeSpan.textContent = formatBytes(file.size);
+      perfStats.classList.remove('hidden');
+      perfStats.innerHTML = 'Loading file (streaming)...';
+
+      const t0 = performance.now();
+
+      // Stream the file in chunks to avoid memory spike
+      const reader = file.stream().getReader();
+      const decoder = new TextDecoder('utf-8');
+
+      // Reset model
+      editor.Model.lines = [];
+      let remainder = '';
+      let totalLines = 0;
+      let chunkCount = 0;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const fullText = remainder + text;
+          const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            const completeText = fullText.substring(0, lastNewlineIndex);
+            const lines = completeText.split('\n');
+
+            // Append without render for speed
+            editor.Model.lines.push(...lines);
+            totalLines += lines.length;
+            remainder = fullText.substring(lastNewlineIndex + 1);
+          } else {
+            remainder = fullText;
+          }
+
+          chunkCount++;
+          // Yield to browser every 20 chunks
+          if (chunkCount % 20 === 0) {
+            perfStats.innerHTML = `Loading... ${totalLines.toLocaleString()} lines`;
+            await new Promise(r => setTimeout(r, 0));
+          }
+        }
+
+        // Handle final remainder
+        if (remainder.length > 0) {
+          editor.Model.lines.push(remainder);
+          totalLines++;
+        }
+
+        const t1 = performance.now();
+        perfStats.innerHTML = `Loaded ${totalLines.toLocaleString()} lines in ${((t1-t0)/1000).toFixed(1)}s`;
+
+        // Trigger render
+        const t2 = performance.now();
+        editor.Viewport.set(1, editor.Viewport.size);
+        const t3 = performance.now();
+
+        perfStats.innerHTML += ` | Render: ${(t3-t2).toFixed(0)}ms`;
+
+      } finally {
+        reader.releaseLock();
+      }
+
+      updateStateDisplay();
+    });
+
+    // Update state display
+    function updateStateDisplay() {
+      const cache = editor.Syntax.stateCache;
+      const viewport = editor.Viewport;
+      const lines = [];
+
+      for (let i = 0; i < viewport.size && viewport.start + i < editor.Model.lines.length; i++) {
+        const absLine = viewport.start + i;
+        const state = cache[absLine] !== undefined ? cache[absLine] : '?';
+        lines.push(`L${absLine + 1}: state=${state}`);
+      }
+
+      stateDisplay.textContent = lines.join(' | ');
+    }
+
+    // Update state display on scroll/edit
+    const originalScroll = editor.Viewport.scroll.bind(editor.Viewport);
+    editor.Viewport.scroll = function(i) {
+      originalScroll(i);
+      updateStateDisplay();
+    };
+
+    // Initial state display
+    updateStateDisplay();
+
+    // Update on any render (keypress, etc)
+    editorEl.addEventListener('keyup', updateStateDisplay);
+    editorEl.addEventListener('click', updateStateDisplay);
+
+    // Focus editor
+    editorEl.focus();
+  </script>
+</body>
+</html>

@@ -1,5 +1,39 @@
 # Claude Instructions for vbuf
 
+## Required HTML Structure for Vbuf Editors
+
+**IMPORTANT**: When creating Vbuf editor instances (in tests, samples, or anywhere), you MUST include ALL of these elements. Vbuf queries for them and will throw `Cannot set properties of null` errors if any are missing.
+
+```html
+<blockquote class="wb no-select" tabindex="0">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div style="display: flex">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between;">
+        <div class="wb-status-left"><span class="wb-linecount"></span></div>
+        <div class="wb-status-right">
+            <span class="wb-coordinate"></span>
+            <span>|</span>
+            <span class="wb-indentation"></span>
+        </div>
+    </div>
+</blockquote>
+```
+
+**Required elements checklist:**
+- [ ] `.wb` - Main container (blockquote)
+- [ ] `.wb-clipboard-bridge` - Hidden textarea for clipboard
+- [ ] `.wb-gutter` - Line numbers container
+- [ ] `.wb-lines` - Text content container
+- [ ] `.wb-status` - Status bar container
+- [ ] `.wb-linecount` - Line count display
+- [ ] `.wb-coordinate` - Cursor position display
+- [ ] `.wb-indentation` - Indentation display
+
+Missing ANY of these will cause runtime errors.
+
 ## Writing Tests (specs.dsl)
 
 When writing tests in `test/specs.dsl`, follow these guidelines:
@@ -81,6 +115,104 @@ left with shift → selects "AB" (includes B where cursor was + A moved over)
 ```
 
 This differs from editors where cursor sits between characters (like a thin I-beam).
+
+## Extensions
+
+vbuf has a modular extension system. Extensions are located in `extensions/` and are tested in the "Extensions" tab of the test UI (`test/index.html`).
+
+### Available Extensions
+
+| Extension | File | Description |
+|-----------|------|-------------|
+| **Syntax** | `syntax.js` | Regex-based syntax highlighting with state caching |
+| **Elementals** | `elementals.js` | DOM-based UI elements (buttons, inputs, labels) in a layer above text |
+| **TUI Legacy** | `tui-legacy.js` | Text-based UI elements via text manipulation |
+| **ChunkLoader** | `chunkloader.js` | Lazy loading for large files |
+
+### Extension Architecture
+
+Extensions follow a consistent pattern:
+
+```javascript
+function VbufExtension(vbuf, options = {}) {
+  // Access internals via vbuf._internals
+  const { render, renderHooks } = vbuf._internals;
+
+  // Create extension API
+  const Extension = {
+    enabled: false,
+    // ... methods
+  };
+
+  // Attach to vbuf instance
+  vbuf.Extension = Extension;
+  return Extension;
+}
+```
+
+### Using Extensions
+
+```javascript
+const editor = new Vbuf(element, options);
+
+// Initialize extension
+VbufSyntax(editor);
+editor.Syntax.setLanguage('javascript');
+editor.Syntax.enabled = true;
+
+// Initialize another extension
+VbufElementals(editor);
+editor.Elementals.addButton({ row: 1, col: 5, label: 'OK' });
+editor.Elementals.enabled = true;
+```
+
+### Writing Extension Tests
+
+Extension tests are pure JavaScript (not DSL-based) and live in the "Extensions" tab. Use the following pattern:
+
+```javascript
+extRunner.describe('My Extension', () => {
+    extRunner.it('does something', () => {
+        const { editor, cleanup } = createTestEditor();
+        try {
+            VbufMyExtension(editor);
+            // Test assertions
+            assertTrue(editor.MyExtension.enabled);
+            assertEqual(editor.MyExtension.value, expected);
+        } finally {
+            cleanup();
+        }
+    });
+});
+```
+
+**Assertion helpers:**
+- `assertEqual(actual, expected, msg)` - Strict equality
+- `assertDeepEqual(actual, expected, msg)` - JSON equality
+- `assertTrue(value, msg)` - Value is truthy
+- `assertFalse(value, msg)` - Value is falsy
+
+### Syntax Extension Details
+
+The syntax extension uses a state machine tokenizer:
+
+- **State cache**: `stateCache[lineIndex]` stores the tokenizer state at the start of each line
+- **Incremental**: On edit, cache is invalidated from the edited line forward
+- **Languages**: Built-in support for JavaScript, HTML, CSS, JSON, Python
+
+Key methods:
+- `editor.Syntax.setLanguage(lang)` - Set the language grammar
+- `editor.Syntax.tokenizeLine(text, startState)` - Tokenize a single line
+- `editor.Syntax.ensureStateCache(lineIndex)` - Populate cache up to line
+
+### Elementals vs TUI Legacy
+
+| Feature | Elementals | TUI Legacy |
+|---------|------------|------------|
+| Implementation | DOM elements in overlay | Text manipulation |
+| Cursor interaction | Separate layer | Affects text content |
+| Styling | CSS classes | Inline spans |
+| Use case | Rich interactive UI | Simple text-based UI |
 
 ## Generating Sample Pages
 
