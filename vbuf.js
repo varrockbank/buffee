@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.7-alpha.1
+ * @version 5.5.8-alpha.1
  */
 
 /**
@@ -46,14 +46,14 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.7-alpha.1";
+  this.version = "5.5.8-alpha.1";
 
   // Extract configuration with defaults
   const {
     initialViewportSize = 20,
     lineHeight = 24,
     editorPaddingPX = 4,
-    indentation = 4,
+    indentation: initialIndentation = 4,
     colorPrimary = "#B2B2B2",
     colorSecondary = "#212026",
     gutterSize: initialGutterSize = 2,
@@ -66,6 +66,7 @@ function Vbuf(node, config = {}) {
   } = config;
 
   let gutterSize = initialGutterSize;
+  let indentation = initialIndentation;
 
   const $e = node.querySelector('.wb-lines');
   Object.assign($e.style, {
@@ -844,9 +845,6 @@ function Vbuf(node, config = {}) {
       hook($e, Viewport);
     }
 
-    // TODO: this is infrequently changed. Render it ad-hoc in the mutator method.
-    $indentation.innerHTML = `Spaces: ${indentation}`;
-
     $statusLineCoord.innerHTML = `Ln ${Viewport.start + head.row + 1 }, Col ${tail.col + 1 }`;
   
     return this;
@@ -894,6 +892,20 @@ function Vbuf(node, config = {}) {
    * @warning Do not modify - changing this value will cause rendering issues.
    */
   this.lineHeight = lineHeight;
+
+  /**
+   * Number of spaces per indentation level.
+   * @type {number}
+   */
+  Object.defineProperty(this, 'indentation', {
+    get: () => indentation,
+    set: (value) => {
+      indentation = value;
+      $indentation.innerHTML = `Spaces: ${indentation}`;
+    },
+    enumerable: true
+  });
+  this.indentation = indentation; // trigger setter to initialize display
 
   /**
    * Internal API for extensions.

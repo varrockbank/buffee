@@ -781,3 +781,37 @@ expect($gutter.style.width).toBe("3ch");
 // Scroll back up: lines 0-8 visible, end=8 (1 digit), gutter = 2ch
 fixture.wb.Viewport.scroll(-2);
 expect($gutter.style.width).toBe("2ch");
+
+
+# Indentation property
+
+## should have default indentation of 4
+### Default indentation is 4 spaces
+expect(fixture.wb.indentation).toBe(4);
+
+## should update indentation at runtime
+### Setting indentation updates value and display
+fixture.wb.indentation = 2;
+expect(fixture.wb.indentation).toBe(2);
+const $indentation = fixture.node.querySelector(".wb-indentation");
+expect($indentation.innerHTML).toBe("Spaces: 2");
+
+## should allow changing indentation multiple times
+### Indentation can be changed multiple times
+fixture.wb.indentation = 8;
+expect(fixture.wb.indentation).toBe(8);
+fixture.wb.indentation = 4;
+expect(fixture.wb.indentation).toBe(4);
+const $indentation = fixture.node.querySelector(".wb-indentation");
+expect($indentation.innerHTML).toBe("Spaces: 4");
+
+## should initialize with custom indentation from config
+### Config indentation=7 sets initial value
+const customNode = document.createElement("div");
+customNode.className = "wb no-select";
+customNode.innerHTML = fixture.node.innerHTML;
+document.body.appendChild(customNode);
+const customEditor = new Vbuf(customNode, { indentation: 7 });
+expect(customEditor.indentation).toBe(7);
+expect(customNode.querySelector(".wb-indentation").innerHTML).toBe("Spaces: 7");
+customNode.remove();
