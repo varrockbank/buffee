@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.6.0-alpha.1
+ * @version 5.6.1-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.6.0-alpha.1";
+  this.version = "5.6.1-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -334,10 +334,10 @@ function Vbuf(node, config = {}) {
         // Get selected text before deleting
         const selectedText = this.lines.join('\n');
 
-        // Delete selection, then insert new text
+        // Delete selection, then insert new text (marked as combined for atomic undo)
         History._delete(absRow, first.col, selectedText);
         if (s.length > 0) {
-          History._insert(absRow, first.col, s);
+          History._insert(absRow, first.col, s, true, true); // combined=true
         }
 
         // Update cursor to end of inserted text
@@ -679,18 +679,43 @@ function Vbuf(node, config = {}) {
     undoStack: [],
     /** @type {Array} Stack of undone operations for redo */
     redoStack: [],
+    /** @type {number} Timestamp of last operation for coalescing */
+    _lastOpTime: 0,
+    /** @type {number} Max ms between ops to coalesce */
+    coalesceTimeout: 500,
 
-    /** Capture current cursor state */
+    /** Capture current cursor/selection state */
     _captureCursor() {
-      return { row: head.row, col: head.col };
+      return {
+        headRow: head.row, headCol: head.col,
+        tailRow: tail.row, tailCol: tail.col
+      };
     },
 
-    /** Restore cursor state */
+    /** Restore cursor/selection state */
     _restoreCursor(cursor) {
-      head.row = cursor.row;
-      head.col = cursor.col;
-      tail.row = cursor.row;
-      tail.col = cursor.col;
+      head.row = cursor.headRow;
+      head.col = cursor.headCol;
+      tail.row = cursor.tailRow;
+      tail.col = cursor.tailCol;
+    },
+
+    /** Check if we can coalesce with the last operation */
+    _canCoalesce(type, row, col, text) {
+      if (this.undoStack.length === 0) return false;
+      if (Date.now() - this._lastOpTime > this.coalesceTimeout) return false;
+
+      const last = this.undoStack[this.undoStack.length - 1];
+      if (last.type !== type) return false;
+      if (text.includes('\n') || last.text.includes('\n')) return false;
+
+      if (type === 'insert') {
+        // Can coalesce if inserting right after the last insert
+        return last.row === row && last.col + last.text.length === col;
+      } else {
+        // Can coalesce backspace if deleting right before the last delete
+        return last.row === row && col + text.length === last.col;
+      }
     },
 
     /**
@@ -699,8 +724,9 @@ function Vbuf(node, config = {}) {
      * @param {number} col - Column index
      * @param {string} text - Text to insert (may contain newlines)
      * @param {boolean} [recordHistory=true] - Whether to record in undo stack
+     * @param {boolean} [combined=false] - Mark as combined with previous operation (undo/redo together)
      */
-    _insert(row, col, text, recordHistory = true) {
+    _insert(row, col, text, recordHistory = true, combined = false) {
       if (text.length === 0) return;
 
       const cursorBefore = recordHistory ? this._captureCursor() : null;
@@ -728,7 +754,14 @@ function Vbuf(node, config = {}) {
       }
 
       if (recordHistory) {
-        this.undoStack.push({ type: 'insert', row, col, text, cursorBefore });
+        if (this._canCoalesce('insert', row, col, text)) {
+          // Merge with last operation
+          const last = this.undoStack[this.undoStack.length - 1];
+          last.text += text;
+        } else {
+          this.undoStack.push({ type: 'insert', row, col, text, cursorBefore, combined });
+        }
+        this._lastOpTime = Date.now();
         this.redoStack = [];
       }
     },
@@ -739,8 +772,9 @@ function Vbuf(node, config = {}) {
      * @param {number} col - Column index
      * @param {string} text - Text to delete (must match what's at position, may contain newlines)
      * @param {boolean} [recordHistory=true] - Whether to record in undo stack
+     * @param {boolean} [combined=false] - Mark as combined with previous operation (undo/redo together)
      */
-    _delete(row, col, text, recordHistory = true) {
+    _delete(row, col, text, recordHistory = true, combined = false) {
       if (text.length === 0) return;
 
       const cursorBefore = recordHistory ? this._captureCursor() : null;
@@ -763,9 +797,35 @@ function Vbuf(node, config = {}) {
       }
 
       if (recordHistory) {
-        this.undoStack.push({ type: 'delete', row, col, text, cursorBefore });
+        if (this._canCoalesce('delete', row, col, text)) {
+          // Merge with last operation (prepend since backspace goes backwards)
+          const last = this.undoStack[this.undoStack.length - 1];
+          last.text = text + last.text;
+          last.col = col;
+        } else {
+          this.undoStack.push({ type: 'delete', row, col, text, cursorBefore, combined });
+        }
+        this._lastOpTime = Date.now();
         this.redoStack = [];
       }
+    },
+
+    /**
+     * Undo a single operation (internal helper).
+     * @param {Object} op - Operation to undo
+     * @returns {Object} Operation with cursorAfter for redo
+     */
+    _undoOp(op) {
+      const cursorBefore = this._captureCursor();
+
+      // Apply inverse operation without recording to history
+      if (op.type === 'insert') {
+        this._delete(op.row, op.col, op.text, false);
+      } else if (op.type === 'delete') {
+        this._insert(op.row, op.col, op.text, false);
+      }
+
+      return { ...op, cursorAfter: cursorBefore };
     },
 
     /**
@@ -776,21 +836,37 @@ function Vbuf(node, config = {}) {
       if (this.undoStack.length === 0) return false;
 
       const op = this.undoStack.pop();
-      const cursorBefore = this._captureCursor();
+      const undoneOp = this._undoOp(op);
+      this.redoStack.push(undoneOp);
 
-      // Apply inverse operation without recording to history
-      if (op.type === 'insert') {
-        this._delete(op.row, op.col, op.text, false);
+      // If this operation was combined with the previous, undo that too
+      if (op.combined && this.undoStack.length > 0) {
+        const prevOp = this.undoStack.pop();
+        const undonePrevOp = this._undoOp(prevOp);
+        this.redoStack.push(undonePrevOp);
+        // Restore cursor to before the first (delete) operation
+        this._restoreCursor(prevOp.cursorBefore);
       } else {
-        this._insert(op.row, op.col, op.text, false);
+        // Restore cursor to before the original operation
+        this._restoreCursor(op.cursorBefore);
       }
 
-      // Restore cursor to before the original operation
-      this._restoreCursor(op.cursorBefore);
-
-      this.redoStack.push({ ...op, cursorAfter: cursorBefore });
       render(true);
       return true;
+    },
+
+    /**
+     * Redo a single operation (internal helper).
+     * @param {Object} op - Operation to redo
+     */
+    _redoOp(op) {
+      // Re-apply operation without recording to history
+      if (op.type === 'insert') {
+        this._insert(op.row, op.col, op.text, false);
+      } else if (op.type === 'delete') {
+        this._delete(op.row, op.col, op.text, false);
+      }
+      this.undoStack.push(op);
     },
 
     /**
@@ -801,20 +877,23 @@ function Vbuf(node, config = {}) {
       if (this.redoStack.length === 0) return false;
 
       const op = this.redoStack.pop();
+      this._redoOp(op);
 
-      // Re-apply operation without recording to history
-      if (op.type === 'insert') {
-        this._insert(op.row, op.col, op.text, false);
+      // If next operation is combined, redo that too
+      if (this.redoStack.length > 0 && this.redoStack[this.redoStack.length - 1].combined) {
+        const nextOp = this.redoStack.pop();
+        this._redoOp(nextOp);
+        // Restore cursor to after the second (insert) operation
+        if (nextOp.cursorAfter) {
+          this._restoreCursor(nextOp.cursorAfter);
+        }
       } else {
-        this._delete(op.row, op.col, op.text, false);
+        // Restore cursor to after the original operation
+        if (op.cursorAfter) {
+          this._restoreCursor(op.cursorAfter);
+        }
       }
 
-      // Restore cursor to after the original operation
-      if (op.cursorAfter) {
-        this._restoreCursor(op.cursorAfter);
-      }
-
-      this.undoStack.push(op);
       render(true);
       return true;
     },

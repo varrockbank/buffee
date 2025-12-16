@@ -846,13 +846,9 @@ expect(fixture).toHaveLines("");
 fixture.wb.History.redo();
 expect(fixture).toHaveLines("A");
 
-## should undo multiple characters
-### Undo multiple character inserts
+## should undo coalesced characters
+### Undo coalesced character inserts (typed quickly = one undo)
 TYPE "ABC"
-fixture.wb.History.undo();
-expect(fixture).toHaveLines("AB");
-fixture.wb.History.undo();
-expect(fixture).toHaveLines("A");
 fixture.wb.History.undo();
 expect(fixture).toHaveLines("");
 
@@ -871,10 +867,7 @@ enter
 TYPE "World"
 expect(fixture).toHaveLines("Hello", "World");
 fixture.wb.History.undo();
-fixture.wb.History.undo();
-fixture.wb.History.undo();
-fixture.wb.History.undo();
-fixture.wb.History.undo();
+expect(fixture).toHaveLines("Hello", "");
 fixture.wb.History.undo();
 expect(fixture).toHaveLines("Hello");
 
@@ -896,21 +889,40 @@ TYPE "B"
 expect(fixture.wb.History.redoStack.length).toBe(0);
 
 ## should restore cursor position on undo
-### Undo restores cursor to position before edit
+### Undo restores cursor to position before edit (coalesced)
 TYPE "Hello"
 EXPECT cursor at 0,5
 fixture.wb.History.undo();
-EXPECT cursor at 0,4
-fixture.wb.History.undo();
-EXPECT cursor at 0,3
+EXPECT cursor at 0,0
 
 ## should restore cursor position on redo
-### Redo restores cursor to position after edit
+### Redo restores cursor to position after edit (coalesced)
 TYPE "AB"
-fixture.wb.History.undo();
 fixture.wb.History.undo();
 EXPECT cursor at 0,0
 fixture.wb.History.redo();
-EXPECT cursor at 0,1
-fixture.wb.History.redo();
 EXPECT cursor at 0,2
+
+## should restore cursor and selection on undo delete selection
+### Regression: Undo delete selection restores cursor to original selection start
+TYPE "Hello World"
+left with meta
+right 5 times with shift
+backspace
+expect(fixture).toHaveLines("World");
+EXPECT cursor at 0,0
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("Hello World");
+EXPECT cursor at 0,0
+
+## should undo replace selection in one step
+### Regression: Replace selection (delete+insert) undoes atomically
+TYPE "Hello World"
+left with meta
+right 5 times with shift
+TYPE "X"
+expect(fixture).toHaveLines("XWorld");
+EXPECT cursor at 0,1
+fixture.wb.History.undo();
+expect(fixture).toHaveLines("Hello World");
+EXPECT cursor at 0,0
