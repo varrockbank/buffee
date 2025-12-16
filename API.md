@@ -228,8 +228,14 @@ const id = editor.TUI.addButton({
   onActivate: (el) => console.log("Clicked!", el)
 });
 
-// Add prompt (stub - not yet implemented)
-editor.TUI.addPrompt({ row, col, width, title, onActivate });
+// Add prompt (returns ID)
+const promptId = editor.TUI.addPrompt({
+  row: 8,
+  col: 2,
+  width: 30,        // Total width including borders
+  title: "Search",
+  onActivate: (el) => console.log("Submitted:", el.input)
+});
 
 // Remove
 editor.TUI.removeElement(id);
@@ -243,18 +249,53 @@ editor.TUI.currentElement();
 editor.TUI.nextElement();      // Move to next (bind to Tab)
 editor.TUI.activateElement();  // Trigger callback (bind to Enter)
 
+// Key handling (element-specific behavior)
+editor.TUI.handleKeyDown(key); // Returns true if handled
+
 // Highlighting (enabled by default)
 editor.TUI.setHighlight(true);   // Enable
 editor.TUI.setHighlight(false);  // Disable
 ```
 
-**Keyboard binding for TUI:**
+### Element Types
+
+**Button** (`type: 'button'`)
+- Displays label text, optionally with `+-|` border
+- Enter key activates (triggers `onActivate`)
+
+**Prompt** (`type: 'prompt'`)
+- Displays input box with box-drawing characters: `┌─┐│└┘`
+- Printable ASCII keys insert into input
+- Backspace deletes last character
+- Enter submits (triggers `onActivate` with `el.input`)
+
+### Element Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | number | Unique identifier |
+| `type` | string | `'button'` or `'prompt'` |
+| `row` | number | Absolute row position |
+| `col` | number | Column position |
+| `width` | number | Element width in characters |
+| `height` | number | Element height in rows |
+| `contents` | string[] | Array of rendered lines |
+| `input` | string | User input (prompts only) |
+| `title` | string | Prompt title (prompts only) |
+| `onActivate` | function | Callback when activated |
+
+### Keyboard Binding
 
 ```javascript
 element.addEventListener('keydown', (e) => {
   if (!editor.TUI.enabled) return;
-  if (e.key === 'Tab') { e.preventDefault(); editor.TUI.nextElement(); }
-  if (e.key === 'Enter') { e.preventDefault(); editor.TUI.activateElement(); }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    editor.TUI.nextElement();
+  } else {
+    e.preventDefault();
+    editor.TUI.handleKeyDown(e.key);
+  }
 });
 ```
 

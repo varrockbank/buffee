@@ -73,9 +73,10 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Prompt</h2>
+  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Prompt (type to input, Enter to submit)</h2>
   <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">TUI.addPrompt({ row, col, width, title, onActivate })</code></p>
+  <p class="text-neutral-500 text-xs"><code class="text-green-400">TUI.addPrompt({ row, col, width, title, onActivate })</code></p>
+  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">TUI.handleKeyDown(e.key)</code></p>
   <blockquote class="wb no-select border border-neutral-700 w-[500px] mb-4" tabindex="0" id="prompt-demo">
     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
     <div class="flex">
@@ -144,12 +145,12 @@
       colorSecondary: "#212026"
     });
     promptEditor.Model.text = '\n\n\n\n\n\n\n';
-    promptEditor.TUI.addPrompt({ row: 1, col: 2, width: 30, title: 'Search', onActivate: () => { output.textContent = 'Search prompt activated'; } });
-    promptEditor.TUI.addPrompt({ row: 5, col: 2, width: 40, title: 'Command', onActivate: () => { output.textContent = 'Command prompt activated'; } });
+    promptEditor.TUI.addPrompt({ row: 1, col: 2, width: 30, title: 'Search', onActivate: (el) => { output.textContent = 'Search: ' + el.input; } });
+    promptEditor.TUI.addPrompt({ row: 5, col: 2, width: 40, title: 'Command', onActivate: (el) => { output.textContent = 'Command: ' + el.input; } });
     promptEditor.TUI.enabled = true;
     promptEl.addEventListener('keydown', (e) => {
       if (e.key === 'Tab') { e.preventDefault(); promptEditor.TUI.nextElement(); }
-      if (e.key === 'Enter') { e.preventDefault(); promptEditor.TUI.activateElement(); }
+      else { e.preventDefault(); promptEditor.TUI.handleKeyDown(e.key); }
     });
 
     // Focus first editor

@@ -1,5 +1,5 @@
 function Vbuf(node, config = {}) {
-  this.version = "5.4.4-alpha.1";
+  this.version = "5.5.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -456,7 +456,7 @@ function Vbuf(node, config = {}) {
     }
 
     const id = ++tuiElementIdCounter;
-    const element = { id, type, row, col, width, height, contents, onActivate: onActivate || null };
+    const element = { id, type, row, col, width, height, contents, onActivate: onActivate || null, input: '', title: '' };
     tuiElements.push(element);
 
     // Add to row map
@@ -467,6 +467,22 @@ function Vbuf(node, config = {}) {
 
     render(true);
     return id;
+  }
+
+  // Helper to build prompt contents from width, title, and input
+  function buildPromptContents(width, title, input) {
+    const dashesAfterTitle = width - 5 - title.length;
+    const line1 = '┌─ ' + title + ' ' + '─'.repeat(dashesAfterTitle) + '┐';
+
+    // Line 2: │ > input     │
+    const maxInputLen = width - 5; // space for "│ > " and "│"
+    const displayInput = input.length > maxInputLen ? input.slice(-maxInputLen) : input;
+    const padding = ' '.repeat(maxInputLen - displayInput.length);
+    const line2 = '│ > ' + displayInput + padding + '│';
+
+    const line3 = '└' + '─'.repeat(width - 2) + '┘';
+
+    return [line1, line2, line3];
   }
 
   const TUI = {
@@ -511,19 +527,14 @@ function Vbuf(node, config = {}) {
         throw new Error(`Width must be at least ${minWidth} for title "${title}"`);
       }
 
-      // Line 1: ┌─ title ─────┐
-      // Inner = width - 2 (corners); dashes after = inner - 1 (dash before) - 2 (spaces) - title.length
-      const dashesAfterTitle = width - 5 - title.length;
-      const line1 = '┌─ ' + title + ' ' + '─'.repeat(dashesAfterTitle) + '┐';
+      const contents = buildPromptContents(width, title, '');
+      const id = addElement({ type: 'prompt', row, col, width, height: 3, contents, onActivate });
 
-      // Line 2: │ >         │
-      const line2 = '│ > ' + ' '.repeat(width - 5) + '│';
+      // Store title on the element for rebuilding contents when input changes
+      const el = tuiElements.find(e => e.id === id);
+      if (el) el.title = title;
 
-      // Line 3: └─────────────────┘
-      const line3 = '└' + '─'.repeat(width - 2) + '┘';
-
-      const contents = [line1, line2, line3];
-      return addElement({ type: 'prompt', row, col, width, height: 3, contents, onActivate });
+      return id;
     },
 
     // Remove an element by its id
@@ -624,6 +635,53 @@ function Vbuf(node, config = {}) {
           return true;
         }
       }
+      return false;
+    },
+
+    // Handle keydown for current element (type-specific behavior)
+    // For buttons: Enter activates
+    // For prompts: printable chars insert, Backspace deletes, Enter submits
+    handleKeyDown(key) {
+      const cursorRow = Viewport.start + head.row;
+      const cursorCol = head.col;
+
+      // Find current element
+      let currentEl = null;
+      for (const el of tuiElements) {
+        if (cursorRow >= el.row && cursorRow < el.row + el.height &&
+            cursorCol >= el.col && cursorCol < el.col + el.width) {
+          currentEl = el;
+          break;
+        }
+      }
+
+      if (!currentEl) return false;
+
+      if (currentEl.type === 'button') {
+        if (key === 'Enter') {
+          if (currentEl.onActivate) currentEl.onActivate(currentEl);
+          return true;
+        }
+      } else if (currentEl.type === 'prompt') {
+        if (key === 'Enter') {
+          if (currentEl.onActivate) currentEl.onActivate(currentEl);
+          return true;
+        } else if (key === 'Backspace') {
+          if (currentEl.input.length > 0) {
+            currentEl.input = currentEl.input.slice(0, -1);
+            currentEl.contents = buildPromptContents(currentEl.width, currentEl.title, currentEl.input);
+            render(true);
+          }
+          return true;
+        } else if (key.length === 1 && key.charCodeAt(0) >= 32 && key.charCodeAt(0) < 127) {
+          // Printable ASCII
+          currentEl.input += key;
+          currentEl.contents = buildPromptContents(currentEl.width, currentEl.title, currentEl.input);
+          render(true);
+          return true;
+        }
+      }
+
       return false;
     }
   };

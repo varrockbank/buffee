@@ -517,7 +517,7 @@
     <p>At its core vbuf is, humbly speaking, a compositor. A compositor is nomenclature for rendering engine specifically in the context of rendering UIs. Terminal emulators are compositors. Unfortunately, we can't call a Vbuf a terminal emulator ... yet. That would be a massive undertaken
       that is for all intensive purposes out of scope. 
       However, I hope an enterprising individual might possibly repurpose vbuf as such.</p>
-    <p>Vbuf's is geared towards fixed-width UTF-8 character cells in a grid-layout. Emojis and wide UTF-8 characters break the model, although no editor or font has 100% UTF-8 support either.</p>
+    <p>Vbuf's is geared towards fixed-width UTF-8 character cells in a grid-layout. Rendering is line-wise, meaing multiple changes to a line would be most efficiently batched up (e.g. cells in a spreadsheet). Emojis and wide UTF-8 characters break the model, although no editor or font has 100% UTF-8 support either.</p>
     <p>The original motivation was to read segments of streams of large distributed server log files in an SRE capacity.  More generally, viewing a subset of big buffers without incurring JavaScript fatigue and bloat.
       Thanks to direct DOM incisions, "occlusion culling" tricks and V8 wizardry, vbuf sidesteps the DOM bottleneck and VDOM overhead, scaling only in RAM linearly to the buffer size. Absent content-aware and syntax highlighting considerations, Vbuf outperforms popular text editors in compactness, performance and capacity. 
     </p>
@@ -1690,7 +1690,7 @@ const fileTemplate = `
       col: 18,
       width: 40,
       title: 'Command',
-      onActivate: () => alert('Command prompt activated!')
+      onActivate: (el) => alert('Command: ' + el.input)
     });
 
     // Enable TUI mode by default
@@ -1721,15 +1721,15 @@ const fileTemplate = `
       tuiDemo.TUI.addButton({ row, col, label });
     });
 
-    // Bind Tab to nextElement, Enter to activateElement in TUI mode
+    // Bind Tab to nextElement, other keys to handleKeyDown in TUI mode
     tuiDemoElement.addEventListener('keydown', (e) => {
       if (!tuiDemo.TUI.enabled) return;
       if (e.key === 'Tab') {
         e.preventDefault();
         tuiDemo.TUI.nextElement();
-      } else if (e.key === 'Enter') {
+      } else {
         e.preventDefault();
-        tuiDemo.TUI.activateElement();
+        tuiDemo.TUI.handleKeyDown(e.key);
       }
     });
 
