@@ -28,9 +28,12 @@ function expect(actual) {
           throw new Error(`Expected cursor but found selection`);
         }
 
-        // Check coordinates
-        if (firstEdge.row !== row || firstEdge.col !== col) {
-          throw new Error(`Expected cursor at {row: ${row}, col: ${col}}, got {row: ${firstEdge.row}, col: ${firstEdge.col}}`);
+        // Convert to absolute coordinates
+        const absRow = actual.wb.Viewport.start + firstEdge.row;
+
+        // Check coordinates (absolute row, 0-indexed)
+        if (absRow !== row || firstEdge.col !== col) {
+          throw new Error(`Expected cursor at {row: ${row}, col: ${col}}, got {row: ${absRow}, col: ${firstEdge.col}}`);
         }
       },
       toHaveSelectionAt(startRow, startCol, endRow, endCol) {
@@ -47,10 +50,14 @@ function expect(actual) {
           throw new Error(`Expected selection but found cursor`);
         }
 
-        // Check coordinates
-        if (firstEdge.row !== startRow || firstEdge.col !== startCol ||
-            secondEdge.row !== endRow || secondEdge.col !== endCol) {
-          throw new Error(`Expected selection at {row: ${startRow}, col: ${startCol}} to {row: ${endRow}, col: ${endCol}}, got {row: ${firstEdge.row}, col: ${firstEdge.col}} to {row: ${secondEdge.row}, col: ${secondEdge.col}}`);
+        // Convert to absolute coordinates
+        const absFirstRow = actual.wb.Viewport.start + firstEdge.row;
+        const absSecondRow = actual.wb.Viewport.start + secondEdge.row;
+
+        // Check coordinates (absolute rows, 0-indexed)
+        if (absFirstRow !== startRow || firstEdge.col !== startCol ||
+            absSecondRow !== endRow || secondEdge.col !== endCol) {
+          throw new Error(`Expected selection at {row: ${startRow}, col: ${startCol}} to {row: ${endRow}, col: ${endCol}}, got {row: ${absFirstRow}, col: ${firstEdge.col}} to {row: ${absSecondRow}, col: ${secondEdge.col}}`);
         }
       }
     };

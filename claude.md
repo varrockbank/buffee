@@ -45,6 +45,11 @@ fixture.wb.Viewport.scroll(2);
 - `with alt` - Alt/Option key (for word movement)
 - Can combine: `right with meta, shift`
 
+### Coordinate System
+- `EXPECT cursor at row,col` uses **absolute 0-indexed** coordinates
+- `EXPECT selection at r1,c1-r2,c2` uses **absolute 0-indexed** coordinates
+- Row 0 is the first line of the document, regardless of viewport scroll position
+
 ### Test Structure
 ```
 ## should describe what the test verifies
