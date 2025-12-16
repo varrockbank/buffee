@@ -340,30 +340,47 @@ element.addEventListener('keydown', (e) => {
 
 ---
 
-## Read-Only Mode
+## Edit Mode (`editor.editMode`)
 
-Two options for read-only (navigation only, no editing):
+Controls editing and navigation behavior. Three modes are available:
 
-**Option 1: TUI mode** (simpler)
+| Mode | Navigation | Editing | Use Case |
+|------|------------|---------|----------|
+| `'write'` | Yes | Yes | Default - full editing |
+| `'navigate'` | Yes | No | View-only with scrolling |
+| `'read'` | No | No | Static display (TUI uses this) |
+
+```javascript
+// Default mode - full editing
+editor.editMode = 'write';
+
+// Navigate mode - can scroll, no editing
+editor.editMode = 'navigate';
+
+// Read mode - no navigation or editing
+editor.editMode = 'read';
+```
+
+### Common Patterns
+
+**Simple view-only mode:**
 ```javascript
 editor.Model.text = "Your content here";
-editor.TUI.enabled = true;
+editor.editMode = 'navigate';
 ```
 
-**Option 2: Chunked mode**
+**TUI mode** (for interactive elements):
 ```javascript
-editor.Model.activateChunkMode();
-await editor.Model.appendLines(["Line 1", "Line 2", "Line 3"]);
+editor.Model.text = "Your content here";
+editor.TUI.enabled = true;  // Sets editMode to 'read' automatically
 ```
 
-### Chunked Mode Gotcha
-
-Do **not** use `Model.text = "..."` with chunked mode. It will cause:
+**ChunkLoader** (for very large files):
+```javascript
+VbufChunkLoader(editor);
+editor.ChunkLoader.activate();  // Sets editMode to 'navigate' automatically
+await editor.ChunkLoader.appendLines(["Line 1", "Line 2", ...]);
 ```
-TypeError: The provided value is not of type '(ArrayBuffer or ArrayBufferView)'
-```
-
-Chunked mode requires `appendLines()` which handles compression. The `.text` setter bypasses this.
 
 ---
 
@@ -420,17 +437,43 @@ Tree-sitter rendering is capped at 60fps using a dirty flag pattern. Call `markD
 
 ---
 
-## Navigation Control (`editor.setNavigationDisabled`)
+## ChunkLoader Extension (`editor.ChunkLoader`)
 
-Disable arrow key navigation and text editing to make the editor read-only:
+ChunkLoader is an optional extension for loading and viewing very large files. It compresses lines into gzip chunks and decompresses on-demand for efficient memory usage.
+
+```html
+<script src="vbuf.js"></script>
+<script src="extensions/chunkloader.js"></script>
+```
 
 ```javascript
-// Disable navigation (arrow keys do nothing, no text input)
-editor.setNavigationDisabled(true);
+const editor = new Vbuf(document.getElementById('editor'), options);
+VbufChunkLoader(editor);
 
-// Re-enable navigation
-editor.setNavigationDisabled(false);
+// Activate chunked mode (disables editing)
+editor.ChunkLoader.activate(50000);  // 50k lines per chunk
+
+// Append lines (must use this, not Model.text)
+await editor.ChunkLoader.appendLines(largeArrayOfLines);
+
+// Check status
+editor.ChunkLoader.enabled;     // true
+editor.ChunkLoader.totalLines;  // total line count
+editor.ChunkLoader.chunkCount;  // number of compressed chunks
+
+// Clear all data
+editor.ChunkLoader.clear();
+
+// Deactivate and restore normal mode
+editor.ChunkLoader.deactivate();
 ```
+
+### Important Notes
+
+- **Do not use `Model.text`** in chunked mode - use `appendLines()` instead
+- Editing is automatically disabled when activated
+- Chunks are loaded asynchronously - "..." placeholders shown while loading
+- Viewport can straddle at most 2 chunks (previous + current or current + next)
 
 ---
 
@@ -484,8 +527,8 @@ function MyExtension(vbuf) {
 
   // Expose API on vbuf instance
   vbuf.MyExtension = {
-    enable() { vbuf.setNavigationDisabled(true); render(true); },
-    disable() { vbuf.setNavigationDisabled(false); render(true); }
+    enable() { vbuf.editMode = 'navigate'; render(true); },
+    disable() { vbuf.editMode = 'write'; render(true); }
   };
 }
 

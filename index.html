@@ -3,6 +3,7 @@
 <meta charset="UTF-8">
 <script src="vbuf.js"></script>
 <script src="extensions/tui.js"></script>
+<script src="extensions/chunkloader.js"></script>
 <style>
   /************* "Atomic CSS" classes for Boxes *************/
   .💪 { display: flex }                                 /* Flex like muscles.   */
@@ -745,6 +746,7 @@
       colorSecondary: "#38274D",
       logger: compressedFileLoaderLogger
     });
+    VbufChunkLoader(primary);  // Initialize ChunkLoader extension
     mainElement.focus();
     window.primary = primary;
 
@@ -1151,7 +1153,7 @@
 
       const reader = f.stream().getReader();
       try {
-        primary.Model.activateChunkMode();
+        primary.ChunkLoader.activate();
         document.getElementById('read-only-indicator').classList.remove('hidden');
 
         const decoder = new TextDecoder('utf-8');
@@ -1194,21 +1196,19 @@
           await primary.Model.appendLines([remainder], false);
         }
 
-        // Calculate compressed size
-        for (const chunk of primary.Model.chunks) {
-          compressedSize += chunk.length;
-        }
+        // Get compressed size from ChunkLoader
+        compressedSize = primary.ChunkLoader.compressedSize;
 
         const t1 = performance.now();
         const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
         const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
 
-        compressedFileLoaderLogger(`[Chunked+Compressed] Stored ${primary.Model.totalLines.toLocaleString()} lines in ${primary.Model.chunks.length} gzipped chunks`);
+        compressedFileLoaderLogger(`[Chunked+Compressed] Stored ${primary.ChunkLoader.totalLines.toLocaleString()} lines in ${primary.ChunkLoader.chunkCount} gzipped chunks`);
         compressedFileLoaderLogger(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
         compressedFileLoaderLogger(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
         compressedFileLoaderLogger(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
         compressedFileLoaderLogger(`  Compression ratio: ${compressionRatio}% savings`);
-        compressedFileLoaderLogger(`  Memory savings: ${primary.Model.chunks.length} chunks vs ${primary.Model.totalLines.toLocaleString()} array elements = ${(primary.Model.totalLines / primary.Model.chunks.length).toFixed(0)}x reduction`);
+        compressedFileLoaderLogger(`  Memory savings: ${primary.ChunkLoader.chunkCount} chunks vs ${primary.ChunkLoader.totalLines.toLocaleString()} array elements = ${(primary.ChunkLoader.totalLines / primary.ChunkLoader.chunkCount).toFixed(0)}x reduction`);
       } finally {
         reader.releaseLock();
       }

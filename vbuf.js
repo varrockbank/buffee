@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.5-alpha.1
+ * @version 5.5.6-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.5-alpha.1";
+  this.version = "5.5.6-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -102,6 +102,7 @@ function Vbuf(node, config = {}) {
   });
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
+  
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
   const fragmentGutters = document.createDocumentFragment();
@@ -585,18 +586,17 @@ function Vbuf(node, config = {}) {
   };
 
   /**
-   * When true, arrow key navigation is disabled (used by TUI mode, etc.)
-   * @type {boolean}
+   * Editor mode: 'write' (full editing), 'navigate' (read + arrow keys), 'read' (view only)
+   * @type {'write'|'navigate'|'read'}
    */
-  let navigationDisabled = false;
+  let editMode = 'write';
 
   /**
-   * Document model managing text content and chunked storage for large files.
-   * Supports both simple array mode and compressed chunked mode for large documents.
+   * Document model managing text content.
    * @namespace Model
    */
   const Model = {
-    /** @type {string[]} Array of text lines (used in simple mode) */
+    /** @type {string[]} Array of text lines */
     lines: [''],
 
     /** @type {string} Total byte count of the document */
@@ -604,54 +604,11 @@ function Vbuf(node, config = {}) {
     /** @type {number} Original line count when document was loaded */
     originalLineCount: 0,
 
-    /** @type {boolean} Whether chunked mode is active for large files */
-    useChunkedMode: false,
-    /** @type {Uint8Array[]} Compressed chunks of lines */
-    chunks: [],
-    /** @type {number} Number of lines per chunk */
-    chunkSize: 50_000,
-    /** @type {number} Total number of lines across all chunks */
-    totalLines: 0,
-    /** @type {string[]} Current chunk decompressed */
-    buffer: [],
-    /** @type {number} Current chunk index (-1 = incomplete last chunk) */
-    currentChunkIndex: -1,
-    /** @type {string[]} Previous chunk decompressed (for viewport straddling) */
-    prevBuffer: [],
-    /** @type {string[]} Next chunk decompressed (for viewport straddling) */
-    nextBuffer: [],
-    /** @private */
-    _textEncoder: new TextEncoder(),
-    /** @private */
-    _textDecoder: new TextDecoder(),
-
-    /**
-     * Activates chunked mode for handling large files with gzip compression.
-     * @param {number} [chunkSize=50000] - Number of lines per chunk
-     * @throws {Error} If viewport size is larger than chunk size
-     */
-    activateChunkMode(chunkSize = 50_000) {
-        // Ensure Viewport does not straddle more than 2 chunks.
-        // TODO: we don't enforce this invariant when setting Viewport.size
-        if (Viewport.size >= chunkSize) {
-          throw new Error(`Viewport ${Viewport.size} can't be larger than chunkSize ${chunkSize}`);
-        }
-        this.useChunkedMode = true;
-        this.chunks = [];
-        this.buffer = [];
-        this.totalLines = 0;
-        this.lines = [];
-        this.currentChunkIndex = -1;
-        this.prevBuffer = [];
-        this.nextBuffer = [];
-        this.chunkSize = chunkSize;
-    },
-
     /**
      * Index of the last line in the document.
      * @returns {number} Zero-based index of the last line
      */
-    get lastIndex() { return this.useChunkedMode ? this.totalLines - 1 : this.lines.length - 1 },
+    get lastIndex() { return this.lines.length - 1 },
 
     /**
      * Sets the document content from a string.
@@ -686,148 +643,12 @@ function Vbuf(node, config = {}) {
 
     /**
      * Appends lines to the end of the document.
-     * In chunked mode, handles compression and chunk management.
      * @param {string[]} newLines - Lines to append
      * @param {boolean} [skipRender=false] - Whether to skip re-rendering
-     * @returns {Promise<void>}
      */
-    async appendLines(newLines, skipRender = false) {
-      if (this.useChunkedMode) {
-        // Calculate chunk indices based on totalLines
-        let startChunkIndex = Math.floor(this.totalLines / this.chunkSize);
-        let startPosInChunk = this.totalLines % this.chunkSize;
-
-        let remainingLines = newLines;
-        // Store some in current chunk
-        if(startChunkIndex == this.currentChunkIndex) {
-          const remainingSpace = this.chunkSize - this.buffer.length;
-          const linesToCurrentChunk = newLines.slice(0, remainingSpace);
-          remainingLines = newLines.slice(remainingSpace);
-          this.buffer.push(linesToCurrentChunk);
-          this.totalLines += remainingSpace;
-          startChunkIndex++;
-          startPosInChunk = 0;
-        }
-
-        while(remainingLines.length != 0) {
-          let remainingSpaceInChunk = this.chunkSize - startPosInChunk;
-            // All remaining lines fit in current chunk
-          if(remainingLines.length <= remainingSpaceInChunk) {
-            // Either new chunk or existing chunk
-            let chunkLines = [];
-            if (startChunkIndex < this.chunks.length) {
-              chunkLines = await this._decompressChunk(startChunkIndex);
-            }
-
-            chunkLines.push(...remainingLines);
-            this.totalLines += remainingLines.length;
-
-            await this._compressChunk(startChunkIndex, chunkLines);
-
-            remainingLines = [];
-          } else {
-            const linesInChunk = remainingLines.slice(0, remainingSpaceInChunk);
-            remainingLines = remainingLines.slice(remainingSpaceInChunk);
-
-            // 1. Read chunk out of compression (if it exists)
-            let chunkLines = [];
-            if (startChunkIndex < this.chunks.length) {
-              chunkLines = await this._decompressChunk(startChunkIndex);
-            }
-
-            // 2. Append linesInChunk to chunk
-            chunkLines.push(...linesInChunk);
-            this.totalLines += linesInChunk.length;
-
-            // 3. Recompress chunk
-            await this._compressChunk(startChunkIndex, chunkLines);
-
-            startChunkIndex++;
-            startPosInChunk = 0;
-          }
-        }
-      } else {
-        // Legacy mode for small files
-        this.lines.push(...newLines);
-      }
+    appendLines(newLines, skipRender = false) {
+      this.lines.push(...newLines);
       if (!skipRender) render();
-    },
-
-    /**
-     * Compresses lines into a gzip chunk and stores it.
-     * @private
-     * @param {number} chunkIndex - Index in the chunks array
-     * @param {string[]} lines - Lines to compress
-     * @returns {Promise<void>}
-     */
-    async _compressChunk(chunkIndex, lines) {
-      logger(`[Compress] Compressing chunk ${chunkIndex} (${lines.length} lines)`);
-      const text = lines.join('\n');
-      const data = this._textEncoder.encode(text);
-
-      // Use CompressionStream API (gzip)
-      const stream = new ReadableStream({ start(controller) { controller.enqueue(data); controller.close(); }});
-
-      const chunks = [];
-      const reader = stream.pipeThrough(new CompressionStream('gzip')).getReader();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-      }
-
-      // Combine all Uint8Array chunks into one
-      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-      const result = new Uint8Array(totalLength);
-      let offset = 0;
-      for (const chunk of chunks) {
-        result.set(chunk, offset);
-        offset += chunk.length;
-      }
-
-      if (chunkIndex < this.chunks.length) {
-        this.chunks[chunkIndex] = result;
-      } else {
-        this.chunks.push(result);
-      }
-      logger(`[Compress] Chunk ${chunkIndex} compressed: ${(result.length / 1024).toFixed(2)} KB`);
-    },
-
-    /**
-     * Decompresses a gzip chunk and returns the lines.
-     * @private
-     * @param {number} chunkIndex - Index in the chunks array
-     * @returns {Promise<string[]>} Array of decompressed lines
-     */
-    async _decompressChunk(chunkIndex) {
-      logger(`[Decompress] Decompressing chunk ${chunkIndex}`);
-      const compressed = this.chunks[chunkIndex];
-      const stream = new ReadableStream({ start(controller) { controller.enqueue(compressed); controller.close(); }});
-
-      const decompressedStream = stream.pipeThrough(new DecompressionStream('gzip'));
-      const chunks = [];
-      const reader = decompressedStream.getReader();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-      }
-
-      // Efficiently concatenate Uint8Array chunks
-      const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-      const result = new Uint8Array(totalLength);
-      let offset = 0;
-      for (const chunk of chunks) {
-        result.set(chunk, offset);
-        offset += chunk.length;
-      }
-
-      const text = this._textDecoder.decode(result);
-      const lines = text.split('\n');
-      logger(`[Decompress] Chunk ${chunkIndex} decompressed: ${lines.length} lines`);
-      return lines;
     },
   }
 
@@ -861,7 +682,7 @@ function Vbuf(node, config = {}) {
       render();
       const t1 = performance.now();
       const millis = parseFloat(t1 - t0);
-      const lineCount = Model.useChunkedMode ? Model.totalLines : Model.lines.length;
+      const lineCount = Model.lines.length;
       console.log(`Took ${millis.toFixed(2)} millis to scroll viewport with ${lineCount} lines. That's ${1000/millis} FPS.`);
     },
 
@@ -882,73 +703,9 @@ function Vbuf(node, config = {}) {
 
     /**
      * Gets the lines currently visible in the viewport.
-     * In chunked mode, may return placeholders while loading.
      * @returns {string[]} Array of visible line contents
      */
     get lines() {
-      if (Model.useChunkedMode) {
-        const startChunkIndex = Math.floor(this.start / Model.chunkSize);
-        const endChunkIndex = Math.floor(this.end / Model.chunkSize);
-
-        // Check if we need to load new chunks
-        if(Model.currentChunkIndex !== startChunkIndex) {
-          // Asynchronously load prev, current, and next chunks
-          const loadChunks = async () => {
-            const prevChunkIndex = startChunkIndex - 1;
-            const nextChunkIndex = startChunkIndex + 1;
-
-            logger(`[Buffer] Loading 3-chunk window:`);
-            logger(`  - Prev: ${prevChunkIndex >= 0 && prevChunkIndex < Model.chunks.length ? prevChunkIndex : 'none'}`);
-            logger(`  - Current: ${startChunkIndex}`);
-            logger(`  - Next: ${nextChunkIndex < Model.chunks.length ? nextChunkIndex : 'none'}`);
-
-            Model.currentChunkIndex = startChunkIndex;
-
-            // Load current chunk
-            Model.buffer = await Model._decompressChunk(startChunkIndex);
-
-            // Load previous chunk if it exists
-            if (prevChunkIndex >= 0 && prevChunkIndex < Model.chunks.length) {
-              Model.prevBuffer = await Model._decompressChunk(prevChunkIndex);
-            } else {
-              Model.prevBuffer = [];
-            }
-
-            // Load next chunk if it exists
-            if (nextChunkIndex < Model.chunks.length) {
-              Model.nextBuffer = await Model._decompressChunk(nextChunkIndex);
-            } else {
-              Model.nextBuffer = [];
-            }
-
-            logger(`[Buffer] 3-chunk window loaded successfully`);
-            render(); // Re-render once decompressed
-          };
-
-          loadChunks();
-          return Array(this.size).fill("..."); // Show placeholders while decompressing
-        }
-
-        // Build result from available chunks
-        const result = [];
-        for (let i = this.start; i <= this.end; i++) {
-          const chunkIndex = Math.floor(i / Model.chunkSize);
-          const lineInChunk = i % Model.chunkSize;
-
-          if (chunkIndex === startChunkIndex - 1 && Model.prevBuffer.length > 0) {
-            result.push(Model.prevBuffer[lineInChunk] || '');
-          } else if (chunkIndex === startChunkIndex) {
-            result.push(Model.buffer[lineInChunk] || '');
-          } else if (chunkIndex === startChunkIndex + 1 && Model.nextBuffer.length > 0) {
-            result.push(Model.nextBuffer[lineInChunk] || '');
-          } else {
-            result.push('');
-          }
-        }
-        return result;
-      }
-
-      // Legacy mode
       return Model.lines.slice(this.start, this.end + 1);
     },
   };
@@ -1119,11 +876,17 @@ function Vbuf(node, config = {}) {
   this.Selection = Selection;
 
   /**
-   * Disables or enables arrow key navigation and text editing.
-   * When disabled, the editor becomes read-only and arrow keys are ignored.
-   * @param {boolean} disabled - True to disable navigation, false to enable
+   * Editor mode controlling input behavior.
+   * - 'write': Full editing (default)
+   * - 'navigate': View and navigate with arrow keys, no editing
+   * - 'read': View only, no navigation or editing
+   * @type {'write'|'navigate'|'read'}
    */
-  this.setNavigationDisabled = (disabled) => { navigationDisabled = disabled; };
+  Object.defineProperty(this, 'editMode', {
+    get: () => editMode,
+    set: (value) => { editMode = value; },
+    enumerable: true
+  });
 
   /**
    * Line height in pixels. Used for positioning elements and calculating viewport.
@@ -1197,7 +960,7 @@ function Vbuf(node, config = {}) {
 
     if(event.key.startsWith("Arrow")) {
       event.preventDefault(); // prevents page scroll
-      if (navigationDisabled) return; // disable arrow keys when navigation is disabled
+      if (editMode === 'read') return; // read mode: no navigation
 
       if(event.metaKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
@@ -1247,7 +1010,7 @@ function Vbuf(node, config = {}) {
           Selection.moveCol(1);
         }
       }
-    } else if (Model.useChunkedMode || navigationDisabled) { // navigation-only in chunked mode or when navigation disabled
+    } else if (editMode !== 'write') { // navigate/read mode: no editing
       return;
     } else if (event.key === "Backspace") {
       Selection.delete();

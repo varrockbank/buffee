@@ -256,7 +256,7 @@ function VbufTUI(vbuf) {
       const wasEnabled = tuiModeEnabled;
       tuiModeEnabled = !!value;
       // Tell vbuf to disable/enable navigation
-      vbuf.setNavigationDisabled(tuiModeEnabled);
+      vbuf.editMode = tuiModeEnabled ? 'read' : 'write';
       // Move cursor to first element only when transitioning to enabled
       if (!wasEnabled && tuiModeEnabled && tuiElements.length > 0) {
         // Find first element (sort by row, then col)
