@@ -1,13 +1,11 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.4-alpha.1
+ * @version 5.5.5-alpha.1
  */
 
 /**
  * @typedef {Object} VbufConfig
- * @property {Object} [treeSitterParser=null] - Tree-sitter parser instance for syntax highlighting
- * @property {Object} [treeSitterQuery=null] - Tree-sitter query for capturing syntax nodes
  * @property {number} [initialViewportSize=20] - Number of visible lines in the viewport
  * @property {number} [lineHeight=24] - Height of each line in pixels
  * @property {number} [editorPaddingPX=4] - Padding around the editor in pixels
@@ -48,12 +46,10 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.4-alpha.1";
+  this.version = "5.5.5-alpha.1";
 
   // Extract configuration with defaults
   const {
-    treeSitterParser = null,
-    treeSitterQuery = null,
     initialViewportSize = 20,
     lineHeight = 24,
     editorPaddingPX = 4,
@@ -607,10 +603,6 @@ function Vbuf(node, config = {}) {
     byteCount: "",
     /** @type {number} Original line count when document was loaded */
     originalLineCount: 0,
-    /** @type {Object|null} Tree-sitter parse tree for syntax highlighting */
-    treeSitterTree: null,
-    /** @type {Array} Tree-sitter captures for syntax highlighting */
-    treeSitterCaptures: [],
 
     /** @type {boolean} Whether chunked mode is active for large files */
     useChunkedMode: false,
@@ -663,17 +655,13 @@ function Vbuf(node, config = {}) {
 
     /**
      * Sets the document content from a string.
-     * Splits on newlines and optionally parses with tree-sitter.
+     * Splits on newlines.
      * @param {string} text - The full document text
      */
     set text(text) {
       this.lines = text.split("\n");
       this.byteCount = new TextEncoder().encode(text).length
       this.originalLineCount = this.lines.length;
-      if(treeSitterParser && treeSitterQuery) {
-        this.treeSitterTree = treeSitterParser.parse(text);
-        this.treeSitterCaptures = treeSitterQuery.captures(this.treeSitterTree.rootNode);
-      }
       render(true);
     },
 
@@ -1041,58 +1029,6 @@ function Vbuf(node, config = {}) {
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
       $e.children[i].textContent = Viewport.lines[i] || null;
-
-    if(Model.treeSitterTree && Model.treeSitterCaptures) {
-      // The point of tree sitter is to incremental restructuring of the tree.
-      // That is, each text editor operation changes the underlying positions and therefore
-      // the tree needs to be revised. the simplest revision is updating index. the harder revisions
-      // is the addition and removal of nodes. at any rate, each text editor operation would need to be
-      // coupled to changes in treesitter tree. here, we are lazy and reparse the tree everytime
-
-      const text = Model.lines.join("\n")
-      Model.treeSitterTree = treeSitterParser.parse(text);
-      Model.treeSitterCaptures = treeSitterQuery.captures(Model.treeSitterTree.rootNode);
-
-      let minJ = 0;
-      for(let i = 0; i < Viewport.size; i++) {
-        $e.children[i].innerHTML = "";
-        $e.children[i].textContent = Viewport.lines[i] || null;
-        // TODO: terribly inefficient loop. Just grab the elements that are relevant
-        for(let j = minJ; j < Model.treeSitterCaptures.length; j++) {
-          const capture = Model.treeSitterCaptures[j]
-          const startPosition = capture.node.startPosition;
-          if(startPosition.row === Viewport.start + i) {
-            const startCol = startPosition.column;
-            const endCol = startCol + capture.node.text.length;
-
-            const line = $e.children[i].textContent;
-            const left = line.slice(0, startCol);
-            const right = line.slice(endCol);
-
-            // console.log("original string: ", line);
-            // console.log("  left: ", left);
-            // console.log("  right: ", right);
-            // console.log("  startPostion:", startPosition);
-            // console.log("  endCol:", endCol);
-
-            // TODO: be careful if this is HTML, it is escaped.
-            if (capture.name === "function") {
-              if(left.length > 8) {
-                const leftA = left.slice(0, left.length - 9);
-                const leftB = left.slice(left.length - 9);
-                $e.children[i].innerHTML = `${leftA}<span class="highlight-function">${leftB}</span><span class="highlight-function-name">${capture.node.text}</span>${right}`;
-              }
-            } else if (capture.name === "string") {
-              $e.children[i].innerHTML = `${left}<span class="highlight-string">${capture.node.text}</span>${right}`;
-            }
-            // console.log("after: ", $e.children[i].textContent);
-
-            minJ = j;
-            break;
-          }
-        }
-      }
-    }
 
     // Call extension hooks for content overlay
     for (const hook of renderHooks.onRenderContent) {

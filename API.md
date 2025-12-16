@@ -229,7 +229,7 @@ TUI is an optional extension for interactive terminal-style UI elements. Include
 
 ```html
 <script src="vbuf.js"></script>
-<script src="tui.js"></script>
+<script src="extensions/tui.js"></script>
 ```
 
 ```javascript
@@ -373,6 +373,50 @@ Chunked mode requires `appendLines()` which handles compression. The `.text` set
 // Append line and scroll to bottom (useful for logs)
 editor.appendLineAtEnd("Log entry");
 ```
+
+---
+
+## Tree-sitter Extension (`editor.TreeSitter`)
+
+Tree-sitter is an optional extension for syntax highlighting. Include the separate script and initialize with a parser and query:
+
+```html
+<script src="vbuf.js"></script>
+<script src="extensions/treesitter.js"></script>
+```
+
+```javascript
+const editor = new Vbuf(document.getElementById('editor'), options);
+VbufTreeSitter(editor, { parser: jsParser, query: jsQuery });
+
+// Enable syntax highlighting
+editor.TreeSitter.enabled = true;
+
+// After modifying content, mark as dirty to trigger re-parse
+editor.Model.text = "function hello() { return 'world'; }";
+editor.TreeSitter.markDirty();
+
+// Force immediate re-parse
+editor.TreeSitter.reparse();
+
+// Access parse tree and captures (read-only)
+editor.TreeSitter.tree;     // Current parse tree
+editor.TreeSitter.captures; // Current query captures
+```
+
+### CSS Classes
+
+The extension adds these classes for styling:
+
+```css
+.highlight-function { color: #c678dd; }
+.highlight-function-name { color: #61afef; }
+.highlight-string { color: #98c379; }
+```
+
+### Performance
+
+Tree-sitter rendering is capped at 60fps using a dirty flag pattern. Call `markDirty()` after content changes to trigger re-parsing on the next animation frame.
 
 ---
 
