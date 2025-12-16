@@ -1,5 +1,5 @@
 function Vbuf(node, config = {}) {
-  this.version = "5.4.3-alpha.1";
+  this.version = "5.4.4-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -504,9 +504,26 @@ function Vbuf(node, config = {}) {
       }
     },
 
-    // Add a prompt element (stub)
+    // Add a prompt element
     addPrompt({ row, col, width, title, onActivate }) {
-      // TODO: implement prompt element
+      const minWidth = title.length + 5; // 2 corners + 1 dash + 2 spaces + title
+      if (width < minWidth) {
+        throw new Error(`Width must be at least ${minWidth} for title "${title}"`);
+      }
+
+      // Line 1: ┌─ title ─────┐
+      // Inner = width - 2 (corners); dashes after = inner - 1 (dash before) - 2 (spaces) - title.length
+      const dashesAfterTitle = width - 5 - title.length;
+      const line1 = '┌─ ' + title + ' ' + '─'.repeat(dashesAfterTitle) + '┐';
+
+      // Line 2: │ >         │
+      const line2 = '│ > ' + ' '.repeat(width - 5) + '│';
+
+      // Line 3: └─────────────────┘
+      const line3 = '└' + '─'.repeat(width - 2) + '┘';
+
+      const contents = [line1, line2, line3];
+      return addElement({ type: 'prompt', row, col, width, height: 3, contents, onActivate });
     },
 
     // Remove an element by its id

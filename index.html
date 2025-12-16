@@ -1684,6 +1684,15 @@ const fileTemplate = `
     // Show initial file (also creates the file list elements)
     loadFile('main.js');
 
+    // Add a prompt at the bottom
+    tuiDemo.TUI.addPrompt({
+      row: 12,
+      col: 18,
+      width: 40,
+      title: 'Command',
+      onActivate: () => alert('Command prompt activated!')
+    });
+
     // Enable TUI mode by default
     tuiDemo.TUI.enabled = true;
     document.getElementById('tui-toggle-btn').textContent = 'Disable TUI Mode';

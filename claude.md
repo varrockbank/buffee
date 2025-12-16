@@ -122,6 +122,7 @@ For multiple lines of JS:
 <p class="text-neutral-500 text-xs">JS:</p>
 <p class="text-neutral-500 text-xs"><code class="text-green-400">new Vbuf(el, { initialViewportSize: 18, showGutter: false })</code></p>
 <p class="text-neutral-500 text-xs"><code class="text-green-400">TUI.addButton({ row, col, label, border: true, onActivate })</code></p>
+<p class="text-neutral-500 text-xs"><code class="text-green-400">TUI.addPrompt({ row, col, width, title, onActivate })</code></p>
 <p class="text-neutral-500 text-xs mb-4"><code class="text-green-400">TUI.enabled = true</code></p>
 ```
 
