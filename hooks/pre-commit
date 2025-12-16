@@ -11,7 +11,7 @@ if git diff --cached --name-only | grep -q "^vbuf.js$"; then
     if [ "$OLD_VERSION" = "$NEW_VERSION" ] && [ -n "$OLD_VERSION" ]; then
         echo "✗ Error: vbuf.js changed but version was not bumped"
         echo "  Current version: $OLD_VERSION"
-        echo "  Please update this.version in vbuf.js"
+        echo "  Please update this.version in vbuf.js AND stage it."
         exit 1
     fi
 fi

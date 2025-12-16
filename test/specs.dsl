@@ -751,3 +751,33 @@ EXPECT cursor at 0,1
 PRESS ';' 3 times
 expect(fixture).toHaveLines(';;;');
 EXPECT cursor at 0,3
+
+
+# Gutter resizing
+
+## should grow gutter when scrolling to double-digit line numbers
+### Gutter grows from 1 to 2 digits when viewport.end reaches 10
+// Create fixture with viewport size 9
+fixture = FixtureFactory.forTest(9);
+// Add 11 lines (indices 0-10)
+fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11";
+// Initial: lines 0-8 visible, end=8 (1 digit), gutter = 2ch
+const $gutter = fixture.node.querySelector(".wb-gutter");
+expect($gutter.style.width).toBe("2ch");
+// Scroll down by 2: lines 2-10 visible, end=10 (2 digits), gutter = 3ch
+fixture.wb.Viewport.scroll(2);
+expect($gutter.style.width).toBe("3ch");
+
+## should shrink gutter when scrolling back to single-digit line numbers
+### Gutter shrinks from 2 to 1 digit when viewport.end drops below 10
+// Create fixture with viewport size 9
+fixture = FixtureFactory.forTest(9);
+// Add 11 lines (indices 0-10)
+fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11";
+// Scroll to double-digit first
+fixture.wb.Viewport.scroll(2);
+const $gutter = fixture.node.querySelector(".wb-gutter");
+expect($gutter.style.width).toBe("3ch");
+// Scroll back up: lines 0-8 visible, end=8 (1 digit), gutter = 2ch
+fixture.wb.Viewport.scroll(-2);
+expect($gutter.style.width).toBe("2ch");

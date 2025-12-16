@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.6-alpha.1
+ * @version 5.5.7-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.6-alpha.1";
+  this.version = "5.5.7-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -749,9 +749,8 @@ function Vbuf(node, config = {}) {
       $lineCounter.textContent = `${lineCount.toLocaleString()}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
     }
 
-    // TODO: nit: we don't reclaim and shrink the gutter if the text get smaller.
     const digitsInLargestLineNumber = Viewport.end.toString().length;
-    if(digitsInLargestLineNumber > gutterSize) {
+    if(digitsInLargestLineNumber !== gutterSize) {
       gutterSize = digitsInLargestLineNumber;
       $gutter.style.width = gutterSize + gutterPadding + 'ch';
     }
@@ -897,7 +896,6 @@ function Vbuf(node, config = {}) {
   this.lineHeight = lineHeight;
 
   /**
-   * TODO: evaluate what to make public 
    * Internal API for extensions.
    * Extensions can use renderHooks to register callbacks.
    * @private

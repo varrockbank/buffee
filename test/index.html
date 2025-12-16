@@ -804,6 +804,12 @@
         .walkthrough-btn:hover {
             background: #bb7711;
         }
+        .walkthrough-na {
+            color: #666;
+            font-size: 12px;
+            margin-left: 8px;
+            font-style: italic;
+        }
         .walkthrough-backdrop {
             position: fixed;
             top: 0;
@@ -1687,9 +1693,10 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
                     const icon = test.status === 'pass' ? '✓' : test.status === 'fail' ? '✗' : '○';
                     const compileErrorIcon = hasCompileError ? '<span class="compile-error-icon">⚠</span>' : '';
-                    const walkthroughBtn = test.fixture && test.fixture.walkthrough
+                    const hasWalkthroughSteps = test.fixture?.walkthrough?.steps?.length > 0;
+                    const walkthroughBtn = hasWalkthroughSteps
                         ? `<button class="walkthrough-btn" onclick="walkthrough.open('${suite.name}', ${testIndex})">Walkthrough</button>`
-                        : '';
+                        : `<span class="walkthrough-na">Walkthrough N/A</span>`;
 
                     testDiv.innerHTML = `
                         <span class="test-icon ${test.status}">${icon}${compileErrorIcon}</span>
