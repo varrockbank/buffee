@@ -51,6 +51,10 @@ Layout the HTML for the editor.
   position: absolute;
   mix-blend-mode: difference;
 }
+.wb .wb-cursor {
+  background-color: #FF6B6B;
+  mix-blend-mode: difference;
+}
 .wb .wb-status span { padding-right: 4px; }
 ```
 

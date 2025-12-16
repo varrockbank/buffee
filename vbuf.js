@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.6.9-alpha.1
+ * @version 5.7.0-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.6.9-alpha.1";
+  this.version = "5.7.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -80,6 +80,18 @@ function Vbuf(node, config = {}) {
     tabSize: expandtab || 4
   });
 
+  // Cursor overlay - shows head position distinctly within a selection (appended after line containers in render)
+  const $cursor = document.createElement("div");
+  $cursor.className = "wb-cursor";
+  Object.assign($cursor.style, {
+    position: 'absolute',
+    visibility: 'hidden',
+    width: '1ch',
+    height: lineHeight+'px',
+    fontSize: lineHeight+'px',
+    zIndex: '2'
+  });
+
   const $status = node.querySelector('.wb-status');
   Object.assign($status.style, {
     padding: '6px',
@@ -108,6 +120,7 @@ function Vbuf(node, config = {}) {
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
   let lastViewportSize = 0; // Track viewport size for delta-based updates
+  let cursorAppended = false;
 
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
@@ -1061,12 +1074,19 @@ function Vbuf(node, config = {}) {
         }
         $e.appendChild(fragmentLines);
         addSelections(lastViewportSize, Viewport.size);
+        if (!cursorAppended) {
+          $e.appendChild($cursor);
+          cursorAppended = true;
+        }
       } else if (delta < 0) {
         // Remove excess line containers and selections
+        // Temporarily remove cursor so it's not affected by lastChild removal
+        if (cursorAppended) $cursor.remove();
         for (let i = 0; i < -delta; i++) {
           $e.lastChild?.remove();
           $selections.pop()?.remove();
         }
+        if (cursorAppended) $e.appendChild($cursor);
       }
 
       lastViewportSize = Viewport.size;
@@ -1157,6 +1177,16 @@ function Vbuf(node, config = {}) {
       $selections[secondViewportRow].style.visibility = 'visible';
     }
     // * END render selection
+
+    // Render cursor overlay (always shows head position)
+    const headViewportRow = head.row - Viewport.start;
+    if (headViewportRow >= 0 && headViewportRow < Viewport.size) {
+      $cursor.style.top = headViewportRow * lineHeight + 'px';
+      $cursor.style.left = head.col + 'ch';
+      $cursor.style.visibility = 'visible';
+    } else {
+      $cursor.style.visibility = 'hidden';
+    }
 
     // Call extension hooks for render complete
     for (const hook of renderHooks.onRenderComplete) {
