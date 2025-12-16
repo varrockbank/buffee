@@ -1,7 +1,7 @@
 /**
  * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.5.8-alpha.1
+ * @version 5.5.9-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Vbuf(node, config = {}) {
-  this.version = "5.5.8-alpha.1";
+  this.version = "5.5.9-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -333,8 +333,9 @@ function Vbuf(node, config = {}) {
     /**
      * Inserts a string at cursor position, replacing any selection.
      * @param {string} s - String to insert
+     * @param {boolean} [skipRender=false] - Skip rendering (for batched operations)
      */
-    insert(s) {
+    insert(s, skipRender = false) {
       const t0 = performance.now();
       if (this.isSelection) {
         // Sort tail and head by order of appearance ( depends on chirality )
@@ -352,7 +353,7 @@ function Vbuf(node, config = {}) {
         Model.lines[index] = left + s + right;
         maxCol = head.col += s.length;
       }
-      render(true);
+      if (!skipRender) render(true);
       const t1 = performance.now();
       const millis = parseFloat(t1 - t0);
       console.log(`Took ${millis.toFixed(2)} millis to insert with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
@@ -390,8 +391,7 @@ function Vbuf(node, config = {}) {
      * Inserts a new line at cursor position, splitting the current line.
      */
     newLine() {
-      // TODO: handle redundant rendering
-      if (this.isSelection) Selection.insert('');
+      if (this.isSelection) Selection.insert('', true); // skipRender - we render below
 
       const t0 = performance.now();
       const { index, left, right } = this.partitionLine(tail);

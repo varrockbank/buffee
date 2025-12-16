@@ -815,3 +815,15 @@ const customEditor = new Vbuf(customNode, { indentation: 7 });
 expect(customEditor.indentation).toBe(7);
 expect(customNode.querySelector(".wb-indentation").innerHTML).toBe("Spaces: 7");
 customNode.remove();
+
+
+# NewLine with selection
+
+## should replace selection with newline
+### NewLine with selection deletes selection and inserts newline (vim-style: cursor on char, shift+left selects current + previous)
+TYPE "ABC"
+left 2 times
+left with shift
+enter
+expect(fixture).toHaveLines("", "C");
+EXPECT cursor at 1,0

@@ -1,5 +1,23 @@
 # Claude Instructions for vbuf
 
+## Cursor Model (Vim-style)
+
+vbuf uses a vim-style cursor model:
+
+- **Cursor sits ON a character**, not between characters
+- After typing "ABC", cursor is at col 3 (past the last character)
+- `left` moves cursor onto the previous character
+- **Shift+Arrow selects inclusively**: selecting left includes the current character AND the character(s) moved over
+
+Example:
+```
+Type "ABC"     → cursor at col 3 (after C)
+left 2 times   → cursor at col 1 (on B)
+left with shift → selects "AB" (includes B where cursor was + A moved over)
+```
+
+This differs from editors where cursor sits between characters (like a thin I-beam).
+
 ## Generating Sample Pages
 
 When creating sample HTML pages in the `samples/` directory, follow these guidelines:

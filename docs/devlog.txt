@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 5.5.9-alpha.1 [2025-12-16]
+*** Optimization
+- avoid a redundant render when new line 
+
 ** 5.5.8-alpha.1 [2025-12-16]
 *** Optimization
 - Update indentation in status bar only when indentation set
