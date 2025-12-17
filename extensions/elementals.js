@@ -1,18 +1,18 @@
 /**
- * @fileoverview VbufElementals - Layer-based UI elements for Vbuf.
+ * @fileoverview BuffeeElementals - Layer-based UI elements for Buffee.
  * Unlike tui-legacy which manipulates textContent, Elementals creates
  * actual DOM elements in a dedicated layer above the text.
  * @version 1.0.0
  */
 
 /**
- * Initializes Elementals extension for a Vbuf instance.
+ * Initializes Elementals extension for a Buffee instance.
  * Creates UI elements (buttons, labels, inputs) as DOM nodes in the element layer.
  *
- * @param {Vbuf} vbuf - The Vbuf instance to extend
+ * @param {Buffee} vbuf - The Buffee instance to extend
  * @returns {Object} The Elementals API object
  */
-function VbufElementals(vbuf) {
+function BuffeeElementals(vbuf) {
   const { $elementLayer, render, renderHooks } = vbuf._internals;
   const { Viewport, lineHeight } = vbuf;
 

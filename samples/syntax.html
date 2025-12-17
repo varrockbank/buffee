@@ -2,80 +2,70 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>vbuf - Syntax Highlighting</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>buffee - Syntax Highlighting</title>
   <script src="../vbuf.js"></script>
   <script src="../extensions/syntax.js"></script>
+  <link rel="stylesheet" href="../reset.css">
   <style>
-    .wb {
-      background-color: #282C34;
-      color: #B2B2B2;
-      position: relative;
-      outline: none;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    select, input[type="file"] { margin: 4px 8px 4px 0; }
+    #perf-stats, #state-display {
+      font-family: monospace;
+      font-size: 12px;
+      color: #4ade80;
+      margin-top: 12px;
+      padding: 12px;
+      background: #0a0a0a;
+      border: 1px solid #444;
+      overflow-x: auto;
     }
-    .no-select { user-select: none; }
-    .wb-clipboard-bridge {
-      position: fixed; left: 0; top: 1px;
-      width: 0; height: 1px; opacity: 0; pointer-events: none;
-    }
-    .wb .wb-lines pre::before { content: "\200B"; }
-    .wb .wb-lines pre { margin: 0; overflow: hidden; }
-    .wb .wb-selection {
-      background-color: #EDAD10;
-      position: absolute;
-      mix-blend-mode: difference;
-    }
-    .wb .wb-cursor {
-      background-color: #FF6B6B;
-    }
-    .wb .wb-status span { padding-right: 4px; }
+    #perf-stats { color: #facc15; }
   </style>
 </head>
-<body class="bg-neutral-900 p-5 font-sans">
-  <h1 class="text-white text-lg mb-2">Syntax Highlighting</h1>
-  <p class="text-neutral-400 text-sm mb-4">
-    Regex-based tokenizer with incremental state caching.
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Syntax Highlighting</p>
+
+  <h1>Syntax Highlighting</h1>
+  <p>Regex-based tokenizer with incremental state caching.</p>
+
+  <p>
+    <label>Language:
+      <select id="lang-select">
+        <option value="javascript">JavaScript</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="json">JSON</option>
+        <option value="python">Python</option>
+      </select>
+    </label>
+    <label><input type="checkbox" id="syntax-checkbox" checked> Syntax highlighting</label>
   </p>
 
-  <div class="flex items-center gap-3 mb-4 flex-wrap">
-    <label class="text-neutral-400 text-sm">Language:</label>
-    <select id="lang-select" class="bg-neutral-800 border border-neutral-600 text-white px-2 py-1 rounded">
-      <option value="javascript">JavaScript</option>
-      <option value="html">HTML</option>
-      <option value="css">CSS</option>
-      <option value="json">JSON</option>
-      <option value="python">Python</option>
-    </select>
-    <label class="flex items-center gap-2 text-neutral-400 text-sm cursor-pointer">
-      <input type="checkbox" id="syntax-checkbox" checked class="w-4 h-4 accent-green-500">
-      Syntax highlighting
-    </label>
-  </div>
+  <p>
+    <label>Load file: <input type="file" id="file-input"></label>
+    <span id="file-size"></span>
+  </p>
 
-  <div class="flex items-center gap-3 mb-4 flex-wrap">
-    <label class="text-neutral-400 text-sm">Load file:</label>
-    <input type="file" id="file-input" class="text-neutral-400 text-sm">
-    <span id="file-size" class="text-neutral-500 text-xs"></span>
-  </div>
+  <div id="perf-stats" style="display: none;"></div>
 
-  <div id="perf-stats" class="font-mono text-yellow-400 p-3 bg-neutral-950 border border-neutral-700 mb-4 w-[700px] text-xs hidden">
-  </div>
-
-  <h2 class="text-neutral-300 text-sm mt-6 mb-2">JavaScript</h2>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs"><code class="text-green-400">VbufSyntax(editor)</code></p>
-  <p class="text-neutral-500 text-xs"><code class="text-green-400">editor.Syntax.setLanguage('javascript')</code></p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">editor.Syntax.enabled = true</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[700px] mb-4" tabindex="0" id="editor">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>JavaScript</h2>
+  <pre>BuffeeSyntax(editor)
+editor.Syntax.setLanguage('javascript')
+editor.Syntax.enabled = true</pre>
+  <blockquote class="wb no-select" tabindex="0" id="editor" style="border: 1px solid #444; width: 700px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -83,25 +73,23 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">State Cache Visualization</h2>
-  <p class="text-neutral-500 text-xs mb-2">Shows the tokenizer state at the start of each visible line (0 = normal, 1+ = special states like multiline comment/string)</p>
-  <div id="state-display" class="font-mono text-green-400 p-3 bg-neutral-950 border border-neutral-700 min-h-[24px] w-[700px] text-xs overflow-x-auto">
-  </div>
+  <h2>State Cache Visualization</h2>
+  <p>Shows the tokenizer state at the start of each visible line (0 = normal, 1+ = special states like multiline comment/string)</p>
+  <div id="state-display"></div>
 
   <script>
     const editorEl = document.getElementById('editor');
     const langSelect = document.getElementById('lang-select');
-    const toggleBtn = document.getElementById('toggle-btn');
     const stateDisplay = document.getElementById('state-display');
 
-    const editor = new Vbuf(editorEl, {
+    const editor = new Buffee(editorEl, {
       initialViewportSize: 20,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
 
     // Initialize syntax highlighting
-    VbufSyntax(editor);
+    BuffeeSyntax(editor);
     editor.Syntax.setLanguage('javascript');
     editor.Syntax.enabled = true;
 
@@ -241,7 +229,7 @@ body {
 }`,
 
       json: `{
-  "name": "vbuf",
+  "name": "buffee",
   "version": "5.7.1",
   "description": "Virtual buffer text editor",
   "main": "vbuf.js",
@@ -351,7 +339,6 @@ if __name__ == "__main__":
     const syntaxCheckbox = document.getElementById('syntax-checkbox');
     syntaxCheckbox.addEventListener('change', () => {
       editor.Syntax.enabled = syntaxCheckbox.checked;
-      // Force re-render
       editor.Viewport.scroll(0);
     });
 
@@ -372,16 +359,14 @@ if __name__ == "__main__":
       if (!file) return;
 
       fileSizeSpan.textContent = formatBytes(file.size);
-      perfStats.classList.remove('hidden');
+      perfStats.style.display = 'block';
       perfStats.innerHTML = 'Loading file (streaming)...';
 
       const t0 = performance.now();
 
-      // Stream the file in chunks to avoid memory spike
       const reader = file.stream().getReader();
       const decoder = new TextDecoder('utf-8');
 
-      // Reset model
       editor.Model.lines = [];
       let remainder = '';
       let totalLines = 0;
@@ -400,7 +385,6 @@ if __name__ == "__main__":
             const completeText = fullText.substring(0, lastNewlineIndex);
             const lines = completeText.split('\n');
 
-            // Append without render for speed
             editor.Model.lines.push(...lines);
             totalLines += lines.length;
             remainder = fullText.substring(lastNewlineIndex + 1);
@@ -409,14 +393,12 @@ if __name__ == "__main__":
           }
 
           chunkCount++;
-          // Yield to browser every 20 chunks
           if (chunkCount % 20 === 0) {
             perfStats.innerHTML = `Loading... ${totalLines.toLocaleString()} lines`;
             await new Promise(r => setTimeout(r, 0));
           }
         }
 
-        // Handle final remainder
         if (remainder.length > 0) {
           editor.Model.lines.push(remainder);
           totalLines++;
@@ -425,7 +407,6 @@ if __name__ == "__main__":
         const t1 = performance.now();
         perfStats.innerHTML = `Loaded ${totalLines.toLocaleString()} lines in ${((t1-t0)/1000).toFixed(1)}s`;
 
-        // Trigger render
         const t2 = performance.now();
         editor.Viewport.set(1, editor.Viewport.size);
         const t3 = performance.now();

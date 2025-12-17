@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 5.7.2-alpha.1 [2025-12-17]
+*** refactor
+- API for explicit registration of extensions
+
 ** 5.7.1-alpha.1 [2025-12-16]
 *** feature
 - layered rendering. rewrite tui extension (legacy) as elementals extension.

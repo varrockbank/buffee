@@ -1,11 +1,11 @@
 /**
- * @fileoverview Vbuf - A high-performance virtual buffer text editor for the browser.
+ * @fileoverview Buffee - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.7.1-alpha.1
+ * @version 5.7.2-alpha.1
  */
 
 /**
- * @typedef {Object} VbufConfig
+ * @typedef {Object} BuffeeConfig
  * @property {number} [initialViewportSize=20] - Number of visible lines in the viewport
  * @property {number} [lineHeight=24] - Height of each line in pixels
  * @property {number} [editorPaddingPX=4] - Padding around the editor in pixels
@@ -26,7 +26,7 @@
  */
 
 /**
- * Creates a new Vbuf virtual buffer editor instance.
+ * Creates a new Buffee virtual buffer editor instance.
  * @constructor
  * @param {HTMLElement} node - Container element with required child elements:
  *   - .wb-lines: Container for text lines
@@ -36,17 +36,17 @@
  *   - .wb-indentation: Indentation display
  *   - .wb-clipboard-bridge: Hidden textarea for clipboard operations
  *   - .wb-gutter: Line number gutter
- * @param {VbufConfig} [config={}] - Configuration options
+ * @param {BuffeeConfig} [config={}] - Configuration options
  * @example
- * const editor = new Vbuf(document.getElementById('editor'), {
+ * const editor = new Buffee(document.getElementById('editor'), {
  *   initialViewportSize: 25,
  *   showGutter: true,
  *   lineHeight: 20
  * });
  * editor.Model.text = 'Hello, World!';
  */
-function Vbuf(node, config = {}) {
-  this.version = "5.7.1-alpha.1";
+function Buffee(node, config = {}) {
+  this.version = "5.7.2-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -1062,7 +1062,7 @@ function Vbuf(node, config = {}) {
    * @private
    * @param {boolean} [renderLineContainers=false] - Whether to rebuild line containers
    *   (needed when viewport size changes or on initial render)
-   * @returns {Vbuf} The Vbuf instance for chaining
+   * @returns {Buffee} The Buffee instance for chaining
    */
   function render(renderLineContainers = false) {
     if (lastRender.lineCount !== Model.lastIndex + 1 ) {
@@ -1230,7 +1230,7 @@ function Vbuf(node, config = {}) {
   }
 
   // ============================================================================
-  // Public API - exposed on the Vbuf instance
+  // Public API - exposed on the Buffee instance
   // ============================================================================
 
   /**
@@ -1256,6 +1256,21 @@ function Vbuf(node, config = {}) {
    * @type {Object}
    */
   this.History = History;
+
+  /**
+   * Registers an extension with this editor instance.
+   * @param {Function} extension - Extension initializer function
+   * @param {Object} [options] - Optional configuration for the extension
+   * @returns {Buffee} This editor instance for chaining
+   * @example
+   * const editor = new Buffee(element)
+   *   .use(BuffeeSyntax)
+   *   .use(BuffeeElementals)
+   */
+  this.use = (extension, options) => {
+    extension(this, options);
+    return this;
+  };
 
   /**
    * Editor mode controlling input behavior.

@@ -1,5 +1,5 @@
 /**
- * Test DSL for Vbuf
+ * Test DSL for Buffee
  *
  * Object-oriented test environment that encapsulates a node and provides
  * literate methods for user interactions.
@@ -78,7 +78,7 @@ function createEditorNode() {
 class EditorTestHarness {
   constructor(node, size = 10) {
     this.node = node;
-    this.wb = new Vbuf(node, { initialViewportSize: size });
+    this.wb = new Buffee(node, { initialViewportSize: size });
     this.walkthrough = new Walkthrough();
 
     // Store reference for test framework

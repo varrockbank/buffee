@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Ultra High Capacity</title>
+  <script src="../vbuf.js"></script>
+  <script src="../extensions/chunkloader.js"></script>
+  <link rel="stylesheet" href="../reset.css">
+  <style>
+    fieldset { margin: 16px 0; padding: 12px; }
+    .hidden { display: none; }
+    #file-loader-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #file-loader-options button {
+      margin: 0;
+      text-align: left;
+    }
+    .read-only-indicator {
+      background-color: #ff6b35;
+      color: white;
+      padding: 8px 16px;
+      text-align: center;
+      font-weight: 500;
+      font-size: 14px;
+      margin: 0 0 -1px 0;
+      border: 1px solid #ff6b35;
+    }
+    #editor.wb {
+      background-color: #201430;
+      color: #E1D6F8;
+    }
+    #editor.wb .wb-selection {
+      background-color: #F9AD40;
+    }
+  </style>
+</head>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Ultra High Capacity</p>
+
+  <h1>Ultra High Capacity</h1>
+  <p>Load and display files with millions or billions of lines using various loading strategies.</p>
+
+  <div id="read-only-indicator" class="read-only-indicator hidden">
+    Read-Only Mode (Chunked+Compressed) - Navigation only, editing disabled
+  </div>
+  <blockquote class="wb no-select" tabindex="0" id="editor" style="border: 1px solid #444; width: 100%;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; background: #38274D;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <fieldset>
+    <legend>Viewport:</legend>
+    <label for="viewport-start">Start:</label>
+    <input id="viewport-start" value="1">
+    <label for="viewport-size">Window size:</label>
+    <input id="viewport-size" value="15">
+    <button id="viewport-update">Set</button>
+  </fieldset>
+
+  <fieldset>
+    <legend>File Loader:</legend>
+    <div>
+      <label for="file-input"><span id="fileSize"></span></label>
+      <input id="file-input" type="file" name="myFiles" style="width: 100%; box-sizing: border-box;">
+
+      <div id="file-loader-buttons" style="margin-top: 16px;">
+        <div style="margin-bottom: 12px;">
+          <label for="append-at-line">Insert at line: </label><input id="append-at-line" value="1">
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong>Choose loading strategy:</strong>
+        </div>
+        <div id="file-loader-options">
+          <button id="load-file-naive">Standard Loader <code style="margin-left: 8px;">&lt;10M lines</code></button>
+          <button id="load-file-chunked">Chunked (File.slice) <code style="margin-left: 8px;">&lt;70M lines</code></button>
+          <button id="load-file-filereader">Chunked (FileReader) <code style="margin-left: 8px;">&lt;70M lines</code></button>
+          <button id="load-file-stream">Streaming (ReadableStream) <code style="margin-left: 8px;">&lt;70M lines</code></button>
+          <button id="load-file-stream-materialized">Streaming + Materialization <code style="margin-left: 8px;">&lt;75M lines</code></button>
+          <button id="load-file-stream-materialized-gc">Streaming + GC Hints <code style="margin-left: 8px;">&lt;90M lines</code></button>
+          <button id="load-file-chunked-compressed">Ultra-High-Capacity Mode <code style="margin-left: 8px;">1B+ lines (read-only)</code></button>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <h3>Logs:</h3>
+  <blockquote class="wb no-select" tabindex="0" id="logs-editor" style="border: 1px solid #444; width: 100%;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    const editorEl = document.getElementById('editor');
+    const logsEl = document.getElementById('logs-editor');
+
+    const logs = new Buffee(logsEl, {
+      colorPrimary: "#87FF5F",
+      colorSecondary: "#212026",
+      initialViewportSize: 8,
+      showGutter: false
+    });
+
+    function log(s) {
+      console.log(s);
+      logs.appendLineAtEnd(s);
+    }
+
+    const editor = new Buffee(editorEl, {
+      colorPrimary: "#E1D6F8",
+      colorSecondary: "#38274D",
+      initialViewportSize: 15,
+      logger: log
+    });
+    BuffeeChunkLoader(editor);
+
+    editor.Model.text = 'Select a file to load...';
+    editorEl.focus();
+
+    // Viewport controls
+    document.getElementById('viewport-update').addEventListener('click', () => {
+      const viewportStart = parseInt(document.getElementById('viewport-start').value);
+      const viewportSize = parseInt(document.getElementById('viewport-size').value);
+      editor.Viewport.set(viewportStart, viewportSize);
+    });
+
+    // File input handler
+    document.getElementById("file-input").addEventListener("change", () => {
+      const file = document.getElementById("file-input").files[0];
+      const nBytes = file.size;
+      const aMultiples = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+      let sOutput = "";
+      for (nMultiple = 0, nApprox = nBytes / 1024; nApprox > 1; nApprox /= 1024, nMultiple++) {
+        sOutput = nApprox.toFixed(3) + " " + aMultiples[nMultiple] + " (" + nBytes + " bytes)";
+      }
+      document.getElementById("fileSize").innerHTML = "File size: " + (sOutput || (nBytes + " bytes"));
+      document.getElementById("file-loader-buttons").classList.remove('hidden');
+    }, false);
+
+    // Standard Loader
+    document.getElementById('load-file-naive').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const t0 = performance.now();
+      const text = await f.text();
+      const t1 = performance.now();
+      log(`[Naive] Read file to text: ${(t1 - t0).toFixed(2)}ms`);
+
+      const t2 = performance.now();
+      editor.Model.text = text;
+      const t3 = performance.now();
+      const lineCount = editor.Model.lines.length;
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      log(`[Naive] Set Model.text (split + render): ${(t3 - t2).toFixed(2)}ms`);
+      log(`[Naive] Loaded ${lineCount.toLocaleString()} lines in ${(t3 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+    });
+
+    // Chunked (File.slice)
+    document.getElementById('load-file-chunked').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const t0 = performance.now();
+      editor.Model.lines = [];
+
+      const CHUNK_SIZE = 1 * 1024 * 1024;
+      let offset = 0;
+      let remainder = '';
+      let totalLines = 0;
+
+      while (offset < f.size) {
+        const blob = f.slice(offset, offset + CHUNK_SIZE);
+        const text = await blob.text();
+        const fullText = remainder + text;
+        const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+        if (lastNewlineIndex !== -1) {
+          const completeText = fullText.substring(0, lastNewlineIndex);
+          const lines = completeText.split('\n');
+          editor.Model.appendLines(lines);
+          totalLines += lines.length;
+          remainder = fullText.substring(lastNewlineIndex + 1);
+        } else {
+          remainder = fullText;
+        }
+        offset += CHUNK_SIZE;
+      }
+
+      if (remainder.length > 0) {
+        editor.Model.appendLines([remainder]);
+        totalLines++;
+      }
+
+      const t1 = performance.now();
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      log(`[Chunked] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+    });
+
+    // Chunked (FileReader)
+    document.getElementById('load-file-filereader').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const t0 = performance.now();
+      editor.Model.lines = [];
+
+      const CHUNK_SIZE = 1 * 1024 * 1024;
+      let offset = 0;
+      let remainder = '';
+      let totalLines = 0;
+
+      function readBlobAsText(blob) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = (e) => reject(e);
+          reader.readAsText(blob);
+        });
+      }
+
+      while (offset < f.size) {
+        const blob = f.slice(offset, offset + CHUNK_SIZE);
+        const text = await readBlobAsText(blob);
+        const fullText = remainder + text;
+        const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+        if (lastNewlineIndex !== -1) {
+          const completeText = fullText.substring(0, lastNewlineIndex);
+          const lines = completeText.split('\n');
+          editor.Model.appendLines(lines);
+          totalLines += lines.length;
+          remainder = fullText.substring(lastNewlineIndex + 1);
+        } else {
+          remainder = fullText;
+        }
+        offset += CHUNK_SIZE;
+      }
+
+      if (remainder.length > 0) {
+        editor.Model.appendLines([remainder]);
+        totalLines++;
+      }
+
+      const t1 = performance.now();
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      log(`[FileReader] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+    });
+
+    // Streaming (ReadableStream)
+    document.getElementById('load-file-stream').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const t0 = performance.now();
+      editor.Model.lines = [];
+
+      let remainder = '';
+      let totalLines = 0;
+      const decoder = new TextDecoder('utf-8');
+      const stream = f.stream();
+      const reader = stream.getReader();
+      let chunkCount = 0;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const fullText = remainder + text;
+          const lastNewlineIndex = fullText.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            const completeText = fullText.substring(0, lastNewlineIndex);
+            const lines = completeText.split('\n');
+            editor.Model.appendLines(lines);
+            totalLines += lines.length;
+            remainder = fullText.substring(lastNewlineIndex + 1);
+          } else {
+            remainder = fullText;
+          }
+
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        if (remainder.length > 0) {
+          editor.Model.appendLines([remainder]);
+          totalLines++;
+        }
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        log(`[Stream] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+      } finally {
+        reader.releaseLock();
+      }
+    });
+
+    // Streaming + Materialization
+    document.getElementById('load-file-stream-materialized').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const reader = f.stream().getReader();
+      try {
+        editor.Model.lines = [];
+        const decoder = new TextDecoder('utf-8');
+        let chunkCount = 0;
+        const t0 = performance.now();
+        let remainder = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const lastNewlineIndex = text.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            const allLines = text.split('\n');
+            const slicedLines = allLines.slice(0, -1);
+            slicedLines[0] = remainder + slicedLines[0];
+            remainder = allLines[allLines.length - 1];
+
+            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
+            editor.Model.appendLines(materializedLines, true);
+          } else {
+            remainder += text;
+          }
+
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            editor.Model.appendLines([], false);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        editor.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        log(`[Stream+Mat] Loaded ${editor.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+      } finally {
+        reader.releaseLock();
+      }
+    });
+
+    // Streaming + GC Hints
+    document.getElementById('load-file-stream-materialized-gc').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const reader = f.stream().getReader();
+      try {
+        editor.Model.lines = [];
+        const decoder = new TextDecoder('utf-8');
+        let chunkCount = 0;
+        const t0 = performance.now();
+        let remainder = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const lastNewlineIndex = text.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            const allLines = text.split('\n');
+            const slicedLines = allLines.slice(0, -1);
+            slicedLines[0] = remainder + slicedLines[0];
+            remainder = allLines[allLines.length - 1];
+
+            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
+            editor.Model.appendLines(materializedLines, chunkCount % 10 == 5 ? false : true);
+          } else {
+            remainder += text;
+          }
+
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            const _ = new Array(100000);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        editor.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
+
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        log(`[Stream+GC] Loaded ${editor.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+      } finally {
+        reader.releaseLock();
+      }
+    });
+
+    // Ultra-High-Capacity Mode (Chunked + Compressed)
+    document.getElementById('load-file-chunked-compressed').addEventListener('click', async () => {
+      const f = document.getElementById("file-input").files[0];
+      if (!f) { alert("No file selected"); return; }
+
+      const reader = f.stream().getReader();
+      try {
+        editor.ChunkLoader.activate();
+        document.getElementById('read-only-indicator').classList.remove('hidden');
+
+        const decoder = new TextDecoder('utf-8');
+        let chunkCount = 0;
+        const t0 = performance.now();
+        let remainder = '';
+        let originalSize = 0;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          const lastNewlineIndex = text.lastIndexOf('\n');
+
+          if (lastNewlineIndex !== -1) {
+            const allLines = text.split('\n');
+            const slicedLines = allLines.slice(0, -1);
+            slicedLines[0] = remainder + slicedLines[0];
+            remainder = allLines[allLines.length - 1];
+
+            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
+            originalSize += materializedLines.join('\n').length;
+            await editor.Model.appendLines(materializedLines, true);
+          } else {
+            remainder += text;
+          }
+
+          chunkCount++;
+          if (chunkCount % 10 === 0) {
+            await editor.Model.appendLines([], false);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
+        }
+
+        if (remainder.length > 0) {
+          await editor.Model.appendLines([remainder], false);
+        }
+
+        const compressedSize = editor.ChunkLoader.compressedSize;
+        const t1 = performance.now();
+        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+        const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+
+        log(`[Chunked+Compressed] Stored ${editor.ChunkLoader.totalLines.toLocaleString()} lines in ${editor.ChunkLoader.chunkCount} gzipped chunks`);
+        log(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
+        log(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
+        log(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
+        log(`  Compression ratio: ${compressionRatio}% savings`);
+        log(`  Memory savings: ${editor.ChunkLoader.chunkCount} chunks vs ${editor.ChunkLoader.totalLines.toLocaleString()} array elements = ${(editor.ChunkLoader.totalLines / editor.ChunkLoader.chunkCount).toFixed(0)}x reduction`);
+      } finally {
+        reader.releaseLock();
+      }
+    });
+  </script>
+</body>
+</html>

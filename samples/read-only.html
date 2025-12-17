@@ -2,49 +2,35 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>vbuf - Read-Only Mode</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>buffee - Read-Only Mode</title>
   <script src="../vbuf.js"></script>
-  <style>
-    .wb {
-      background-color: #282C34;
-      color: #B2B2B2;
-      position: relative;
-      outline: none;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-    }
-    .no-select { user-select: none; }
-    .wb-clipboard-bridge {
-      position: fixed; left: 0; top: 1px;
-      width: 0; height: 1px; opacity: 0; pointer-events: none;
-    }
-    .wb .wb-lines > pre::before { content: "\200B"; }
-    .wb .wb-lines pre { margin: 0; overflow: hidden; }
-    .wb .wb-selection {
-      background-color: #EDAD10;
-      position: absolute;
-      mix-blend-mode: difference;
-    }
-    .wb .wb-status span { padding-right: 4px; }
-  </style>
+  <script src="../extensions/chunkloader.js"></script>
+  <link rel="stylesheet" href="../reset.css">
 </head>
-<body class="bg-neutral-900 p-5 font-sans">
-  <h1 class="text-white text-lg mb-2">Read-Only Mode</h1>
-  <p class="text-neutral-400 text-sm mb-6">Two options for read-only editors. Try typing - editing is disabled, but arrow keys work.</p>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Read-Only Mode</p>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Option 1: TUI Mode (simpler)</h2>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs"><code class="text-green-400">new Vbuf(el, { initialViewportSize: 10 })</code></p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">TUI.enabled = true</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[600px] mb-4" tabindex="0" id="editor-tui">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h1>Read-Only Mode</h1>
+  <p>Two options for read-only editors. Try typing - editing is disabled, but arrow keys work.</p>
+
+  <h2>Option 1: TUI Mode (simpler)</h2>
+  <pre>new Buffee(el, { initialViewportSize: 10 })
+TUI.enabled = true</pre>
+  <blockquote class="wb no-select" tabindex="0" id="editor-tui" style="border: 1px solid #444; width: 600px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -52,20 +38,19 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Option 2: Chunked Mode</h2>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs"><code class="text-green-400">new Vbuf(el, { initialViewportSize: 10 })</code></p>
-  <p class="text-neutral-500 text-xs"><code class="text-green-400">Model.activateChunkMode()</code></p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">Model.appendLines([...])</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[600px] mb-4" tabindex="0" id="editor-chunked">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>Option 2: Chunked Mode (for large files)</h2>
+  <pre>BuffeeChunkLoader(editor)
+ChunkLoader.activate()
+await ChunkLoader.appendLines([...])</pre>
+  <blockquote class="wb no-select" tabindex="0" id="editor-chunked" style="border: 1px solid #444; width: 600px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -86,7 +71,7 @@ function example() {
 example();`;
 
     // Option 1: TUI mode
-    const edTui = new Vbuf(document.getElementById('editor-tui'), {
+    const edTui = new Buffee(document.getElementById('editor-tui'), {
       initialViewportSize: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
@@ -94,16 +79,15 @@ example();`;
     edTui.Model.text = content;
     edTui.TUI.enabled = true;
 
-    // Option 2: Chunked mode
-    const edChunked = new Vbuf(document.getElementById('editor-chunked'), {
+    // Option 2: Chunked mode (for large files)
+    const edChunked = new Buffee(document.getElementById('editor-chunked'), {
       initialViewportSize: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
-
-    // Must use activateChunkMode + appendLines, NOT Model.text
-    edChunked.Model.activateChunkMode();
-    edChunked.Model.appendLines(content.split('\n'));
+    BuffeeChunkLoader(edChunked);
+    edChunked.ChunkLoader.activate();
+    edChunked.ChunkLoader.appendLines(content.split('\n'));
   </script>
 </body>
 </html>

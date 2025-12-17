@@ -951,7 +951,7 @@ const customNode = document.createElement("div");
 customNode.className = "wb no-select";
 customNode.innerHTML = fixture.node.innerHTML;
 document.body.appendChild(customNode);
-const customEditor = new Vbuf(customNode, { indentation: 7 });
+const customEditor = new Buffee(customNode, { indentation: 7 });
 expect(customEditor.indentation).toBe(7);
 expect(customNode.querySelector(".wb-indentation").innerHTML).toBe("Spaces: 7");
 customNode.remove();

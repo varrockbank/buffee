@@ -2,54 +2,38 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>vbuf - Editor Sizing</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>buffee - Editor Sizing</title>
   <script src="../vbuf.js"></script>
+  <link rel="stylesheet" href="../reset.css">
   <style>
-    .wb {
-      background-color: #282C34;
-      color: #B2B2B2;
-      position: relative;
-      outline: none;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-      font-size: 24px;
-    }
-    .no-select { user-select: none; }
-    .wb-clipboard-bridge {
-      position: fixed; left: 0; top: 1px;
-      width: 0; height: 1px; opacity: 0; pointer-events: none;
-    }
-    .wb .wb-lines > pre::before { content: "\200B"; }
-    .wb .wb-lines pre { margin: 0; overflow: hidden; }
-    .wb .wb-selection {
-      background-color: #EDAD10;
-      position: absolute;
-      mix-blend-mode: difference;
-    }
-    .wb .wb-status span { padding-right: 4px; }
+    .wb { font-size: 24px; }
   </style>
 </head>
-<body class="bg-neutral-900 p-5 font-sans">
-  <h1 class="text-white text-lg mb-2">Editor Sizing with Character Units</h1>
-  <p class="text-neutral-400 text-sm mb-2">
-    The editor uses monospace font. Set width on the container element via CSS.
-    Use <code class="text-green-400">ch</code> units for predictable column counts, or <code class="text-green-400">100%</code> to fill parent.
-  </p>
-  <p class="text-neutral-400 text-sm mb-6">
-    Height (number of lines) is set via the <code class="text-green-400">initialViewportSize</code> option in the constructor.
-  </p>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Editor Sizing</p>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">80 columns × 10 lines</h2>
-  <p class="text-neutral-500 text-xs mb-2">CSS: <code class="text-green-400">width: 80ch;</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[80ch] mb-4" tabindex="0" id="editor-80">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h1>Editor Sizing</h1>
+  <p>The editor uses monospace font. Set width on the container element via CSS.</p>
+  <p>Use <code>ch</code> units for predictable column counts, or <code>100%</code> to fill parent.</p>
+  <p>Height (number of lines) is set via the <code>initialViewportSize</code> option.</p>
+
+  <h2>80 columns &times; 10 lines</h2>
+  <p>CSS: <code>width: 80ch;</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-80" style="border: 1px solid #444; width: 80ch;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -57,18 +41,17 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">1 line editor (no status)</h2>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">new Vbuf(el, { initialViewportSize: 1, showStatusLine: false })</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[40ch] mb-4" tabindex="0" id="editor-1line">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>1 line editor (no status)</h2>
+  <p><code>new Buffee(el, { initialViewportSize: 1, showStatusLine: false })</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-1line" style="border: 1px solid #444; width: 40ch;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -76,19 +59,18 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">40 columns (no gutter)</h2>
-  <p class="text-neutral-500 text-xs">CSS: <code class="text-green-400">width: 40ch;</code></p>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">new Vbuf(el, { showGutter: false })</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[40ch] mb-4" tabindex="0" id="editor-40-clean">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>40 columns (no gutter)</h2>
+  <p>CSS: <code>width: 40ch;</code></p>
+  <p><code>new Buffee(el, { showGutter: false })</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-40-clean" style="border: 1px solid #444; width: 40ch;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -96,17 +78,17 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">40 columns × 5 lines</h2>
-  <p class="text-neutral-500 text-xs mb-2">CSS: <code class="text-green-400">width: 40ch;</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[40ch] mb-4" tabindex="0" id="editor-40">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>40 columns &times; 5 lines</h2>
+  <p>CSS: <code>width: 40ch;</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-40" style="border: 1px solid #444; width: 40ch;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -114,35 +96,17 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">120 columns × 15 lines</h2>
-  <p class="text-neutral-500 text-xs mb-2">CSS: <code class="text-green-400">width: 120ch;</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[120ch] mb-4" tabindex="0" id="editor-120">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>100% width &times; 8 lines</h2>
+  <p>CSS: <code>width: 100%;</code></p>
+  <blockquote class="wb no-select" tabindex="0" id="editor-full" style="border: 1px solid #444; width: 100%;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">100% width × 8 lines</h2>
-  <p class="text-neutral-500 text-xs mb-2">CSS: <code class="text-green-400">width: 100%;</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-full mb-4" tabindex="0" id="editor-full">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
-    </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -159,7 +123,7 @@
     }
 
     // 80 columns × 10 lines
-    const ed80 = new Vbuf(document.getElementById('editor-80'), {
+    const ed80 = new Buffee(document.getElementById('editor-80'), {
       initialViewportSize: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
@@ -167,7 +131,7 @@
     ed80.Model.text = ruler(80) + '\n// 80 column editor\nLine 3\nLine 4\nLine 5';
 
     // 1 line editor
-    const ed1Line = new Vbuf(document.getElementById('editor-1line'), {
+    const ed1Line = new Buffee(document.getElementById('editor-1line'), {
       initialViewportSize: 1,
       showStatusLine: false,
       colorPrimary: "#B2B2B2",
@@ -176,7 +140,7 @@
     ed1Line.Model.text = ruler(40);
 
     // 40 columns no gutter
-    const ed40Clean = new Vbuf(document.getElementById('editor-40-clean'), {
+    const ed40Clean = new Buffee(document.getElementById('editor-40-clean'), {
       initialViewportSize: 5,
       showGutter: false,
       colorPrimary: "#B2B2B2",
@@ -185,23 +149,15 @@
     ed40Clean.Model.text = ruler(40) + '\n// No gutter\nLine 3';
 
     // 40 columns × 5 lines
-    const ed40 = new Vbuf(document.getElementById('editor-40'), {
+    const ed40 = new Buffee(document.getElementById('editor-40'), {
       initialViewportSize: 5,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
     ed40.Model.text = ruler(40) + '\n// 40 columns\nCompact editor';
 
-    // 120 columns × 15 lines
-    const ed120 = new Vbuf(document.getElementById('editor-120'), {
-      initialViewportSize: 15,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    ed120.Model.text = ruler(120) + '\n// 120 column editor\nLine 3';
-
     // Full width × 8 lines
-    const edFull = new Vbuf(document.getElementById('editor-full'), {
+    const edFull = new Buffee(document.getElementById('editor-full'), {
       initialViewportSize: 8,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"

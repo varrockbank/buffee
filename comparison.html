@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Comparison</title>
+  <link rel="stylesheet" href="reset.css">
+</head>
+<body>
+  <nav id="nav"></nav>
+  <script>
+    fetch('navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="index.html">home</a> / Comparison</p>
+
+  <h1>Comparison</h1>
+  <p>
+    The lanscape of text editors:
+  </p>
+
+  <ol>
+    <li>native - performant</li>
+    <li>web
+      <ol type="a">
+        <li>Monaco, VSCode - corporate/enterprise friendly, IDE, bulky, overkill</li>
+        <li>textarea - meant for single page of snippets and something form data</li>
+        <li>microlibraries - embeddable, geared towards WYSIWYG, effectively enhanced textarea, not ideal for building IDEs</li>
+        <li>Ace.js - embeddable, formidable, great, </li>
+      </ol>
+    </li>
+  </ol>
+
+  <h2><code>Monaco/VScode</code></h2>
+
+  <p>
+    VScode is a feature-rich <span style="text-decoration: line-through">text editor</span> IDE. At ~100MB+, roughly 10000x Buffee's footprint, that cost is reasonable when a user consciously installs it on their own machine.
+  </p>
+
+  <p>
+    It is bloated and overkill as an <span style="font-weight: bold;">embedded text editor</span> on the web.
+  </p>
+
+  <p>
+    As The Selfish Gene suggests, systems evolve to optimize for their own replication rather than for the environment they inhabit.
+    The phenonomon of VSCode-based apps parallel this dynamic. Instead of applications embedding an editor, it seems VSCode is embedding the application.
+  </p>
+  <p>
+    VS Code–based apps tend to look and behave like VS Code. As a SaaS, they are effectively a VS Code “private server”: they ship the full stock editor, a config.json, and their VSCode extension pre-installed.
+    Business idea: VSCode-as-a-Service, where tenants supply data, config.json, and a link to their VSCode extension. The 100 MB+ VSCode download could be cached once, rather than redundantly downloaded by every VSCode based app.
+ </p> 
+  
+ <p>
+  In contrast, Buffee is intended as a building block for creating original editor experiences, including IDEs
+  </p>
+  <ol>
+    <li>Compact: 4kb footprint and no dependencies</li>
+    <li>Hackable API and internals</li>
+    <li>Embeddability: quintenssial text editor operations and not more (git, AI agent, multiplexing, terminal emulator)
+  </li>
+  </ol>
+ 
+  <h2><code>&lt;textarea&gt;</code></h2>
+
+  <p>textarea was built for form input and small text snippets. It is a poor approximation of a real text editor. As a building block, it is fundamentally flawed.</p>
+
+  <p>
+    It is acceptable only when you need to override one or two behaviors. The moment you attempt to align it with the interaction model of Vim or VS Code, the abstraction collapses. textarea is deeply idiosyncratic—matching modern editor semantics would require a near-complete rewrite, which defeats the purpose of using it in the first place.
+  </p>
+
+  <p>One core flaw is its data model: a single mutable string, with line breaks encoded as \n. Worse, this entire model is bound directly to the DOM. Every keystroke requires allocating a new string and pushing it back through the DOM, forcing re-layout and repaint. Both operations are wastefully expensive.
+    With as little as ten thousand lines, this overhead becomes perceptible. At hundreds of thousands or millions of lines, it becomes untenable. We have been spoiled by native editors that handle large files so well that we forget this is a feature, not a given.
+  </p>
+
+  <p> 
+    Another idiosyncracy is cursor/selection. The caret is owned by the browser. Implementing a custom cursor, selection model, or multi-caret editing doesn’t just require new logic—it requires actively fighting the browser’s built-in behavior, often through brittle hacks and event suppression.
+  </p>
+
+  <p>In brief, <code>&lt;textarea&gt;</code> is idiosyncratic, inflexible and low-capacity.</p>
+
+  <h2>Ace.js</h2>
+  <p>Ace Editor stands out. Per their README (September 2025): "Handles huge documents (at last check, 4,000,000 lines is the upper limit)". This is orders of magnitude better than microlibraries in Buffee's weight class.</p>
+  <p>It's a respectable library for building editor experiences. I'd recommend it.</p>
+  <p>Downsides:</p>
+  <ul>
+    <li>Showing signs of age. Less active, legacy/compatibility baggage</li>
+    <li>Small but still 10x+ Buffee's size</li>
+    <li>Buffee is more purist w.r.t. being retro and fixed-width rendering like in terminals</li>
+    <li>It includes bells and whistles that, unless tree-shakeable, make it bloated compared to Buffee</li>
+    <li>Ace instantiates a hidden <code>&lt;textarea&gt;</code> around the user's cursor to bind keyboard input. One caveat: large selections require large textareas, bringing the DOM bottleneck into the fault. Buffee avoids this with virtual carets.</li>
+  </ul>
+  <p>Buffee enjoys the privilege of starting fresh in 2025, and even learning from Ace.js</p>
+
+
+  <h2>Other microlibraries</h2>
+  <p>
+    Libraries in the same weight division as Buffee or Ace.js often achieve their small footprint by being clever code-golf hacks of textarea. This is lipstick on a pig.
+They inherit the idiosyncracies of textarea and therefore ill suited as building blocks.
+  </p>
+
+    <p>
+Granted, these libraries are usually WYSIWYG widgets and improvement over native form inputs rather than as full-blown editor experience.
+    </p>
+  </p>
+    
+  <h2>C++ buffer management via WebAssembly</h2>
+  <p>Early experiments involved delegating buffer management to a WASM module written in C++. JS-Native implementation in V8 won out.</p>
+  <p>There is overhead to the JS&lt;-&gt;WASM boundary crossing. It was significant but just below the level of human perception. The threshold was quickly breached by time spent in WASM-land. Handrolling datastructures in C++ or other native code that outperforms V8 optimizations is difficult. A lot of engineering/witchcraft went into V8 and it shows.</p>
+  <p>Also, the WASM toolchain still felt like "death by a thousand cuts". All things considered, it is more pleasant to work with VanillaJS.</p>
+
+</body>
+</html>

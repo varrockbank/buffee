@@ -2,50 +2,37 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Index of /samples</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>buffee - Kitchen Sink</title>
+  <link rel="stylesheet" href="../reset.css">
 </head>
-<body class="bg-neutral-900 p-5 font-sans">
-  <h1 class="text-white text-lg mb-4">Index of /samples</h1>
+<body>
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / Kitchen Sink</p>
 
-  <table class="text-sm font-mono">
-    <thead>
-      <tr class="text-neutral-500 text-left">
-        <th class="pr-8 pb-2">Name</th>
-        <th class="pr-8 pb-2">Description</th>
-      </tr>
-    </thead>
-    <tbody class="text-neutral-300">
-      <tr>
-        <td class="pr-8 py-1"><a href="basic-editor.html" class="text-blue-400 hover:underline">basic-editor.html</a></td>
-        <td class="text-neutral-500">Simple editable text editor</td>
-      </tr>
-      <tr>
-        <td class="pr-8 py-1"><a href="gutter-status.html" class="text-blue-400 hover:underline">gutter-status.html</a></td>
-        <td class="text-neutral-500">Gutter and status bar options</td>
-      </tr>
-      <tr>
-        <td class="pr-8 py-1"><a href="read-only.html" class="text-blue-400 hover:underline">read-only.html</a></td>
-        <td class="text-neutral-500">Read-only mode (TUI and chunked)</td>
-      </tr>
-      <tr>
-        <td class="pr-8 py-1"><a href="sizing.html" class="text-blue-400 hover:underline">sizing.html</a></td>
-        <td class="text-neutral-500">Editor sizing with character units</td>
-      </tr>
-      <tr>
-        <td class="pr-8 py-1"><a href="tui-legacy.html" class="text-blue-400 hover:underline">tui-legacy.html</a></td>
-        <td class="text-neutral-500">TUI elements via text manipulation</td>
-      </tr>
-      <tr>
-        <td class="pr-8 py-1"><a href="elementals.html" class="text-blue-400 hover:underline">elementals.html</a></td>
-        <td class="text-neutral-500">Layer-based UI elements (DOM nodes)</td>
-      </tr>
-      <tr>
-        <td class="pr-8 py-1"><a href="syntax.html" class="text-blue-400 hover:underline">syntax.html</a></td>
-        <td class="text-neutral-500">Regex-based syntax highlighting</td>
-      </tr>
-    </tbody>
-  </table>
+  <h1>Kitchen Sink</h1>
+
+  <ul>
+    <li><a href="basic-editor.html">basic-editor.html</a> - Simple editable text editor</li>
+    <li><a href="gutter-status.html">gutter-status.html</a> - Gutter and status bar options</li>
+    <li><a href="read-only.html">read-only.html</a> - Read-only mode (TUI and chunked)</li>
+    <li><a href="sizing.html">sizing.html</a> - Editor sizing with character units</li>
+    <li><a href="tui-legacy.html">tui-legacy.html</a> - TUI elements via text manipulation</li>
+    <li><a href="elementals.html">elementals.html</a> - Layer-based UI elements (DOM nodes)</li>
+    <li><a href="syntax.html">syntax.html</a> - Regex-based syntax highlighting</li>
+    <li><a href="ultra-high-capacity.html">ultra-high-capacity.html</a> - Load files with millions/billions of lines</li>
+  </ul>
+
+  <h2>Fun Examples</h2>
+  <ul>
+    <li><a href="ascii-movie.html">ascii-movie.html</a> - Star Wars ASCII animation player</li>
+    <li><a href="matrix.html">matrix.html</a> - Matrix digital rain effect</li>
+    <li><a href="conway.html">conway.html</a> - Conway's Game of Life</li>
+  </ul>
 
 </body>
 </html>

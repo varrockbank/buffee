@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Extensions</title>
+  <link rel="stylesheet" href="reset.css">
+</head>
+<body>
+  <nav id="nav"></nav>
+  <script>
+    fetch('navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="index.html">home</a> / Extensions</p>
+
+  <h1>Extensions</h1>
+  <p>Optional modules for buffee. Load independently.</p>
+
+  <h2>Syntax</h2>
+  <p><code>syntax.js</code></p>
+  <p>Regex-based syntax highlighting with incremental state caching. Ships with JavaScript, HTML, CSS, JSON, and Python.</p>
+  <pre>editor.use(BuffeeSyntax)
+editor.Syntax.setLanguage('javascript')
+editor.Syntax.enabled = true</pre>
+  <p><a href="samples/syntax.html">Demo →</a></p>
+
+  <h2>Elementals</h2>
+  <p><code>elementals.js</code></p>
+  <p>DOM-based UI elements in a layer above text. Buttons, inputs, labels with character-unit positioning.</p>
+  <pre>editor.use(BuffeeElementals)
+editor.Elementals.addButton({ row: 1, col: 5, label: 'OK' })
+editor.Elementals.enabled = true</pre>
+  <p><a href="samples/elementals.html">Demo →</a></p>
+
+  <h2>TUI Legacy</h2>
+  <p><code>tui-legacy.js</code></p>
+  <p>Terminal UI via text manipulation. Buttons, prompts, scrollboxes using box-drawing characters.</p>
+  <pre>editor.use(BuffeeTUI)
+editor.TUI.addButton({ row: 1, col: 2, label: 'OK', border: true })
+editor.TUI.enabled = true</pre>
+  <p><a href="samples/tui-legacy.html">Demo →</a></p>
+
+  <h2>ChunkLoader</h2>
+  <p><code>chunkloader.js</code></p>
+  <p>Gzip-compressed chunked storage for massive files. Decompress on scroll.</p>
+  <pre>editor.use(BuffeeChunkLoader)
+editor.ChunkLoader.activate(50000)
+await editor.ChunkLoader.appendLines(lines)</pre>
+  <p><a href="samples/read-only.html">Demo →</a></p>
+
+  <hr>
+
+  <h2>Using Multiple Extensions</h2>
+  <p>Load multiple extensions on the same editor instance.</p>
+  <pre>const editor = new Buffee(element)
+  .use(BuffeeSyntax)
+  .use(BuffeeElementals)
+
+editor.Syntax.setLanguage('javascript')
+editor.Syntax.enabled = true
+
+editor.Elementals.addButton({
+  row: 0, col: 40,
+  label: 'Run',
+  onActivate: () => console.log('Running...')
+})
+editor.Elementals.enabled = true</pre>
+
+</body>
+</html>

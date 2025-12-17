@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - ASCII Movie</title>
+  <script src="../vbuf.js"></script>
+  <link rel="stylesheet" href="../reset.css">
+  <style>
+    .wb { background-color: #000000; color: #FFD700; }
+    .wb .wb-selection { background-color: #333333; }
+  </style>
+</head>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / ASCII Movie</p>
+
+  <h1>ASCII Movie</h1>
+  <p>Playback of the Star Wars ASCII animation. Original file from <a href="https://www.asciimation.co.nz/starwars" target="_blank">asciimation.co.nz</a> (2MB, 1000+ frames).</p>
+
+  <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 10px; flex-wrap: wrap;">
+    <button id="play-pause-btn">Play</button>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <label for="speed-slider">Speed:</label>
+      <input type="range" id="speed-slider" min="1" max="300" value="120" style="width: 120px;">
+      <span id="speed-value">120ms</span>
+    </div>
+  </div>
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+    Frame: <span id="frame-counter" style="min-width: 90px;">0 / 0</span>
+    <input type="range" id="frame-slider" min="0" max="0" value="0" style="flex: 1;">
+  </div>
+
+  <blockquote class="wb no-select" tabindex="0" id="editor" style="border: 1px solid #444; width: 100%;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; background: #000000;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    const editorEl = document.getElementById('editor');
+    const editor = new Buffee(editorEl, {
+      colorPrimary: "#FFD700",
+      colorSecondary: "#000000",
+      initialViewportSize: 13,
+      showGutter: false
+    });
+
+    editor.Model.text = 'Loading Star Wars ASCII movie...';
+
+    let movieData = null;
+    let frames = [];
+    let currentFrame = 0;
+    let isPlaying = false;
+    let frameInterval = null;
+    let frameDelay = 120;
+
+    async function loadStarWarsMovie() {
+      try {
+        const response = await fetch('../assets/sw.txt');
+        movieData = await response.text();
+        const rawFrames = movieData.split('\\n');
+        const LINES_PER_FRAME = 14;
+        frames = [];
+
+        for (let i = 0; i < rawFrames.length; i += LINES_PER_FRAME) {
+          const metadata = rawFrames[i];
+          const numFrames = parseInt(metadata);
+          const frame = rawFrames.slice(i + 1, i + LINES_PER_FRAME).join('\n');
+          if (frame.trim()) {
+            for (let j = 0; j < numFrames; j++) {
+              frames.push(frame);
+            }
+          }
+        }
+
+        document.getElementById('frame-slider').max = frames.length - 1;
+        currentFrame = 750;
+        showFrame(750);
+      } catch (err) {
+        console.error("Error loading Star Wars movie:", err);
+        editor.Model.text = "Error loading movie. Check that sw.txt is in the assets directory.";
+      }
+    }
+
+    function showFrame(frameIndex) {
+      if (frames.length > 0) {
+        editor.Model.text = frames[frameIndex % frames.length];
+        document.getElementById('frame-counter').textContent = `${frameIndex + 1} / ${frames.length}`;
+        document.getElementById('frame-slider').value = frameIndex;
+      }
+    }
+
+    function playMovie() {
+      if (isPlaying) return;
+      isPlaying = true;
+      document.getElementById('play-pause-btn').textContent = 'Pause';
+      frameInterval = setInterval(() => {
+        showFrame(currentFrame);
+        currentFrame = (currentFrame + 1) % frames.length;
+      }, frameDelay);
+    }
+
+    function pauseMovie() {
+      isPlaying = false;
+      document.getElementById('play-pause-btn').textContent = 'Play';
+      if (frameInterval) {
+        clearInterval(frameInterval);
+        frameInterval = null;
+      }
+    }
+
+    document.getElementById('play-pause-btn').addEventListener('click', () => {
+      if (isPlaying) {
+        pauseMovie();
+      } else {
+        playMovie();
+      }
+    });
+
+    document.getElementById('speed-slider').addEventListener('input', (e) => {
+      frameDelay = parseInt(e.target.value);
+      document.getElementById('speed-value').textContent = frameDelay + 'ms';
+      if (isPlaying) {
+        pauseMovie();
+        playMovie();
+      }
+    });
+
+    document.getElementById('frame-slider').addEventListener('input', (e) => {
+      currentFrame = parseInt(e.target.value);
+      showFrame(currentFrame);
+    });
+
+    loadStarWarsMovie();
+
+    // Autoplay when page loads
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !isPlaying && frames.length > 0) {
+          playMovie();
+          observer.unobserve(editorEl);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    observer.observe(editorEl);
+  </script>
+</body>
+</html>

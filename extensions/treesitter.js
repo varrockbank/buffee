@@ -1,24 +1,24 @@
 /**
- * @fileoverview VbufTreeSitter - Tree-sitter syntax highlighting extension for Vbuf.
+ * @fileoverview BuffeeTreeSitter - Tree-sitter syntax highlighting extension for Buffee.
  * Provides syntax highlighting using Tree-sitter parsers.
  * @version 1.0.0
  */
 
 /**
- * Initializes Tree-sitter syntax highlighting for a Vbuf instance.
+ * Initializes Tree-sitter syntax highlighting for a Buffee instance.
  * Renders at 60fps using a dirty flag pattern.
  *
- * @param {Vbuf} vbuf - The Vbuf instance to extend
+ * @param {Buffee} vbuf - The Buffee instance to extend
  * @param {Object} options - Tree-sitter configuration
  * @param {Object} options.parser - Tree-sitter parser instance
  * @param {Object} options.query - Tree-sitter query for capturing syntax nodes
  * @returns {Object} The TreeSitter API object
  * @example
- * const editor = new Vbuf(document.getElementById('editor'));
- * const TreeSitter = VbufTreeSitter(editor, { parser: jsParser, query: jsQuery });
+ * const editor = new Buffee(document.getElementById('editor'));
+ * const TreeSitter = BuffeeTreeSitter(editor, { parser: jsParser, query: jsQuery });
  * TreeSitter.enabled = true;
  */
-function VbufTreeSitter(vbuf, { parser, query }) {
+function BuffeeTreeSitter(vbuf, { parser, query }) {
   const { $e, render, renderHooks } = vbuf._internals;
   const { Viewport, Model } = vbuf;
 

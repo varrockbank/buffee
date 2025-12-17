@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Performance</title>
+  <link rel="stylesheet" href="reset.css">
+</head>
+<body>
+  <nav id="nav"></nav>
+  <script>
+    fetch('navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="index.html">home</a> / Performance</p>
+
+  <h1>Performance</h1>
+  <p>This documents profiles performance and documents R&amp;D decisions, mostly around handling large file capacity.</p>
+
+  <p>This project has 3 pillars of performance:</p>
+  <ol>
+    <li>Network payload size</li>
+    <li>How responsive the editor is</li>
+    <li>Capacity (how large of files we can load)</li>
+  </ol>
+
+  <p>At the time of writing, the network payload size is ~4KB and the responsiveness is &lt;20ms.</p>
+
+  <p>We will see how far we can push the capacity limit. Eventually, but in the distant edge cases, responsiveness will degrade. In fact, we may even see issues of correctness.</p>
+
+  <p>We want to profile the behavior at that boundary, perhaps study solutions, which informs our design decision, but not necessarily dictate it. In simpler terms, we may discover that it's possible to handle mega large files with some tweaks but the trade-off to the vast majority of usage is not worth optimizing for this long tail.</p>
+
+  <p>All tests done on 18GB MacBook Air. Key is that capacity scales O(n) of RAM with low overhead and no bottleneck. Compare vs libraries that mount whole file to DOM being unresponsive by O(100K) lines. VDOM has other scaling issues.</p>
+
+  <h2>Basic Load Test with Naive File Loader</h2>
+  <p>This is a load test with a "naive loader" which reads the file into the heap and splits on "\n".</p>
+
+  <h3>30 lines</h3>
+  <pre>Took 0.20 millis to scroll viewport with 30 lines. That's 5000.00 FPS.
+Took 1.90 millis to insert with 30 lines. That's 526.32 FPS.
+Took 1.60 millis to insert new line with 30 lines. That's 625.00 FPS.
+Took 1.50 millis to delete line with 29 lines. That's 666.67 FPS.
+Took 1.40 millis to delete character with 30 lines. That's 714.29 FPS.</pre>
+
+  <h3>500k lines (jump to viewport 250000)</h3>
+  <pre>Took 0.30 millis to scroll viewport with 500001 lines. That's 3333.33 FPS.
+Took 1.30 millis to insert with 500001 lines. That's 769.23 FPS.
+Took 2.30 millis to insert new line with 500003 lines. That's 434.78 FPS.
+Took 2.50 millis to delete line with 500002 lines. That's 400 FPS.
+Took 1.10 millis to delete character with 500002 lines. That's 909.09 FPS.</pre>
+
+  <h3>5 million lines (100 MB, jump to viewport 2,999,999)</h3>
+  <pre>Took 0.70 millis to scroll viewport with 5000001 lines. That's 1428.57 FPS.
+Took 1.30 millis to insert with 5000000 lines. That's 769.23 FPS.
+Took 6.40 millis to insert new line with 5000001 lines. That's 156.25 FPS.
+Took 1.20 millis to delete character with 5000001 lines. That's 833.33 FPS.
+Took 5.60 millis to delete line with 5000000 lines. That's 178.57 FPS.</pre>
+
+  <h3>10 million lines (280 MB)</h3>
+  <pre>Took 0.70 millis to scroll viewport with 10000001 lines. That's 1428.57 FPS.
+Took 1.30 millis to insert with 10000001 lines. That's 769.23 FPS.
+Took 28.40 millis to insert new line with 10000002 lines. That's 35.21 FPS.
+Took 1.30 millis to delete character with 10000001 lines. That's 769.23 FPS.
+Took 4.60 millis to delete line with 10000001 lines. That's 217.39 FPS.</pre>
+
+  <p>It took ~1 second to load the 100MB 10 million line file with the naive loader. Same as with VSCode.</p>
+
+  <p>We stop here for the naive loader because its limit is somewhere between the 10 million and 20 million line files. This is likely due to the string length and/or the ability to split on "\n" for such a large string.</p>
+
+  <h2>Test Files</h2>
+  <p>To avoid Git hosting excessively large files, resources directory only contains up to 200k file. The files were generated as follows:</p>
+  <pre>seq 1 5000000 | awk '{print "This is line number " $1}' &gt; 5_million_lines.txt</pre>
+  <p>This is not representative of real files because there is a lot of regularity. However, it makes it convenient to do apples-to-apples comparison.</p>
+
+  <h2>Chunked File Loading</h2>
+
+  <h3>No improvement: Sequentially adding lines</h3>
+  <p>We add an <code>appendLines</code> method to model and send in 100k lines at a time.</p>
+  <pre>const fileLines = fileSourceTextString.split('\n');
+primary.Model.lines = [];
+const BATCH_SIZE = 100_000;
+for (let i = 0; i &lt; fileLines.length; i += BATCH_SIZE) {
+  const batch = fileLines.slice(i, i + BATCH_SIZE);
+  editor.Model.appendLines(batch);
+}</pre>
+  <p>This doesn't work and still fails on 20 million line files. The bottleneck seems to be on the source file being in memory.</p>
+
+  <h3>~70 million: File.slice to read byte chunks</h3>
+  <p>We avoid converting the file to String right away. The unit of iteration are in terms of bytes (1MB at a time) rather than lines and strings and delimiters.</p>
+  <p><strong>It works!</strong></p>
+  <pre>[Chunked] Loaded 20,000,000 lines in 1348.00ms // 542 MiB
+[Chunked] Loaded 50,000,001 lines in 5351.40ms // 1516 MiB
+[Chunked] Loaded 70,000,001 lines in 10449.20ms // 1925 MiB</pre>
+  <p>The browser tab crashes at 72 million on a 100 million line file.</p>
+
+  <h3>Comparison: Naive vs Chunked</h3>
+  <table>
+    <tr><th>Lines</th><th>Naive</th><th>Chunked</th></tr>
+    <tr><td>200,000</td><td>29.30ms</td><td>30.30ms</td></tr>
+    <tr><td>500,000</td><td>41.60ms</td><td>44.80ms</td></tr>
+    <tr><td>1,000,000</td><td>68.20ms</td><td>84.10ms</td></tr>
+    <tr><td>5,000,000</td><td>295.60ms</td><td>293.30ms</td></tr>
+    <tr><td>10,000,000</td><td>821.70ms</td><td>678.70ms</td></tr>
+    <tr><td>20,000,000</td><td>fails</td><td>1348.00ms</td></tr>
+    <tr><td>50,000,001</td><td>fails</td><td>5351.40ms</td></tr>
+    <tr><td>70,000,001</td><td>fails</td><td>10449.20ms</td></tr>
+  </table>
+  <p>The chunked file byte reader implementation isn't too complex so it should be preferred for robustness.</p>
+
+  <h3>Memory Usage</h3>
+  <p>At 70 million lines, consumed 3660MB of heap space, near Chrome's 4GB tab limit. Running Chrome with <code>--js-flags="--max-old-space-size=8192"</code> does not seem to increase the tab limit.</p>
+
+  <h3>Chunk Size Experiments</h3>
+  <p>Larger chunk sizes are more performant but risk stack overflow when calling appendLines. 1MB is the sweet spot.</p>
+  <table>
+    <tr><th>Lines</th><th>256KB</th><th>512KB</th><th>1MB</th><th>2MB</th></tr>
+    <tr><td>10M</td><td>872.80ms</td><td>685.40ms</td><td>678.70ms</td><td>640.30ms</td></tr>
+    <tr><td>20M</td><td>1768.60ms</td><td>1394.80ms</td><td>1348.00ms</td><td>1316.30ms</td></tr>
+    <tr><td>50M</td><td>6921.20ms</td><td>4838.50ms</td><td>5351.40ms</td><td>5461.80ms</td></tr>
+  </table>
+
+  <h3>Stream API Loader</h3>
+  <p>Stream API is the most modern approach. Faster after 1 million lines.</p>
+  <pre>[Stream] Loaded 5,000,000 lines in 249.60ms
+[Stream] Loaded 10,000,000 lines in 494.00ms
+[Stream] Loaded 20,000,000 lines in 1016.80ms
+[Stream] Loaded 50,000,001 lines in 4380.10ms
+[Stream] Loaded 70,000,001 lines in 12008.30ms</pre>
+  <p>Crashes at around 75 million after adding UI yield logic.</p>
+
+  <h3>Materializing Sliced Strings</h3>
+  <p>After inspecting heap, [sliced strings] accounted for ~100MB redundancy. Materializing strings gives 5-10% capacity improvement:</p>
+  <pre>// Before
+primary.Model.appendLines(slicedLines, true);
+// Heap: 3650MB
+
+// After - force materialization
+const materializedLines = slicedLines.map(line =&gt; Array.from(line).join(''));
+primary.Model.appendLines(materializedLines, true);
+// Heap peak: 3300MB, after: 3150MB</pre>
+
+  <h3>Force GC</h3>
+  <p>This hack gets the GC to kick in earlier:</p>
+  <pre>const _ = new Array(100000);</pre>
+  <p>Unstable after 70 million LOC, but would hit 88 million often.</p>
+
+  <h2>Ultra-High-Capacity Mode</h2>
+  <p>This mode involves incremental compression. The compressed data lives in native C++ memory rather than the heap.</p>
+  <p>The editor breezed past the previous 88 million cap and reached <strong>1+ billion lines</strong> while consuming ~2.5GB of RAM. This is contingent on the specific file and its compression profile.</p>
+
+
+
+  <h2>Ideas</h2>
+  <ul>
+    <li>IndexedDB for persistence</li>
+  </ul>
+  <hr>
+
+  <h2>Buffer data structure</h2>
+
+<p>
+Buffers are the darkhorses text editor implementations. They map 1:1 with the problem domain but are infeasible in practice as text editing operations constantly involve lines being reindexed. The pantheon of native text editors require a combination of complex data structures (VSCode, whle running in Electron, still reached for a Piecetree: https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation). The piecetree is implementation alone is 10x buffee's entire footprint. Buffee owes this to V8 arrays not being real arrays and hyperoptimized by V8 magic. We can program against an intuitive model and remain compact, while getting O(1) cursor/line-wise editor operations 
+</p>
+
+  <h3>VSCode's Buffer Management</h3>
+
+  <p>
+In 2022, VSCode would choke on 10^7 LoC (50MB) files, becoming unresponsive for up to a minute while loading them into memory.
+
+VSCode had already adopted a Piece Table combined with a balanced tree (see: https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation).
+
+By September 2025, VSCode appears to have fixed this bottleneck by detecting large files, short-circuiting preprocessing, and defaulting to plaintext editing. The issue may have been in syntax highlighting rather than buffer management—`vim` proves it's feasible to syntax highlight much larger files.
+  </p>
+
+ <h2>Rendering strategy </h2>
+
+ <p>
+  Beyond V8 arrays, buffee's performance is achieved by "culling" techniques borrowed from game programming.
+  That is, we only render the viewport. 
+ </p>
+
+  <p>
+    The rendering logic is low-level and surgical on the small DOM footprint which we do maintain. 
+    This is opposed to the zeitgeist of webdev which involves maintaining a VDOM, diffing it, then patching it to the real DOM. 
+    The smallest yet still trustworthy DOM diffing libraries are larger than buffee in its entirety.
+  </p>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Matrix Digital Rain</title>
+  <script src="../vbuf.js"></script>
+  <link rel="stylesheet" href="../reset.css">
+  <style>
+    .wb { background-color: #000000; color: #00ff41; }
+    .wb .wb-selection { background-color: #003300; }
+  </style>
+</head>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Matrix Digital Rain</p>
+
+  <h1>Matrix Digital Rain</h1>
+  <p>Classic "falling code" effect demonstrating continuous buffer updates and character randomization.</p>
+
+  <blockquote class="wb no-select" tabindex="0" id="editor" style="border: 1px solid #00ff41; width: 100%;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    </div>
+    <div class="wb-status" style="display: flex; justify-content: space-between; background: #001100;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
+        <span class="wb-coordinate"></span>
+        <span>|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </blockquote>
+
+  <script>
+    const editorEl = document.getElementById('editor');
+    const editor = new Buffee(editorEl, {
+      colorPrimary: "#00ff41",
+      colorSecondary: "#001100",
+      initialViewportSize: 20,
+      showStatusLine: false,
+      showGutter: false
+    });
+
+    const MATRIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
+    const MATRIX_COLS = 80;
+    const MATRIX_ROWS = 20;
+    let matrixColumns = [];
+
+    // Initialize columns with random starting positions
+    for (let i = 0; i < MATRIX_COLS; i++) {
+      matrixColumns.push({
+        y: Math.floor(Math.random() * MATRIX_ROWS),
+        speed: Math.random() * 0.5 + 0.3,
+        chars: Array(MATRIX_ROWS).fill(' ')
+      });
+    }
+
+    function updateMatrix() {
+      const lines = [];
+
+      matrixColumns.forEach((col, colIndex) => {
+        col.y += col.speed;
+
+        if (col.y > MATRIX_ROWS + 10) {
+          col.y = -Math.random() * 10;
+          col.speed = Math.random() * 0.5 + 0.3;
+        }
+
+        const headRow = Math.floor(col.y);
+        if (headRow >= 0 && headRow < MATRIX_ROWS) {
+          col.chars[headRow] = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+        }
+
+        for (let row = 0; row < MATRIX_ROWS; row++) {
+          if (row < headRow - 15) {
+            col.chars[row] = ' ';
+          } else if (Math.random() < 0.05) {
+            col.chars[row] = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+          }
+        }
+      });
+
+      for (let row = 0; row < MATRIX_ROWS; row++) {
+        let line = '';
+        for (let col = 0; col < MATRIX_COLS; col++) {
+          line += matrixColumns[col].chars[row];
+        }
+        lines.push(line);
+      }
+
+      editor.Model.text = lines.join('\n');
+    }
+
+    // Start Matrix animation
+    setInterval(updateMatrix, 50);
+  </script>
+</body>
+</html>

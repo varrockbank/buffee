@@ -1,5 +1,5 @@
 /**
- * @fileoverview VbufTUI - Terminal User Interface extension for Vbuf.
+ * @fileoverview BuffeeTUI - Terminal User Interface extension for Buffee.
  * Provides interactive UI elements like buttons, prompts, and scrollboxes.
  * @version 1.0.0
  */
@@ -21,18 +21,18 @@
  */
 
 /**
- * Initializes TUI (Terminal User Interface) mode for a Vbuf instance.
+ * Initializes TUI (Terminal User Interface) mode for a Buffee instance.
  * When enabled, editing is disabled and navigation between elements is active.
  *
- * @param {Vbuf} vbuf - The Vbuf instance to extend with TUI functionality
+ * @param {Buffee} vbuf - The Buffee instance to extend with TUI functionality
  * @returns {Object} The TUI API object
  * @example
- * const editor = new Vbuf(document.getElementById('editor'));
- * const TUI = VbufTUI(editor);
+ * const editor = new Buffee(document.getElementById('editor'));
+ * const TUI = BuffeeTUI(editor);
  * TUI.addButton({ row: 0, col: 0, label: 'Click me', onActivate: () => alert('clicked') });
  * TUI.enabled = true;
  */
-function VbufTUI(vbuf) {
+function BuffeeTUI(vbuf) {
   const { head, $e, render, renderHooks } = vbuf._internals;
   const { Viewport, Selection, Model, lineHeight } = vbuf;
 

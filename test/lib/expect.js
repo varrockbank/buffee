@@ -1,4 +1,4 @@
-// Assertion library for Vbuf tests
+// Assertion library for Buffee tests
 
 function expect(actual) {
   // Check if actual is an EditorTestHarness instance

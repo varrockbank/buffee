@@ -2,49 +2,32 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>vbuf - Basic Editor</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>buffee - Basic Editor</title>
   <script src="../vbuf.js"></script>
-  <style>
-    .wb {
-      background-color: #282C34;
-      color: #B2B2B2;
-      position: relative;
-      outline: none;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-    }
-    .no-select { user-select: none; }
-    .wb-clipboard-bridge {
-      position: fixed; left: 0; top: 1px;
-      width: 0; height: 1px; opacity: 0; pointer-events: none;
-    }
-    .wb .wb-lines > pre::before { content: "\200B"; }
-    .wb .wb-lines pre { margin: 0; overflow: hidden; }
-    .wb .wb-selection {
-      background-color: #EDAD10;
-      position: absolute;
-      mix-blend-mode: difference;
-    }
-    .wb .wb-status span { padding-right: 4px; }
-  </style>
+  <link rel="stylesheet" href="../reset.css">
 </head>
-<body class="bg-neutral-900 p-5 font-sans">
-  <h1 class="text-white text-lg mb-2">Basic Editor</h1>
-  <p class="text-neutral-400 text-sm mb-2">A simple editable text editor with default settings.</p>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs mb-4"><code class="text-green-400">new Vbuf(el, { initialViewportSize: 15 })</code></p>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Basic Editor</p>
 
-  <blockquote class="wb no-select border border-neutral-700 w-[600px]" tabindex="0" id="editor">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h1>Basic Editor</h1>
+  <p>A simple editable text editor with default settings.</p>
+  <p><code>new Buffee(el, { initialViewportSize: 15 })</code></p>
+
+  <blockquote class="wb no-select" tabindex="0" id="editor" style="border: 1px solid #444; width: 600px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left flex">
-        <span class="wb-linecount"></span>
-      </div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -54,13 +37,13 @@
 
   <script>
     const el = document.getElementById('editor');
-    const editor = new Vbuf(el, {
+    const editor = new Buffee(el, {
       initialViewportSize: 15,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
 
-    editor.Model.text = `// Welcome to vbuf
+    editor.Model.text = `// Welcome to buffee
 // Start typing...
 
 function hello() {

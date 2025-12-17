@@ -1,8 +1,8 @@
-# vbuf API Reference
+# buffee API Reference
 
 ## Installation
 
-Include the JavaScript function `Vbuf`
+Include the JavaScript function `Buffee`
 
 ```html
 <script src="vbuf.js"></script>
@@ -88,7 +88,7 @@ Add extra width to compensate for gutter and padding:
 **Option 2: Hide gutter and minimize padding**
 
 ```javascript
-new Vbuf(el, { showGutter: false, editorPaddingPX: 0 });
+new Buffee(el, { showGutter: false, editorPaddingPX: 0 });
 ```
 
 **Option 3: Use 100% width**
@@ -123,7 +123,7 @@ For `ch` units to work correctly, the container's `font-size` must match `lineHe
 ## Initialize
 
 ```javascript
-const editor = new Vbuf(document.getElementById('editor'), {
+const editor = new Buffee(document.getElementById('editor'), {
   colorPrimary: "#B2B2B2",
   colorSecondary: "#212026",
   initialViewportSize: 20,
@@ -250,8 +250,8 @@ TUI is an optional extension for interactive terminal-style UI elements. Include
 ```
 
 ```javascript
-const editor = new Vbuf(document.getElementById('editor'), options);
-VbufTUI(editor);  // Initialize TUI extension
+const editor = new Buffee(document.getElementById('editor'), options);
+BuffeeTUI(editor);  // Initialize TUI extension
 
 // Now use editor.TUI
 editor.TUI.enabled = true;
@@ -394,7 +394,7 @@ editor.TUI.enabled = true;  // Sets editMode to 'read' automatically
 
 **ChunkLoader** (for very large files):
 ```javascript
-VbufChunkLoader(editor);
+BuffeeChunkLoader(editor);
 editor.ChunkLoader.activate();  // Sets editMode to 'navigate' automatically
 await editor.ChunkLoader.appendLines(["Line 1", "Line 2", ...]);
 ```
@@ -420,8 +420,8 @@ Tree-sitter is an optional extension for syntax highlighting. Include the separa
 ```
 
 ```javascript
-const editor = new Vbuf(document.getElementById('editor'), options);
-VbufTreeSitter(editor, { parser: jsParser, query: jsQuery });
+const editor = new Buffee(document.getElementById('editor'), options);
+BuffeeTreeSitter(editor, { parser: jsParser, query: jsQuery });
 
 // Enable syntax highlighting
 editor.TreeSitter.enabled = true;
@@ -464,8 +464,8 @@ ChunkLoader is an optional extension for loading and viewing very large files. I
 ```
 
 ```javascript
-const editor = new Vbuf(document.getElementById('editor'), options);
-VbufChunkLoader(editor);
+const editor = new Buffee(document.getElementById('editor'), options);
+BuffeeChunkLoader(editor);
 
 // Activate chunked mode (disables editing)
 editor.ChunkLoader.activate(50000);  // 50k lines per chunk
@@ -496,7 +496,7 @@ editor.ChunkLoader.deactivate();
 
 ## Extension API (`editor._internals`)
 
-The `_internals` object exposes internal state for building extensions. Extensions can hook into the render cycle without vbuf needing to know about them.
+The `_internals` object exposes internal state for building extensions. Extensions can hook into the render cycle without buffee needing to know about them.
 
 ```javascript
 const {
@@ -550,7 +550,7 @@ function MyExtension(vbuf) {
 }
 
 // Usage
-const editor = new Vbuf(el, options);
+const editor = new Buffee(el, options);
 MyExtension(editor);
 editor.MyExtension.enable();
 ```

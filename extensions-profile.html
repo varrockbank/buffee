@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>vbuf - Extensions Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="vbuf.js"></script>
+  <script src="extensions/syntax.js"></script>
+  <script src="extensions/elementals.js"></script>
+  <script src="extensions/tui-legacy.js"></script>
+  <script src="extensions/chunkloader.js"></script>
+  <style>
+    .wb {
+      background-color: #282C34;
+      color: #B2B2B2;
+      position: relative;
+      outline: none;
+      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    }
+    .no-select { user-select: none; }
+    .wb-clipboard-bridge {
+      position: fixed; left: 0; top: 1px;
+      width: 0; height: 1px; opacity: 0; pointer-events: none;
+    }
+    .wb .wb-lines pre::before { content: "\200B"; }
+    .wb .wb-lines pre { margin: 0; overflow: hidden; }
+    .wb .wb-selection {
+      background-color: #EDAD10;
+      position: absolute;
+      mix-blend-mode: difference;
+    }
+    .wb .wb-cursor { background-color: #FF6B6B; }
+    .wb .wb-status span { padding-right: 4px; }
+
+    .profile-card {
+      background: #1a1d23;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+    }
+    .metric:last-child { border-bottom: none; }
+    .metric-label { color: #888; }
+    .metric-value { font-family: monospace; color: #4ade80; }
+    .metric-value.slow { color: #f87171; }
+    .metric-value.medium { color: #fbbf24; }
+  </style>
+</head>
+<body class="bg-neutral-900 p-8 font-sans">
+  <div class="max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-2">
+      <h1 class="text-white text-2xl">Extensions Profile</h1>
+      <a href="index.html" class="text-purple-400 hover:underline text-sm">Back to main</a>
+    </div>
+    <p class="text-neutral-400 mb-6">
+      Performance benchmarks for vbuf extensions. Click "Run Profile" to measure each extension.
+    </p>
+
+    <div class="flex gap-4 mb-8">
+      <button id="run-all-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded font-medium">
+        Run All Profiles
+      </button>
+      <label class="flex items-center gap-2 text-neutral-400">
+        <span>Iterations:</span>
+        <input type="number" id="iterations" value="100" min="10" max="10000"
+               class="bg-neutral-800 border border-neutral-600 text-white px-2 py-1 w-24 rounded">
+      </label>
+    </div>
+
+    <!-- Syntax Extension Profile -->
+    <div class="profile-card">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-white text-lg">Syntax Highlighting</h2>
+        <button class="profile-btn bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded text-sm" data-ext="syntax">
+          Run Profile
+        </button>
+      </div>
+      <p class="text-neutral-500 text-sm mb-4">Regex-based tokenization with state caching</p>
+      <div id="syntax-results">
+        <div class="metric">
+          <span class="metric-label">tokenizeLine (single line)</span>
+          <span class="metric-value" id="syntax-tokenize">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">ensureStateCache (1000 lines)</span>
+          <span class="metric-value" id="syntax-cache">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">highlightViewport (20 lines)</span>
+          <span class="metric-value" id="syntax-viewport">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Cache invalidation + revalidate</span>
+          <span class="metric-value" id="syntax-invalidate">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Elementals Extension Profile -->
+    <div class="profile-card">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-white text-lg">Elementals</h2>
+        <button class="profile-btn bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded text-sm" data-ext="elementals">
+          Run Profile
+        </button>
+      </div>
+      <p class="text-neutral-500 text-sm mb-4">DOM-based UI elements in overlay layer</p>
+      <div id="elementals-results">
+        <div class="metric">
+          <span class="metric-label">addButton (single)</span>
+          <span class="metric-value" id="elementals-add-button">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">addInput (single)</span>
+          <span class="metric-value" id="elementals-add-input">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Add 100 elements</span>
+          <span class="metric-value" id="elementals-bulk">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">nextElement navigation</span>
+          <span class="metric-value" id="elementals-nav">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">clear() all elements</span>
+          <span class="metric-value" id="elementals-clear">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TUI Legacy Extension Profile -->
+    <div class="profile-card">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-white text-lg">TUI Legacy</h2>
+        <button class="profile-btn bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded text-sm" data-ext="tui">
+          Run Profile
+        </button>
+      </div>
+      <p class="text-neutral-500 text-sm mb-4">Text-based UI via content manipulation</p>
+      <div id="tui-results">
+        <div class="metric">
+          <span class="metric-label">addButton (single)</span>
+          <span class="metric-value" id="tui-add-button">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">addButton with border</span>
+          <span class="metric-value" id="tui-add-border">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Add 50 elements</span>
+          <span class="metric-value" id="tui-bulk">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Render with 50 elements</span>
+          <span class="metric-value" id="tui-render">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">clear() all elements</span>
+          <span class="metric-value" id="tui-clear">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ChunkLoader Extension Profile -->
+    <div class="profile-card">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-white text-lg">ChunkLoader</h2>
+        <button class="profile-btn bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded text-sm" data-ext="chunkloader">
+          Run Profile
+        </button>
+      </div>
+      <p class="text-neutral-500 text-sm mb-4">Compressed chunked storage for large files</p>
+      <div id="chunkloader-results">
+        <div class="metric">
+          <span class="metric-label">activate()</span>
+          <span class="metric-value" id="chunk-activate">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">appendLines (1000 lines)</span>
+          <span class="metric-value" id="chunk-append-1k">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">appendLines (10000 lines)</span>
+          <span class="metric-value" id="chunk-append-10k">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Compression ratio</span>
+          <span class="metric-value" id="chunk-ratio">--</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">clear()</span>
+          <span class="metric-value" id="chunk-clear">--</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden test editor -->
+    <div id="test-container" style="position: absolute; left: -9999px; visibility: hidden;">
+      <blockquote class="wb no-select" tabindex="0" id="test-editor">
+        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+        <div style="display: flex">
+          <div class="wb-gutter"></div>
+          <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+        </div>
+        <div class="wb-status" style="display: flex; justify-content: space-between;">
+          <div class="wb-status-left"><span class="wb-linecount"></span></div>
+          <div class="wb-status-right">
+            <span class="wb-coordinate"></span>
+            <span>|</span>
+            <span class="wb-indentation"></span>
+          </div>
+        </div>
+      </blockquote>
+    </div>
+  </div>
+
+  <script>
+    // Utility functions
+    function formatTime(ms) {
+      if (ms < 0.01) return `${(ms * 1000).toFixed(2)} µs`;
+      if (ms < 1) return `${ms.toFixed(3)} ms`;
+      return `${ms.toFixed(2)} ms`;
+    }
+
+    function getSpeedClass(ms, thresholds = { fast: 1, medium: 10 }) {
+      if (ms < thresholds.fast) return '';
+      if (ms < thresholds.medium) return 'medium';
+      return 'slow';
+    }
+
+    function setMetric(id, value, thresholds) {
+      const el = document.getElementById(id);
+      el.textContent = formatTime(value);
+      el.className = 'metric-value ' + getSpeedClass(value, thresholds);
+    }
+
+    function generateCode(lines) {
+      const code = [];
+      for (let i = 0; i < lines; i++) {
+        code.push(`const variable${i} = "string value ${i}"; // comment ${i}`);
+      }
+      return code.join('\n');
+    }
+
+    function createFreshEditor() {
+      const container = document.getElementById('test-container');
+      container.innerHTML = `
+        <blockquote class="wb no-select" tabindex="0" id="test-editor">
+          <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+          <div style="display: flex">
+            <div class="wb-gutter"></div>
+            <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+          </div>
+          <div class="wb-status" style="display: flex; justify-content: space-between;">
+            <div class="wb-status-left"><span class="wb-linecount"></span></div>
+            <div class="wb-status-right">
+              <span class="wb-coordinate"></span>
+              <span>|</span>
+              <span class="wb-indentation"></span>
+            </div>
+          </div>
+        </blockquote>
+      `;
+      const el = container.querySelector('#test-editor');
+      return new Buffee(el, { initialViewportSize: 20 });
+    }
+
+    function getIterations() {
+      return parseInt(document.getElementById('iterations').value) || 100;
+    }
+
+    // Profile functions
+    async function profileSyntax() {
+      const iterations = getIterations();
+      const editor = createFreshEditor();
+      BuffeeSyntax(editor);
+      editor.Syntax.setLanguage('javascript');
+      editor.Syntax.enabled = true;
+
+      // Generate test content
+      const testCode = generateCode(1000);
+      editor.Model.text = testCode;
+
+      const testLine = 'const greeting = "Hello, World!"; // This is a comment';
+
+      // Profile tokenizeLine
+      let start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.Syntax.tokenizeLine(testLine, 0);
+      }
+      setMetric('syntax-tokenize', (performance.now() - start) / iterations, { fast: 0.1, medium: 1 });
+
+      // Profile ensureStateCache
+      editor.Syntax.clearCache();
+      start = performance.now();
+      editor.Syntax.ensureStateCache(999);
+      setMetric('syntax-cache', performance.now() - start, { fast: 10, medium: 50 });
+
+      // Profile viewport highlight (simulated via getLineTokens)
+      start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        for (let line = 0; line < 20; line++) {
+          editor.Syntax.getLineTokens(line);
+        }
+      }
+      setMetric('syntax-viewport', (performance.now() - start) / iterations, { fast: 1, medium: 5 });
+
+      // Profile invalidation + revalidate
+      start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.Syntax.invalidateFrom(500);
+        editor.Syntax.ensureStateCache(520);
+      }
+      setMetric('syntax-invalidate', (performance.now() - start) / iterations, { fast: 1, medium: 10 });
+    }
+
+    async function profileElementals() {
+      const iterations = getIterations();
+      const editor = createFreshEditor();
+      BuffeeElementals(editor);
+      editor.Model.text = '\n'.repeat(100);
+
+      // Profile addButton
+      let start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.Elementals.addButton({ row: i % 50, col: (i * 10) % 60, label: 'Btn' });
+      }
+      setMetric('elementals-add-button', (performance.now() - start) / iterations, { fast: 0.1, medium: 1 });
+      editor.Elementals.clear();
+
+      // Profile addInput
+      start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.Elementals.addInput({ row: i % 50, col: (i * 30) % 60, width: 10, placeholder: 'test' });
+      }
+      setMetric('elementals-add-input', (performance.now() - start) / iterations, { fast: 0.1, medium: 1 });
+      editor.Elementals.clear();
+
+      // Profile bulk add
+      start = performance.now();
+      for (let i = 0; i < 100; i++) {
+        editor.Elementals.addButton({ row: i % 50, col: (i * 8) % 60, label: `B${i}` });
+      }
+      setMetric('elementals-bulk', performance.now() - start, { fast: 10, medium: 50 });
+
+      // Profile navigation
+      editor.Elementals.enabled = true;
+      start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.Elementals.nextElement();
+      }
+      setMetric('elementals-nav', (performance.now() - start) / iterations, { fast: 0.05, medium: 0.5 });
+
+      // Profile clear
+      start = performance.now();
+      editor.Elementals.clear();
+      setMetric('elementals-clear', performance.now() - start, { fast: 1, medium: 5 });
+    }
+
+    async function profileTUI() {
+      const iterations = getIterations();
+      const editor = createFreshEditor();
+      BuffeeTUI(editor);
+      editor.Model.text = '\n'.repeat(100);
+
+      // Profile addButton
+      let start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.TUI.addButton({ row: i % 50, col: (i * 10) % 60, label: ' Btn ' });
+      }
+      setMetric('tui-add-button', (performance.now() - start) / iterations, { fast: 0.5, medium: 2 });
+      editor.TUI.clear();
+
+      // Profile addButton with border
+      start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.TUI.addButton({ row: (i * 3) % 90, col: (i * 15) % 50, label: 'OK', border: true });
+      }
+      setMetric('tui-add-border', (performance.now() - start) / iterations, { fast: 0.5, medium: 2 });
+      editor.TUI.clear();
+
+      // Profile bulk add
+      start = performance.now();
+      for (let i = 0; i < 50; i++) {
+        editor.TUI.addButton({ row: i, col: 5, label: ` Button ${i} ` });
+      }
+      setMetric('tui-bulk', performance.now() - start, { fast: 20, medium: 100 });
+
+      // Profile render with elements
+      editor.TUI.enabled = true;
+      start = performance.now();
+      for (let i = 0; i < iterations; i++) {
+        editor.Viewport.scroll(0);
+      }
+      setMetric('tui-render', (performance.now() - start) / iterations, { fast: 1, medium: 5 });
+
+      // Profile clear
+      start = performance.now();
+      editor.TUI.clear();
+      setMetric('tui-clear', performance.now() - start, { fast: 1, medium: 5 });
+    }
+
+    async function profileChunkLoader() {
+      const editor = createFreshEditor();
+      BuffeeChunkLoader(editor);
+
+      // Profile activate
+      let start = performance.now();
+      editor.ChunkLoader.activate(1000);
+      setMetric('chunk-activate', performance.now() - start, { fast: 1, medium: 5 });
+
+      // Generate test lines
+      const lines1k = [];
+      for (let i = 0; i < 1000; i++) {
+        lines1k.push(`Line ${i}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`);
+      }
+
+      const lines10k = [];
+      for (let i = 0; i < 10000; i++) {
+        lines10k.push(`Line ${i}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`);
+      }
+
+      // Profile appendLines 1k
+      start = performance.now();
+      await editor.ChunkLoader.appendLines(lines1k, true);
+      setMetric('chunk-append-1k', performance.now() - start, { fast: 50, medium: 200 });
+
+      // Profile appendLines 10k
+      editor.ChunkLoader.clear();
+      start = performance.now();
+      await editor.ChunkLoader.appendLines(lines10k, true);
+      const append10kTime = performance.now() - start;
+      setMetric('chunk-append-10k', append10kTime, { fast: 200, medium: 1000 });
+
+      // Calculate compression ratio
+      const uncompressedSize = lines10k.join('\n').length;
+      const compressedSize = editor.ChunkLoader.compressedSize;
+      const ratio = ((1 - compressedSize / uncompressedSize) * 100).toFixed(1);
+      document.getElementById('chunk-ratio').textContent = `${ratio}% smaller`;
+      document.getElementById('chunk-ratio').className = 'metric-value';
+
+      // Profile clear
+      start = performance.now();
+      editor.ChunkLoader.clear();
+      setMetric('chunk-clear', performance.now() - start, { fast: 0.1, medium: 1 });
+    }
+
+    // Event handlers
+    document.querySelectorAll('.profile-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const ext = btn.dataset.ext;
+        btn.textContent = 'Running...';
+        btn.disabled = true;
+
+        await new Promise(r => setTimeout(r, 10)); // Allow UI update
+
+        try {
+          if (ext === 'syntax') await profileSyntax();
+          else if (ext === 'elementals') await profileElementals();
+          else if (ext === 'tui') await profileTUI();
+          else if (ext === 'chunkloader') await profileChunkLoader();
+        } catch (e) {
+          console.error(e);
+        }
+
+        btn.textContent = 'Run Profile';
+        btn.disabled = false;
+      });
+    });
+
+    document.getElementById('run-all-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('run-all-btn');
+      btn.textContent = 'Running...';
+      btn.disabled = true;
+
+      await new Promise(r => setTimeout(r, 10));
+
+      try {
+        await profileSyntax();
+        await profileElementals();
+        await profileTUI();
+        await profileChunkLoader();
+      } catch (e) {
+        console.error(e);
+      }
+
+      btn.textContent = 'Run All Profiles';
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

@@ -2,35 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>vbuf - Elementals (Layer-based UI)</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>buffee - Elementals</title>
   <script src="../vbuf.js"></script>
   <script src="../extensions/elementals.js"></script>
+  <link rel="stylesheet" href="../reset.css">
   <style>
-    .wb {
-      background-color: #282C34;
-      color: #B2B2B2;
-      position: relative;
-      outline: none;
-      font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
-    }
-    .no-select { user-select: none; }
-    .wb-clipboard-bridge {
-      position: fixed; left: 0; top: 1px;
-      width: 0; height: 1px; opacity: 0; pointer-events: none;
-    }
-    .wb .wb-lines pre::before { content: "\200B"; }
-    .wb .wb-lines pre { margin: 0; overflow: hidden; }
-    .wb .wb-selection {
-      background-color: #EDAD10;
-      position: absolute;
-      mix-blend-mode: difference;
-    }
-    .wb .wb-cursor {
-      background-color: #FF6B6B;
-    }
-    .wb .wb-status span { padding-right: 4px; }
-
     /* Elementals styling */
     .wb-elemental-button {
       background-color: #3a3f4b;
@@ -47,9 +23,7 @@
       outline: 2px solid #EDAD10;
       outline-offset: 1px;
     }
-    .wb-elemental-label {
-      color: #888;
-    }
+    .wb-elemental-label { color: #888; }
     .wb-elemental-input {
       background-color: #1a1d23 !important;
       border-color: #555 !important;
@@ -61,31 +35,43 @@
     .wb-elemental-focused .wb-elemental-input {
       border-color: #EDAD10 !important;
     }
+
+    #output {
+      font-family: monospace;
+      color: #4ade80;
+      margin-top: 12px;
+      padding: 12px;
+      background: #0a0a0a;
+      border: 1px solid #444;
+      min-height: 24px;
+    }
   </style>
 </head>
-<body class="bg-neutral-900 p-5 font-sans">
-  <h1 class="text-white text-lg mb-2">Elementals - Layer-based UI</h1>
-  <p class="text-neutral-400 text-sm mb-2">
-    Unlike tui-legacy which manipulates text content, Elementals creates actual DOM elements in a layer above the text.
-  </p>
-  <p class="text-neutral-400 text-sm mb-6">
-    Press <kbd class="bg-neutral-700 border border-neutral-500 rounded px-1.5 py-0.5 font-mono text-white text-xs">Tab</kbd> to navigate,
-    <kbd class="bg-neutral-700 border border-neutral-500 rounded px-1.5 py-0.5 font-mono text-white text-xs">Enter</kbd> to activate
-  </p>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Elementals</p>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Buttons</h2>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs"><code class="text-green-400">VbufElementals(editor)</code></p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[600px] mb-4" tabindex="0" id="buttons-demo">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h1>Elementals - Layer-based UI</h1>
+  <p>Unlike tui-legacy which manipulates text content, Elementals creates actual DOM elements in a layer above the text.</p>
+  <p>Press <kbd>Tab</kbd> to navigate, <kbd>Enter</kbd> to activate</p>
+
+  <h2>Buttons</h2>
+  <pre>BuffeeElementals(editor)
+Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
+  <blockquote class="wb no-select" tabindex="0" id="buttons-demo" style="border: 1px solid #444; width: 600px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -93,18 +79,17 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Input Fields</h2>
-  <p class="text-neutral-500 text-xs">JS:</p>
-  <p class="text-neutral-500 text-xs mb-2"><code class="text-green-400">Elementals.addInput({ row: 2, col: 10, width: 20, placeholder: 'Type here...' })</code></p>
-  <blockquote class="wb no-select border border-neutral-700 w-[600px] mb-4" tabindex="0" id="inputs-demo">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>Input Fields</h2>
+  <pre>Elementals.addInput({ row: 2, col: 10, width: 20, placeholder: 'Type here...' })</pre>
+  <blockquote class="wb no-select" tabindex="0" id="inputs-demo" style="border: 1px solid #444; width: 600px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -112,17 +97,17 @@
     </div>
   </blockquote>
 
-  <h2 class="text-neutral-300 text-sm mt-8 mb-2">Mixed Elements</h2>
-  <p class="text-neutral-500 text-xs mb-2">Combining labels, inputs, and buttons</p>
-  <blockquote class="wb no-select border border-neutral-700 w-[600px] mb-4" tabindex="0" id="mixed-demo">
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="flex">
+  <h2>Mixed Elements</h2>
+  <p>Combining labels, inputs, and buttons</p>
+  <blockquote class="wb no-select" tabindex="0" id="mixed-demo" style="border: 1px solid #444; width: 600px;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div style="display: flex;">
       <div class="wb-gutter"></div>
-      <div class="wb-lines flex-1 overflow-hidden"></div>
+      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
     </div>
-    <div class="wb-status flex justify-between p-1.5" style="background: #212026; color: #B2B2B2;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right flex">
+    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+      <div><span class="wb-linecount"></span></div>
+      <div style="display: flex;">
         <span class="wb-coordinate"></span>
         <span>|</span>
         <span class="wb-indentation"></span>
@@ -130,22 +115,20 @@
     </div>
   </blockquote>
 
-  <div id="output" class="font-mono text-green-400 mt-3 p-3 bg-neutral-950 border border-neutral-700 min-h-[24px] w-[600px]">
-    Interact with the elements above
-  </div>
+  <div id="output">Interact with the elements above</div>
 
   <script>
     const output = document.getElementById('output');
 
     // Buttons demo
     const buttonsEl = document.getElementById('buttons-demo');
-    const buttonsEditor = new Vbuf(buttonsEl, {
+    const buttonsEditor = new Buffee(buttonsEl, {
       initialViewportSize: 5,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
-    VbufElementals(buttonsEditor);
+    BuffeeElementals(buttonsEditor);
     buttonsEditor.Model.text = '\n\n\n\n';
     buttonsEditor.Elementals.addButton({
       row: 1, col: 2,
@@ -180,13 +163,13 @@
 
     // Inputs demo
     const inputsEl = document.getElementById('inputs-demo');
-    const inputsEditor = new Vbuf(inputsEl, {
+    const inputsEditor = new Buffee(inputsEl, {
       initialViewportSize: 5,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
-    VbufElementals(inputsEditor);
+    BuffeeElementals(inputsEditor);
     inputsEditor.Model.text = '\n\n\n\n';
     inputsEditor.Elementals.addLabel({ row: 1, col: 2, text: 'Name:' });
     inputsEditor.Elementals.addInput({
@@ -212,13 +195,13 @@
 
     // Mixed demo
     const mixedEl = document.getElementById('mixed-demo');
-    const mixedEditor = new Vbuf(mixedEl, {
+    const mixedEditor = new Buffee(mixedEl, {
       initialViewportSize: 8,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
-    VbufElementals(mixedEditor);
+    BuffeeElementals(mixedEditor);
     mixedEditor.Model.text = '\n\n\n\n\n\n\n';
 
     // Form layout

@@ -1,16 +1,16 @@
 /**
- * @fileoverview VbufSyntax - Regex-based syntax highlighting for Vbuf.
+ * @fileoverview BuffeeSyntax - Regex-based syntax highlighting for Buffee.
  * Uses incremental tokenization with state caching for efficient updates.
  * @version 1.0.0
  */
 
 /**
- * Initializes syntax highlighting extension for a Vbuf instance.
+ * Initializes syntax highlighting extension for a Buffee instance.
  *
- * @param {Vbuf} vbuf - The Vbuf instance to extend
+ * @param {Buffee} vbuf - The Buffee instance to extend
  * @returns {Object} The Syntax API object
  */
-function VbufSyntax(vbuf) {
+function BuffeeSyntax(vbuf) {
   const { $e, renderHooks } = vbuf._internals;
   const { Viewport, Model, History } = vbuf;
 

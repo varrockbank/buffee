@@ -1,23 +1,23 @@
 /**
- * @fileoverview VbufChunkLoader - Chunked file loading extension for Vbuf.
+ * @fileoverview BuffeeChunkLoader - Chunked file loading extension for Buffee.
  * Enables loading and viewing very large files using gzip compression and chunked storage.
  * @version 1.0.0
  */
 
 /**
- * Initializes chunked file loading for a Vbuf instance.
+ * Initializes chunked file loading for a Buffee instance.
  * When activated, the editor enters navigate mode (can scroll, no editing) and handles large files efficiently
  * by compressing lines into chunks and decompressing on-demand.
  *
- * @param {Vbuf} vbuf - The Vbuf instance to extend
+ * @param {Buffee} vbuf - The Buffee instance to extend
  * @returns {Object} The ChunkLoader API object
  * @example
- * const editor = new Vbuf(document.getElementById('editor'));
- * const ChunkLoader = VbufChunkLoader(editor);
+ * const editor = new Buffee(document.getElementById('editor'));
+ * const ChunkLoader = BuffeeChunkLoader(editor);
  * ChunkLoader.activate();
  * await ChunkLoader.appendLines(largeArrayOfLines);
  */
-function VbufChunkLoader(vbuf) {
+function BuffeeChunkLoader(vbuf) {
   const { $e, render, renderHooks } = vbuf._internals;
   const { Viewport, Model } = vbuf;
 

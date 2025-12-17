@@ -1,70 +1,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="reset.css">
 <script src="vbuf.js"></script>
 <script src="extensions/tui-legacy.js"></script>
-<script src="extensions/chunkloader.js"></script>
 <style>
-  /************* "Atomic CSS" classes for Boxes *************/
-  .💪 { display: flex }                                 /* Flex like muscles.   */
-  .🥷 { overflow: hidden }
-  .🪜 { flex-flow: column }
-  .🌳 { flex: 1 }                                       /* Grow like a tree.    */
-  .🦠 { justify-content: space-between }                /* Stay spread apart.   */
-
-  .hidden {
-    display: none;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-      background-color: #0a0a0f;
-      color: #c9d1d9;
-      margin: 0;
-      padding: 0;
-      font-size: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-  }
-
-  .container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 0px;
-  }
-
-  h1, h2, h3 {
-      font-weight: 600;
-      line-height: 1.25;
-      color: #ffffff;
-  }
-
-  h2 {
-      font-size: 24px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid #9d4edd;
-      margin-bottom: 16px;
-  }
-
-  p {
-      margin: 0 0 16px 0;
-      color: #8b949e;
-  }
-
-  code {
-      background-color: rgba(110,118,129,0.4);
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
-      font-size: 14px;
-  }
-  blockquote {
-      margin: 16px 0;
-  }
-  /*** Classes for Vbuf ***/
+  /*** Classes for Buffee ***/
   .wb {
       background-color: #282C34;
       color: #B2B2B2;
@@ -108,6 +49,9 @@
       background-color: #FF6B6B;
       mix-blend-mode: exclusion;
   }
+  .wb .wb-status {
+      padding: 6px;
+  }
   .wb .wb-status span {
       padding-right: 4px;
   }
@@ -137,241 +81,6 @@
     background-color: #F9AD40;
   }
 
-  #starwars.wb {
-    background-color: #000000;
-    color: #FFD700;
-  }
-  #starwars.wb .wb-selection {
-    background-color: #333333;
-  }
-
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  input[type="range"]::-webkit-slider-track {
-    background-color: #21262d;
-    border-radius: 3px;
-    height: 6px;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: #00ff41;
-    border-radius: 50%;
-    height: 16px;
-    width: 16px;
-    margin-top: -5px;
-  }
-
-  input[type="range"]::-moz-range-track {
-    background-color: #21262d;
-    border-radius: 3px;
-    height: 6px;
-  }
-
-  input[type="range"]::-moz-range-thumb {
-    background-color: #00ff41;
-    border: none;
-    border-radius: 50%;
-    height: 16px;
-    width: 16px;
-  }
-
-  #matrix.wb {
-    background-color: #000000;
-    color: #00ff41;
-  }
-  #matrix.wb .wb-selection {
-    background-color: #003300;
-  }
-
-  #conway.wb {
-    background-color: white;
-    color: black;
-  }
-  #conway.wb .wb-selection {
-    background-color: #DCDCDA;
-  }
-
-  a {
-    color: #9d4edd;
-    text-decoration: none;
-    transition: color 0.15s ease;
-  }
-  a:visited {
-    color: #9d4edd;
-  }
-  a:hover {
-    color: #c77dff;
-    text-decoration: underline;
-  }
-
-  details {
-    background-color: #161b22;
-    border-radius: 6px;
-    padding: 16px;
-    margin: 16px 0;
-    border: 1px solid #30363d;
-  }
-
-  summary {
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 0;
-    list-style: none;
-    color: #c9d1d9;
-    user-select: none;
-  }
-
-  summary:hover {
-    color: #9d4edd;
-  }
-
-  summary::marker {
-    display: none;
-  }
-
-  summary::before {
-    content: "▶";
-    display: inline-block;
-    margin-right: 8px;
-    transition: transform 0.2s;
-    font-size: 10px;
-  }
-
-  details[open] > summary::before {
-    transform: rotate(90deg);
-  }
-
-  details > div {
-    margin-top: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
-
-  details button, button {
-    background-color: #21262d;
-    color: #c9d1d9;
-    border: 1px solid #30363d;
-    padding: 5px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.15s ease;
-  }
-
-  details button:hover, button:hover {
-    background-color: #30363d;
-    border-color: #ff6b35;
-  }
-
-  details input, input[type="text"], input[type="number"] {
-    background-color: #0d1117;
-    color: #c9d1d9;
-    border: 1px solid #30363d;
-    padding: 5px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    width: 80px;
-  }
-
-  details input:focus, input:focus {
-    outline: 2px solid #9d4edd;
-    outline-offset: -1px;
-  }
-
-  details label, label {
-    font-size: 14px;
-    color: #8b949e;
-  }
-
-  fieldset {
-    margin: 16px 0;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    padding: 16px;
-    overflow: visible;
-  }
-
-  legend {
-    color: #c9d1d9;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 0 8px;
-  }
-
-  input[type="file"]::file-selector-button {
-    background-color: #21262d;
-    color: #c9d1d9;
-    border: 1px solid #30363d;
-    padding: 5px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    margin-right: 12px;
-  }
-
-  input[type="file"]::file-selector-button:hover {
-    background-color: #30363d;
-    border-color: #ff6b35;
-  }
-
-  input[type="file"] {
-    color: #c9d1d9;
-    font-size: 14px;
-    border: none;
-    background: none;
-    max-width: 100%;
-  }
-  
-  #file-loader-options {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  #file-loader-options button {
-    margin: 0;
-    text-align: left;
-  }
-
-  .read-only-indicator {
-    background-color: #ff6b35;
-    color: white;
-    padding: 8px 16px;
-    text-align: center;
-    font-weight: 500;
-    font-size: 14px;
-    border-radius: 6px 6px 0 0;
-    margin: 0 0 -1px 0;
-    border: 1px solid #ff6b35;
-  }
-
-  @keyframes blink {
-    0%, 50% {
-      opacity: 1;
-      color: #00ff41;
-      text-shadow: 0 0 10px #00ff41;
-    }
-    51%, 100% {
-      opacity: 0;
-    }
-  }
-
-  .blink {
-    animation: blink 1s infinite;
-  }
-
   /* TUI Mode demo styling */
   #tui-demo.wb {
     background-color: #1a1a2e;
@@ -380,187 +89,165 @@
   #tui-demo.wb .wb-selection {
     background-color: #9d4edd;
   }
-
-  kbd {
-    background-color: #21262d;
-    border: 1px solid #3d444d;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-family: monospace;
-    font-size: 0.9em;
-  }
 </style>
 </head>
 
 <body>
-  <!-- Header -->
-  <header style="border-bottom: 2px solid #9d4edd; background-color: #010409;">
-    <div class="container" style="display: flex; align-items: center; justify-content: space-between; padding-top: 16px; padding-bottom: 16px;">
-      <div style="display: flex; align-items: center; gap: 16px;">
-        <h1 style="font-size: 20px; margin: 0; font-weight: 600;">[ vbuf <span class="blink">_</span> ]</h1>
-        <span id="vbuf-version" style="color: #8b949e; font-size: 14px;"></span>
-      </div>
-      <nav style="display: flex; gap: 24px; align-items: center;">
-        <a href="getting-started.html" style="font-size: 14px; font-weight: 500;">Getting Started</a>
-        <a href="samples" style="font-size: 14px; font-weight: 500;">Kitchen Sink</a>
-        <a href="test" style="font-size: 14px; font-weight: 500;">Tests</a>
-        <a href="perf" style="font-size: 14px; font-weight: 500;">Research</a>
-        <a href="docs/devlog.txt" style="font-size: 14px; font-weight: 500;">Release Notes</a>
-        <a href="https://github.com/varrockbank/vbuf" style="font-size: 14px; font-weight: 500;">GitHub →</a>
-      </nav>
-    </div>
-  </header>
+  <nav id="nav"></nav>
+  <script>
+    fetch('navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><strong>buffee, the text slayer</strong> (<span id="vbuf-version"></span>) — the anti-hero text editor for the web — compact, fast, unleashed</p>
 
   <!-- Features Section -->
   <div style="padding: 12px 0;">
-    <div class="container">
-      <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px;">
-        <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">~4KB</h3>
-          <p style="margin: 0; font-size: 14px; color: #8b949e;">(gzip+min) distributable</p>
-        </div>
-        <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">0</h3>
-          <p style="margin: 0; font-size: 14px; color: #8b949e;">Dependencies</p>
-        </div>
-        <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">0ms</h3>
-          <p style="margin: 0; font-size: 14px; color: #8b949e;">Build time</p>
-        </div>
-        <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">0ms</h3>
-          <p style="margin: 0; font-size: 14px; color: #8b949e;">VDOM overhead</p>
-        </div>
-        <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">~70m</h3>
-          <p style="margin: 0; font-size: 14px; color: #8b949e;">LOC capacity</p>
-        </div>
-        <div style="text-align: left;">
-          <h3 style="font-size: 32px; margin: 0 0 8px 0; color: #00ff41; font-weight: 700;">1B+</h3>
-          <p style="margin: 0; font-size: 14px; color: #8b949e;">in ultra-high-capacity mode</p>
-        </div>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px;">
+      <div style="text-align: left;">
+        <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">0.01MB</h3>
+        <p style="margin: 0; font-size: 14px;">(gzip+min) distributable</p>
+      </div>
+      <div style="text-align: left;">
+        <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">0</h3>
+        <p style="margin: 0; font-size: 14px;">Dependencies</p>
+      </div>
+      <div style="text-align: left;">
+        <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">0ms</h3>
+        <p style="margin: 0; font-size: 14px;">Build time</p>
+      </div>
+      <div style="text-align: left;">
+        <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">0ms</h3>
+        <p style="margin: 0; font-size: 14px;">VDOM overhead</p>
+      </div>
+      <div style="text-align: left;">
+        <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">~70m</h3>
+        <p style="margin: 0; font-size: 14px;">LOC capacity</p>
+      </div>
+      <div style="text-align: left;">
+        <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">1B+</h3>
+        <p style="margin: 0; font-size: 14px;">in <a href="samples/ultra-high-capacity.html">pro max mode</a></p>
       </div>
     </div>
   </div>
-  
-  <div class="container">
-  <!-- Main Playground -->
-  <section style="margin-bottom: 48px;">
-    <h2 style="padding-top: 0; margin-top: 0">Overpowered text buffer for the web — light, fast, unburdened</h2>
-    <!-- <h2>An overpowered text editor for the web — light, fast, capa</h2> -->
-    <div id="read-only-indicator" class="read-only-indicator hidden">
-      Read-Only Mode (Chunked+Compressed) - Navigation only, editing disabled
-    </div>
-    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="playground" style="margin-top: 0;">
-    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="💪">
+
+    <!-- Main Playground -->
+    <section>
+      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="playground">
+        <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
+        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+          <div class="💪">
+              <div class="wb-gutter"></div>
+              <div class="wb-lines 🌳 🥷"></div>
+          </div>
+          <div class="💪 wb-status 🦠">
+              <div class="wb-status-left 💪">
+                  <span class="wb-linecount"></span>
+              </div>
+              <div class="wb-status-right 💪">
+                  <span class="wb-coordinate"></span>
+                  <span>|</span>
+                  <span class="wb-indentation"></span>
+              </div>
+          </div>
+      </blockquote>
+    </section>
+
+    <!-- About -->
+    <section>
+      <h3>Buffer, Editor, TUI</h3>
+      <p>Essentially this a rendering engine for fixed-width cells in grid-layout.
+        The grid being viewport into an arbitrarily large buffer of text lines.
+      </p>
+      <p>The core implementation tightly couples rendering and text editor capabilities.
+        The original prototype served to view large distributed server logs. 
+        It turns out that making performance headway in this area translates to being a performant text editor.
+        The key optimization is sidestepping DOM bottlenecks and avoiding JavaScript fatigue. 
+      </p>
+      <p>
+        TUI capabilities ship as extension.
+        A separate dream of the author is to liberate OrgMode from the confines of Emacs.
+        This is the realm of text-based interfaces, err... operating systems.
+        The advent of AI coding has also resurged interest in TUIs, namely 
+        terminal-based agentic prompts. Buffee completes the circle:
+        as <a href="https://github.com/dankamongmen/notcurses">notcurses</a> brings browser bling to the terminal, buffee brings 20th century drab 
+        to the modern web.  
+      </p>
+      </p>
+      <p>
+        We'd like to thank the wizards of V8. Compactness is possible because V8 arrays proved instaneously fast. Compare with complex 
+        structures, plural, needed by native editors, e.g. <a href="https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation">piecetable</a>. 
+        Content/syntax-aware considerations aside, buffee rivals or outperforms titans of the text editor industry. 
+      </p>
+    </section>
+
+    <!-- TUI Mode Demo -->
+    <section>
+      <h3>TUI Mode</h3>
+      <p>Terminal UI mode placing interactive elements in the buffer. <kbd>Tab</kbd> to next element. <kbd>Enter</kbd> to activate.</p>
+
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+        <button id="tui-toggle-btn">Enable TUI Mode</button>
+        <button id="tui-highlight-toggle-btn" class="hidden">Highlight All</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
+        <label>Row:</label>
+        <input type="number" id="tui-row" value="0" style="width: 60px;">
+        <label>Col:</label>
+        <input type="number" id="tui-col" value="0" style="width: 60px;">
+        <label>Content:</label>
+        <input type="text" id="tui-content" value="Foobar" style="width: 120px;">
+        <button id="tui-add-btn">Add Element</button>
+      </div>
+      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="tui-demo">
+        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+        <div class="💪">
           <div class="wb-gutter"></div>
           <div class="wb-lines 🌳 🥷"></div>
-      </div>
-      <div class="💪 wb-status 🦠">
+        </div>
+        <div class="💪 wb-status 🦠">
           <div class="wb-status-left 💪">
-              <span class="wb-linecount"></span>
+            <span class="wb-linecount"></span>
           </div>
           <div class="wb-status-right 💪">
-              <span class="wb-coordinate"></span>
-              <span>|</span>
-              <span class="wb-indentation"></span>
+            <span class="wb-coordinate"></span>
+            <span>|</span>
+            <span class="wb-indentation"></span>
           </div>
-      </div>
-  </blockquote>
-
-  <details>
-    <summary>Large File Loader</summary>
-    <fieldset>
-      <legend>Viewport:</legend>
-      <label for="viewport-start">Start:</label>
-      <input id="viewport-start" value="1"></input>
-      <label for="viewport-size">Window size:</label>
-      <input id="viewport-size" value="10"></input>
-      <button id="viewport-update">Set</button>
-    </fieldset>
-    <fieldset>
-      <legend>File Loader:</legend>
-      <div>
-        <label for="file-input"><span id="fileSize"></span></label>
-        <input id="file-input" type="file" name="myFiles" style="width: 100%; box-sizing: border-box;">
-        
-        <div id="file-loader-buttons" class="hidden" style="margin-top: 16px;">
-          <div style="margin-bottom: 12px;">
-            <label for="append-at-line">Insert at line: </label><input id="append-at-line" value="1" ></input>
-          </div>
-          <div style="margin-bottom: 12px;">
-            <strong style="color: #c9d1d9; font-size: 14px;">Choose loading strategy:</strong>
-          </div>
-          <div id="file-loader-options">
-            <button id="load-file-naive">Standard Loader <code style="margin-left: 8px;">&lt;10M lines</code></button>
-            <button id="load-file-chunked">Chunked (File.slice) <code style="margin-left: 8px;">&lt;70M lines</code></button>
-            <button id="load-file-filereader">Chunked (FileReader) <code style="margin-left: 8px;">&lt;70M lines</code></button>
-            <button id="load-file-stream">Streaming (ReadableStream) <code style="margin-left: 8px;">&lt;70M lines</code></button>
-            <button id="load-file-stream-materialized">Streaming + Materialization <code style="margin-left: 8px;">&lt;75M lines</code></button>
-            <button id="load-file-stream-materialized-gc">Streaming + GC Hints <code style="margin-left: 8px;">&lt;90M lines</code></button>
-            <button id="load-file-chunked-compressed">Ultra-High-Capacity Mode <code style="margin-left: 8px;">1B+ lines (read-only)</code></button>
-          </div>
-          <h3 style="font-size: 16px; margin: 24px 0 12px 0;">Ultra-High-Capacity Mode Logs:</h3>
-          <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="file-loader-logs" style="margin-top: 0;">
-          <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-          <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-            <div class="💪">
-                <div class="wb-gutter"></div>
-                <div class="wb-lines 🌳 🥷"></div>
-            </div>
-            <div class="💪 wb-status 🦠">
-                <div class="wb-status-left 💪">
-                    <span class="wb-linecount"></span>
-                </div>
-                <div class="wb-status-right 💪">
-                    <span class="wb-coordinate"></span>
-                    <span>|</span>
-                    <span class="wb-indentation"></span>
-                </div>
-            </div>
-          </blockquote>
         </div>
-      </div>
-    </fieldset>
-  </details>
-  </section>
+      </blockquote>
+    </section>
 
-  <!-- About -->
-  <section style="margin-bottom: 48px;">
-    <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">Buffer, Editor, Compositor, TUI</h3>
-    <p>At its core vbuf is, humbly speaking, a compositor. A compositor is nomenclature for rendering engine specifically in the context of rendering UIs. Terminal emulators are compositors. Unfortunately, we can't call a Vbuf a terminal emulator ... yet. That would be a massive undertaken
-      that is for all intensive purposes out of scope. 
-      However, I hope an enterprising individual might possibly repurpose vbuf as such.</p>
-    <p>Vbuf's is geared towards fixed-width UTF-8 character cells in a grid-layout. Rendering is line-wise, meaing multiple changes to a line would be most efficiently batched up (e.g. cells in a spreadsheet). Emojis and wide UTF-8 characters break the model, although no editor or font has 100% UTF-8 support either.</p>
-    <p>The original motivation was to read segments of streams of large distributed server log files in an SRE capacity.  More generally, viewing a subset of big buffers without incurring JavaScript fatigue and bloat.
-      Thanks to direct DOM incisions, "occlusion culling" tricks and V8 wizardry, vbuf sidesteps the DOM bottleneck and VDOM overhead, scaling only in RAM linearly to the buffer size. Absent content-aware and syntax highlighting considerations, Vbuf outperforms popular text editors in compactness, performance and capacity. 
-    </p>
-    <p>The next logical step was writing and editing to the buffer. i.e. a text editor capablities.</p>
-    <p> An orthogonal goal was liberating OrgMode from Emacs. Here we enter the realm of text-based user interfaces, err... operating systems.
-      The advent of AI coding tools has lead a resurgence in interest for TUIs, namely terminal-based agentic prompts. Vbuf would allow this to go full-circle by bring TUIs to the browsers.</p>
-  </section>
+    <!-- iOS Support Demo -->
+    <section>
+      <h3>iOS Support</h3>
+      <p>This editor demonstrates mobile support with the iOS plugin, enabling touch interactions and on-screen keyboard input.</p>
+      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="notes">
+        <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
+        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+        <div class="💪">
+          <div class="wb-gutter"></div>
+          <div class="wb-lines 🌳 🥷"></div>
+        </div>
+        <div class="💪 wb-status 🦠">
+          <div class="wb-status-left 💪">
+            <span class="wb-linecount"></span>
+          </div>
+          <div class="wb-status-right 💪">
+            <span class="wb-coordinate"></span>
+            <span>|</span>
+            <span class="wb-indentation"></span>
+          </div>
+        </div>
+      </blockquote>
+    </section>
 
-  <!-- TUI Mode Demo -->
-  <section style="margin-bottom: 48px;">
-    <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">TUI Mode</h3>
-    <p>Terminal UI mode placing interactive elements in the buffer. <kbd>Tab</kbd> to next element. <kbd>Enter</kbd> to activate.</p>
-
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
-      <button id="tui-toggle-btn">Enable TUI Mode</button>
-      <button id="tui-highlight-toggle-btn" class="hidden">Highlight All</button>
-    </div>
-    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap;">
-      <label>Row:</label>
-      <input type="number" id="tui-row" value="0" style="width: 60px;">
-      <label>Col:</label>
-      <input type="number" id="tui-col" value="0" style="width: 60px;">
-      <label>Content:</label>
-      <input type="text" id="tui-content" value="Foobar" style="width: 120px;">
-      <button id="tui-add-btn">Add Element</button>
-    </div>
-    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="tui-demo">
+    <!-- Dynamic Data Demo -->
+    <section>
+      <h3>HackerNews Front Page</h3>
+      <p>Example of loading data from APIs.</p>
+    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="hackernews">
+      <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="💪">
         <div class="wb-gutter"></div>
@@ -577,145 +264,7 @@
         </div>
       </div>
     </blockquote>
-  </section>
-
-  <!-- iOS Support Demo -->
-  <section style="margin-bottom: 48px;">
-    <h3>iOS Support</h3>
-    <p>This editor demonstrates mobile support with the iOS plugin, enabling touch interactions and on-screen keyboard input.</p>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="notes">
-    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="💪">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines 🌳 🥷"></div>
-    </div>
-    <div class="💪 wb-status 🦠">
-      <div class="wb-status-left 💪">
-        <span class="wb-linecount"></span>
-      </div>
-      <div class="wb-status-right 💪">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-  </section>
-
-  <!-- Dynamic Data Demo -->
-  <section style="margin-bottom: 48px;">
-    <h3>HackerNews</h3>
-    <p>Example of loading and displaying live data from external APIs. This demo fetches the current Hacker News front page.</p>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="hackernews">
-    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="💪">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines 🌳 🥷"></div>
-    </div>
-    <div class="💪 wb-status 🦠">
-      <div class="wb-status-left 💪">
-        <span class="wb-linecount"></span>
-      </div>
-      <div class="wb-status-right 💪">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-  </section>
-
-  <!-- Animation Demos -->
-  <section style="margin-bottom: 48px;">
-    <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">ASCII Movie</h3>
-    <p>Playback of the Star Wars ASCII animation. Original file from <a href="https://www.asciimation.co.nz/starwars" target="_blank">asciimation.co.nz</a> (2MB, 1000+ frames).</p>
-
-    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 10px; flex-wrap: wrap;">
-    <button id="play-pause-btn">Play</button>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <label for="speed-slider">Speed:</label>
-      <input type="range" id="speed-slider" min="1" max="300" value="120" style="width: 120px;" />
-      <span id="speed-value">120ms</span>
-    </div>
-  </div>
-  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-    Frame: <span id="frame-counter" style="min-width: 90px;">0 / 0</span>
-    <input type="range" id="frame-slider" min="0" max="0" value="0" style="flex: 1;" />
-  </div>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="starwars">
-    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="💪">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines 🌳 🥷"></div>
-    </div>
-    <div class="💪 wb-status 🦠">
-      <div class="wb-status-left 💪">
-        <span class="wb-linecount"></span>
-      </div>
-      <div class="wb-status-right 💪">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">Matrix Digital Rain</h3>
-  <p>Classic "falling code" effect demonstrating continuous buffer updates and character randomization.</p>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="matrix">
-    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="💪">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines 🌳 🥷"></div>
-    </div>
-    <div class="💪 wb-status 🦠">
-      <div class="wb-status-left 💪">
-        <span class="wb-linecount"></span>
-      </div>
-      <div class="wb-status-right 💪">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h3 style="font-size: 18px; margin: 32px 0 12px 0; color: #c9d1d9; font-weight: 600;">Conway's Game of Life</h3>
-  <p>Interactive cellular automaton demonstrating pattern evolution. Includes preset patterns like gliders and oscillators.</p>
-
-  <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 10px; flex-wrap: wrap;">
-    <button id="conway-play-pause-btn">Play</button>
-    <button id="conway-reset-btn">Reset</button>
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <label for="conway-speed-slider">Speed:</label>
-      <input type="range" id="conway-speed-slider" min="50" max="1000" value="200" style="width: 120px;" />
-      <span id="conway-speed-value">200ms</span>
-    </div>
-  </div>
-  <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select" tabindex="0" id="conway">
-    <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
-    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-    <div class="💪">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines 🌳 🥷"></div>
-    </div>
-    <div class="💪 wb-status 🦠">
-      <div class="wb-status-left 💪">
-        <span class="wb-linecount"></span>
-      </div>
-      <div class="wb-status-right 💪">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-  </section>
-
+    </section>
   </div> <!-- End container -->
 
   <script type="module">
@@ -741,493 +290,25 @@
 </script>
 <script>
   window.addEventListener("DOMContentLoaded", () => {
-    const fileLoaderLoggerElement = document.getElementById('file-loader-logs');
-    const fileLoaderLogger = new Vbuf(fileLoaderLoggerElement, {
-      colorPrimary: "#87FF5F",
-      colorSecondary: "#38274D",
-      initialViewportSize: 5,
-      showGutter: false
-    });
-
-    // Set version from vbuf instance
-    document.getElementById('vbuf-version').textContent = 'v' + fileLoaderLogger.version;
-
-    function compressedFileLoaderLogger(s) {
-      console.log(s);
-      fileLoaderLogger.appendLineAtEnd(s);
-    };
     const mainElement = document.getElementById("playground");
-    const primary = new Vbuf(mainElement, {
+    const primary = new Buffee(mainElement, {
       colorPrimary: "#87FF5F",
-      colorSecondary: "#38274D",
-      logger: compressedFileLoaderLogger
+      colorSecondary: "#38274D"
     });
-    VbufChunkLoader(primary);  // Initialize ChunkLoader extension
     mainElement.focus();
     window.primary = primary;
 
+    // Set version from vbuf instance
+    document.getElementById('vbuf-version').textContent = 'v' + primary.version;
+
     const notesElement = document.getElementById('notes');
-    const notes = new Vbuf(notesElement);
+    const notes = new Buffee(notesElement);
 
     const hackerNewsElement = document.getElementById('hackernews');
-    const hackernews = new Vbuf(hackerNewsElement, {
+    const hackernews = new Buffee(hackerNewsElement, {
       colorPrimary: "black",
       colorSecondary: "#FF6602",
       showStatusLine: false,
-    });
-
-    const starWarsElement = document.getElementById('starwars');
-    const starwars = new Vbuf(starWarsElement, {
-      colorPrimary: "#FFD700",
-      colorSecondary: "#000000",
-      initialViewportSize: 13,
-      showGutter: false,
-    });
-
-    const matrixElement = document.getElementById('matrix');
-    const matrix = new Vbuf(matrixElement, {
-      colorPrimary: "#00ff41",
-      colorSecondary: "#000000",
-      initialViewportSize: 20,
-      showStatusLine: false,
-    });
-
-    const conwayElement = document.getElementById('conway');
-    const conway = new Vbuf(conwayElement, {
-      colorPrimary: "black",
-      colorSecondary: "white",
-      initialViewportSize: 30,
-      showStatusLine: false,
-      showGutter: false,
-    });
-
-    // Diagnostics -- Bind UI controls to move viewport
-    document.getElementById('viewport-update').addEventListener('click', () => {
-      const viewportStart = parseInt(document.getElementById('viewport-start').value);
-      const viewportSize = parseInt(document.getElementById('viewport-size').value);
-      primary.Viewport.set(viewportStart, viewportSize);
-    });
-    document.getElementById("file-input").addEventListener("change", () => {
-      const file = document.getElementById("file-input").files[0];
-      const nBytes = file.size;
-      const aMultiples = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-      let sOutput = "";
-      for (nMultiple = 0, nApprox = nBytes / 1024; nApprox > 1; nApprox /= 1024, nMultiple++) {
-        sOutput = nApprox.toFixed(3) + " " + aMultiples[nMultiple] + " (" + nBytes + " bytes)";
-      }
-      document.getElementById("fileSize").innerHTML = "File size: " + (sOutput || (nBytes + " bytes"));
-      document.getElementById("file-loader-buttons").classList.remove('hidden');
-    }, false);
-    document.getElementById('load-file-naive').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-
-      const t0 = performance.now();
-      const text = await f.text();
-      const t1 = performance.now();
-      console.log(`[Naive] Read file to text: ${(t1 - t0).toFixed(2)}ms`);
-
-      const t2 = performance.now();
-      primary.Model.text = text;
-      const t3 = performance.now();
-      const lineCount = primary.Model.lines.length;
-      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-      console.log(`[Naive] Set Model.text (split + render): ${(t3 - t2).toFixed(2)}ms`);
-      console.log(`[Naive] Loaded ${lineCount.toLocaleString()} lines in ${(t3 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
-    });
-
-    document.getElementById('load-file-chunked').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-
-      const t0 = performance.now();
-
-      // Reset the model to start fresh
-      primary.Model.lines = [];
-
-      const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB byte chunks
-      let offset = 0;
-      let remainder = '';
-      let totalLines = 0;
-
-      while (offset < f.size) {
-        // Slice file into chunks
-        const blob = f.slice(offset, offset + CHUNK_SIZE);
-        const text = await blob.text();
-
-        // Prepend any partial line from the previous chunk
-        const fullText = remainder + text;
-
-        // Find the last newline in this chunk
-        const lastNewlineIndex = fullText.lastIndexOf('\n');
-
-        if (lastNewlineIndex !== -1) {
-          // Extract complete lines
-          const completeText = fullText.substring(0, lastNewlineIndex);
-          const lines = completeText.split('\n');
-
-          // Append to model
-          primary.Model.appendLines(lines);
-          totalLines += lines.length;
-
-          // Save the remainder for next iteration
-          remainder = fullText.substring(lastNewlineIndex + 1);
-        } else {
-          // No newline found, accumulate to remainder
-          remainder = fullText;
-        }
-
-        offset += CHUNK_SIZE;
-      }
-
-      // Don't forget the last line if there's a remainder
-      if (remainder.length > 0) {
-        primary.Model.appendLines([remainder]);
-        totalLines++;
-      }
-
-      const t1 = performance.now();
-      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-      console.log(`[Chunked] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
-    });
-
-    document.getElementById('load-file-filereader').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-
-      const t0 = performance.now();
-
-      // Reset the model to start fresh
-      primary.Model.lines = [];
-
-      const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB byte chunks
-      let offset = 0;
-      let remainder = '';
-      let totalLines = 0;
-
-      // Helper to read blob using FileReader (callback-based API)
-      function readBlobAsText(blob) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = (e) => reject(e);
-          reader.readAsText(blob);
-        });
-      }
-
-      while (offset < f.size) {
-        // Slice file into chunks
-        const blob = f.slice(offset, offset + CHUNK_SIZE);
-        const text = await readBlobAsText(blob);
-
-        // Prepend any partial line from the previous chunk
-        const fullText = remainder + text;
-
-        // Find the last newline in this chunk
-        const lastNewlineIndex = fullText.lastIndexOf('\n');
-
-        if (lastNewlineIndex !== -1) {
-          // Extract complete lines
-          const completeText = fullText.substring(0, lastNewlineIndex);
-          const lines = completeText.split('\n');
-
-          // Append to model
-          primary.Model.appendLines(lines);
-          totalLines += lines.length;
-
-          // Save the remainder for next iteration
-          remainder = fullText.substring(lastNewlineIndex + 1);
-        } else {
-          // No newline found, accumulate to remainder
-          remainder = fullText;
-        }
-
-        offset += CHUNK_SIZE;
-      }
-
-      // Don't forget the last line if there's a remainder
-      if (remainder.length > 0) {
-        primary.Model.appendLines([remainder]);
-        totalLines++;
-      }
-
-      const t1 = performance.now();
-      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-      console.log(`[FileReader] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
-    });
-
-    document.getElementById('load-file-stream').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-
-      const t0 = performance.now();
-
-      // Reset the model to start fresh
-      primary.Model.lines = [];
-
-      let remainder = '';
-      let totalLines = 0;
-      const decoder = new TextDecoder('utf-8');
-
-      // Use ReadableStream to process file chunks
-      const stream = f.stream();
-      const reader = stream.getReader();
-
-      let chunkCount = 0;
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) break;
-
-          // Decode the Uint8Array chunk to text
-          const text = decoder.decode(value, { stream: true });
-
-          // Prepend any partial line from the previous chunk
-          const fullText = remainder + text;
-
-          // Find the last newline in this chunk
-          const lastNewlineIndex = fullText.lastIndexOf('\n');
-
-          if (lastNewlineIndex !== -1) {
-            // Extract complete lines
-            const completeText = fullText.substring(0, lastNewlineIndex);
-            const lines = completeText.split('\n');
-
-            // Append to model
-            primary.Model.appendLines(lines);
-            totalLines += lines.length;
-
-            // Save the remainder for next iteration
-            remainder = fullText.substring(lastNewlineIndex + 1);
-          } else {
-            // No newline found, accumulate to remainder
-            remainder = fullText;
-          }
-
-          // Yield to browser every 10 chunks to allow UI updates
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        // Don't forget the last line if there's a remainder
-        if (remainder.length > 0) {
-          primary.Model.appendLines([remainder]);
-          totalLines++;
-        }
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        console.log(`[Stream] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
-      } finally {
-        reader.releaseLock();
-      }
-    });
-
-    document.getElementById('load-file-stream-materialized').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-      const reader = f.stream().getReader();
-      try {
-        primary.Model.lines = [];
-        const decoder = new TextDecoder('utf-8');
-        let chunkCount = 0;
-
-        const t0 = performance.now();
-
-        let remainder = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) break;
-
-          // Decode the Uint8Array chunk to text
-          const text = decoder.decode(value, { stream: true });
-
-          // Find the last newline in this chunk
-          const lastNewlineIndex = text.lastIndexOf('\n');
-          if (lastNewlineIndex !== -1) {
-            // Split everything - last element is the incomplete line
-            const allLines = text.split('\n');
-            const slicedLines = allLines.slice(0, -1);  // All complete lines
-            slicedLines[0] = remainder + [0];
-            remainder = allLines[allLines.length - 1];  // Incomplete line (remainder)
-
-            // Force materialization using Array.from to break sliced string references
-            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
-            // Append to model WITHOUT rendering (massive speedup)
-            primary.Model.appendLines(materializedLines, true);
-          } else {
-            remainder += text;
-          }
-
-          // Yield to browser every 10 chunks to allow UI updates
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            primary.Model.appendLines([], false);
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        // Final render
-        primary.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        console.log(`[Stream+Mat] Loaded ${primary.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
-      } finally {
-        reader.releaseLock();
-      }
-    });
-
-   document.getElementById('load-file-stream-materialized-gc').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-      const reader = f.stream().getReader();
-      try {
-        primary.Model.lines = [];
-        const decoder = new TextDecoder('utf-8');
-        let chunkCount = 0;
-
-        const t0 = performance.now();
-
-        let remainder = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) break;
-
-          // Decode the Uint8Array chunk to text
-          const text = decoder.decode(value, { stream: true });
-
-          // Find the last newline in this chunk
-          const lastNewlineIndex = text.lastIndexOf('\n');
-          if (lastNewlineIndex !== -1) {
-            // Split everything - last element is the incomplete line
-            const allLines = text.split('\n');
-            const slicedLines = allLines.slice(0, -1);  // All complete lines
-            slicedLines[0] = remainder + [0];
-            remainder = allLines[allLines.length - 1];  // Incomplete line (remainder)
-
-            // Force materialization using Array.from to break sliced string references
-            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
-            // Append to model WITHOUT rendering (massive speedup)
-            primary.Model.appendLines(materializedLines, chunkCount % 10 == 5 ? false : true);
-          } else {
-            remainder += text;
-          }
-
-          // Yield to browser every 10 chunks to allow UI updates
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            // Create temporary memory pressure to hint GC
-            const _ = new Array(100000);
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        // Final render
-        primary.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        console.log(`[Stream+Mat] Loaded ${primary.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB (${f.size} bytes)`);
-      } finally {
-        reader.releaseLock();
-      }
-    });
-
-    document.getElementById('load-file-chunked-compressed').addEventListener('click', async () => {
-      const f = document.getElementById("file-input").files[0];
-      if (!f) {
-        alert("No file selected");
-        return;
-      }
-
-      const reader = f.stream().getReader();
-      try {
-        primary.ChunkLoader.activate();
-        document.getElementById('read-only-indicator').classList.remove('hidden');
-
-        const decoder = new TextDecoder('utf-8');
-        let chunkCount = 0;
-        const t0 = performance.now();
-        let remainder = '';
-        let originalSize = 0;
-        let compressedSize = 0;
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          const lastNewlineIndex = text.lastIndexOf('\n');
-
-          if (lastNewlineIndex !== -1) {
-            const allLines = text.split('\n');
-            const slicedLines = allLines.slice(0, -1);
-            slicedLines[0] = remainder + slicedLines[0];
-            remainder = allLines[allLines.length - 1];
-
-            // Materialize to break string references
-            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
-            originalSize += materializedLines.join('\n').length;
-            await primary.Model.appendLines(materializedLines, true);
-          } else {
-            remainder += text;
-          }
-
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            await primary.Model.appendLines([], false); // Trigger render
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        // Handle final remainder
-        if (remainder.length > 0) {
-          await primary.Model.appendLines([remainder], false);
-        }
-
-        // Get compressed size from ChunkLoader
-        compressedSize = primary.ChunkLoader.compressedSize;
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-
-        compressedFileLoaderLogger(`[Chunked+Compressed] Stored ${primary.ChunkLoader.totalLines.toLocaleString()} lines in ${primary.ChunkLoader.chunkCount} gzipped chunks`);
-        compressedFileLoaderLogger(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
-        compressedFileLoaderLogger(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
-        compressedFileLoaderLogger(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
-        compressedFileLoaderLogger(`  Compression ratio: ${compressionRatio}% savings`);
-        compressedFileLoaderLogger(`  Memory savings: ${primary.ChunkLoader.chunkCount} chunks vs ${primary.ChunkLoader.totalLines.toLocaleString()} array elements = ${(primary.ChunkLoader.totalLines / primary.ChunkLoader.chunkCount).toFixed(0)}x reduction`);
-      } finally {
-        reader.releaseLock();
-      }
     });
 
     fetch("docs/instructions.txt")
@@ -1271,310 +352,14 @@
       .then(text => hackernews.Model.text = text)
       .catch(err => console.error("Error fetching Hacker News:", err));
 
-    // Star Wars ASCII Movie Player - Load full movie from assets/sw.txt
-    let movieData = null;
-
-    async function loadStarWarsMovie() {
-      try {
-        const response = await fetch('assets/sw.txt');
-        // TODO: We aren't escape the ' character correctly. so \' shows literally .
-        movieData = await response.text();
-        // Parse frames from movie data
-        const rawFrames = movieData.split('\\n'); // Split on literal \n string
-        const LINES_PER_FRAME = 14;
-        frames = [];
-
-        for (let i = 0; i < rawFrames.length; i += LINES_PER_FRAME) {
-          const metadata = rawFrames[i]
-          const numFrames = parseInt(metadata);
-          const frame = rawFrames.slice(i+1, i + LINES_PER_FRAME).join('\n');
-          if(frame.trim()) {
-            for(let i = 0; i < numFrames; i++) {
-              frames.push(frame);
-            }
-          }
-        }
-
-        document.getElementById('frame-slider').max = frames.length - 1;
-        currentFrame = 750;
-        showFrame(750);
-      } catch (err) {
-        console.error("Error loading Star Wars movie:", err);
-        starwars.Model.text = "Error loading movie. Check that sw.txt is in the same directory.";
-      }
-    }
-
-    const LINES_PER_FRAME = 14;
-    let frames = [];
-    let currentFrame = 0;
-    let isPlaying = false;
-    let frameInterval = null;
-    let frameDelay = 120;
-
-    function showFrame(frameIndex) {
-      if (frames.length > 0) {
-        starwars.Model.text = frames[frameIndex % frames.length];
-        document.getElementById('frame-counter').textContent = `${frameIndex + 1} / ${frames.length}`;
-        document.getElementById('frame-slider').value = frameIndex;
-      }
-    }
-
-    function playMovie() {
-      if (isPlaying) return;
-      isPlaying = true;
-      document.getElementById('play-pause-btn').textContent = 'Pause';
-
-      frameInterval = setInterval(() => {
-        showFrame(currentFrame);
-        currentFrame = (currentFrame + 1) % frames.length;
-      }, frameDelay);
-    }
-
-    function pauseMovie() {
-      isPlaying = false;
-      document.getElementById('play-pause-btn').textContent = 'Play';
-      if (frameInterval) {
-        clearInterval(frameInterval);
-        frameInterval = null;
-      }
-    }
-
-
-    // Controls
-    document.getElementById('play-pause-btn').addEventListener('click', () => {
-      if (isPlaying) {
-        pauseMovie();
-      } else {
-        playMovie();
-      }
-    });
-
-    document.getElementById('speed-slider').addEventListener('input', (e) => {
-      frameDelay = parseInt(e.target.value);
-      document.getElementById('speed-value').textContent = frameDelay + 'ms';
-      if (isPlaying) {
-        pauseMovie();
-        playMovie();
-      }
-    });
-
-    document.getElementById('frame-slider').addEventListener('input', (e) => {
-      currentFrame = parseInt(e.target.value);
-      showFrame(currentFrame);
-    });
-
-    // Load and show movie
-    loadStarWarsMovie();
-
-    // Autoplay when scrolled into view
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !isPlaying && frames.length > 0) {
-          playMovie();
-          observer.unobserve(starWarsElement); // Only autoplay once
-        }
-      });
-    }, { threshold: 0.5 });
-
-    observer.observe(starWarsElement);
-
-    // Matrix Effect Animation
-    const MATRIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
-    const MATRIX_COLS = 80;
-    const MATRIX_ROWS = 20;
-    let matrixColumns = [];
-
-    // Initialize columns with random starting positions
-    for (let i = 0; i < MATRIX_COLS; i++) {
-      matrixColumns.push({
-        y: Math.floor(Math.random() * MATRIX_ROWS),
-        speed: Math.random() * 0.5 + 0.3, // Random speed between 0.3 and 0.8
-        chars: Array(MATRIX_ROWS).fill(' ')
-      });
-    }
-
-    function updateMatrix() {
-      const lines = [];
-
-      // Update each column
-      matrixColumns.forEach((col, colIndex) => {
-        // Move column down
-        col.y += col.speed;
-
-        // Reset to top if reached bottom
-        if (col.y > MATRIX_ROWS + 10) {
-          col.y = -Math.random() * 10;
-          col.speed = Math.random() * 0.5 + 0.3;
-        }
-
-        // Add new character at head position
-        const headRow = Math.floor(col.y);
-        if (headRow >= 0 && headRow < MATRIX_ROWS) {
-          col.chars[headRow] = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-        }
-
-        // Fade out trailing characters
-        for (let row = 0; row < MATRIX_ROWS; row++) {
-          if (row < headRow - 15) {
-            col.chars[row] = ' ';
-          } else if (Math.random() < 0.05) {
-            // Randomly change some characters for glitch effect
-            col.chars[row] = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-          }
-        }
-      });
-
-      // Build the display grid
-      for (let row = 0; row < MATRIX_ROWS; row++) {
-        let line = '';
-        for (let col = 0; col < MATRIX_COLS; col++) {
-          line += matrixColumns[col].chars[row];
-        }
-        lines.push(line);
-      }
-
-      matrix.Model.text = lines.join('\n');
-    }
-
-    // Start Matrix animation
-    setInterval(updateMatrix, 50); // Update every 50ms
-
-    // Conway's Game of Life Implementation
-    const CONWAY_COLS = 80;
-    const CONWAY_ROWS = 30;
-    let conwayGrid = [];
-    let conwayPlaying = false;
-    let conwayInterval = null;
-    let conwayDelay = 200;
-
-    // Initialize grid with random pattern
-    function initConwayGrid() {
-      conwayGrid = [];
-      for (let row = 0; row < CONWAY_ROWS; row++) {
-        conwayGrid[row] = [];
-        for (let col = 0; col < CONWAY_COLS; col++) {
-          // Create some interesting starting patterns
-          conwayGrid[row][col] = Math.random() < 0.25 ? 1 : 0;
-        }
-      }
-
-      // Add a glider in the top-left
-      if (CONWAY_ROWS > 5 && CONWAY_COLS > 5) {
-        conwayGrid[1][2] = 1;
-        conwayGrid[2][3] = 1;
-        conwayGrid[3][1] = 1;
-        conwayGrid[3][2] = 1;
-        conwayGrid[3][3] = 1;
-      }
-    }
-
-    // Count living neighbors
-    function countNeighbors(row, col) {
-      let count = 0;
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          if (dr === 0 && dc === 0) continue;
-          const newRow = (row + dr + CONWAY_ROWS) % CONWAY_ROWS;
-          const newCol = (col + dc + CONWAY_COLS) % CONWAY_COLS;
-          count += conwayGrid[newRow][newCol];
-        }
-      }
-      return count;
-    }
-
-    // Update game state
-    function updateConway() {
-      const newGrid = [];
-
-      // Apply Conway's rules
-      for (let row = 0; row < CONWAY_ROWS; row++) {
-        newGrid[row] = [];
-        for (let col = 0; col < CONWAY_COLS; col++) {
-          const neighbors = countNeighbors(row, col);
-          const alive = conwayGrid[row][col];
-
-          if (alive) {
-            // Cell is alive
-            newGrid[row][col] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
-          } else {
-            // Cell is dead
-            newGrid[row][col] = (neighbors === 3) ? 1 : 0;
-          }
-        }
-      }
-
-      conwayGrid = newGrid;
-      renderConway();
-    }
-
-    // Render grid to editor
-    function renderConway() {
-      const lines = [];
-      for (let row = 0; row < CONWAY_ROWS; row++) {
-        let line = '';
-        for (let col = 0; col < CONWAY_COLS; col++) {
-          line += conwayGrid[row][col] ? '■' : '.';
-        }
-        lines.push(line);
-      }
-      conway.Model.text = lines.join('\n');
-    }
-
-    // Play/pause control
-    function playConway() {
-      if (conwayPlaying) return;
-      conwayPlaying = true;
-      document.getElementById('conway-play-pause-btn').textContent = 'Pause';
-      conwayInterval = setInterval(updateConway, conwayDelay);
-    }
-
-    function pauseConway() {
-      conwayPlaying = false;
-      document.getElementById('conway-play-pause-btn').textContent = 'Play';
-      if (conwayInterval) {
-        clearInterval(conwayInterval);
-        conwayInterval = null;
-      }
-    }
-
-    function resetConway() {
-      pauseConway();
-      initConwayGrid();
-      renderConway();
-    }
-
-    // Event listeners
-    document.getElementById('conway-play-pause-btn').addEventListener('click', () => {
-      if (conwayPlaying) {
-        pauseConway();
-      } else {
-        playConway();
-      }
-    });
-
-    document.getElementById('conway-reset-btn').addEventListener('click', resetConway);
-
-    document.getElementById('conway-speed-slider').addEventListener('input', (e) => {
-      conwayDelay = parseInt(e.target.value);
-      document.getElementById('conway-speed-value').textContent = conwayDelay + 'ms';
-      if (conwayPlaying) {
-        pauseConway();
-        playConway();
-      }
-    });
-
-    // Initialize Conway's Game of Life
-    initConwayGrid();
-    renderConway();
-
     // TUI Mode Demo
     const tuiDemoElement = document.getElementById('tui-demo');
-    const tuiDemo = new Vbuf(tuiDemoElement, {
+    const tuiDemo = new Buffee(tuiDemoElement, {
       colorPrimary: "#eaeaea",
       colorSecondary: "#16213e",
       initialViewportSize: 15,
     });
-    VbufTUI(tuiDemo);  // Initialize TUI extension
+    BuffeeTUI(tuiDemo);  // Initialize TUI extension
 
 const fileTemplate = `
                 ║

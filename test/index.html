@@ -2059,7 +2059,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             `;
             document.body.appendChild(container);
             const el = container.querySelector('.wb');
-            const editor = new Vbuf(el, { initialViewportSize: 10, ...opts });
+            const editor = new Buffee(el, { initialViewportSize: 10, ...opts });
             return { editor, container, cleanup: () => container.remove() };
         }
 
@@ -2072,7 +2072,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('tokenizes JavaScript keywords', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufSyntax(editor);
+                        BuffeeSyntax(editor);
                         editor.Syntax.setLanguage('javascript');
                         editor.Syntax.enabled = true;
                         editor.Model.text = 'const x = 42;';
@@ -2089,7 +2089,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('tokenizes JavaScript strings', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufSyntax(editor);
+                        BuffeeSyntax(editor);
                         editor.Syntax.setLanguage('javascript');
                         const { tokens } = editor.Syntax.tokenizeLine('"hello world"', 0);
                         const stringToken = tokens.find(t => t.type === 'string');
@@ -2102,7 +2102,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('handles multiline comments', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufSyntax(editor);
+                        BuffeeSyntax(editor);
                         editor.Syntax.setLanguage('javascript');
                         editor.Model.text = '/* start\nmiddle\nend */';
 
@@ -2125,7 +2125,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('invalidates state cache on edit', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufSyntax(editor);
+                        BuffeeSyntax(editor);
                         editor.Syntax.setLanguage('javascript');
                         editor.Syntax.enabled = true;
                         editor.Model.text = 'line1\nline2\nline3';
@@ -2145,7 +2145,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('supports multiple languages', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufSyntax(editor);
+                        BuffeeSyntax(editor);
 
                         // Test JavaScript
                         editor.Syntax.setLanguage('javascript');
@@ -2172,7 +2172,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('adds button elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufElementals(editor);
+                        BuffeeElementals(editor);
                         editor.Model.text = '\n\n\n';
                         const id = editor.Elementals.addButton({
                             row: 1, col: 5, label: 'Test'
@@ -2188,7 +2188,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('adds label elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufElementals(editor);
+                        BuffeeElementals(editor);
                         editor.Model.text = '\n\n\n';
                         editor.Elementals.addLabel({ row: 1, col: 5, text: 'Label' });
                         assertEqual(editor.Elementals.elements.length, 1, 'Should have 1 element');
@@ -2201,7 +2201,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('adds input elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufElementals(editor);
+                        BuffeeElementals(editor);
                         editor.Model.text = '\n\n\n';
                         editor.Elementals.addInput({
                             row: 1, col: 5, width: 20, placeholder: 'Type here'
@@ -2216,7 +2216,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('navigates between elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufElementals(editor);
+                        BuffeeElementals(editor);
                         editor.Model.text = '\n\n\n\n\n';
                         editor.Elementals.addButton({ row: 1, col: 2, label: 'A' });
                         editor.Elementals.addButton({ row: 2, col: 2, label: 'B' });
@@ -2233,7 +2233,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('removes elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufElementals(editor);
+                        BuffeeElementals(editor);
                         editor.Model.text = '\n\n\n';
                         const id = editor.Elementals.addButton({ row: 1, col: 2, label: 'Test' });
                         assertEqual(editor.Elementals.elements.length, 1, 'Should have 1 element');
@@ -2247,7 +2247,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('clears all elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufElementals(editor);
+                        BuffeeElementals(editor);
                         editor.Model.text = '\n\n\n';
                         editor.Elementals.addButton({ row: 1, col: 2, label: 'A' });
                         editor.Elementals.addButton({ row: 2, col: 2, label: 'B' });
@@ -2265,7 +2265,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('initializes TUI extension', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufTUI(editor);
+                        BuffeeTUI(editor);
                         assertTrue(!!editor.TUI, 'TUI should be attached to editor');
                         assertFalse(editor.TUI.enabled, 'TUI should be disabled by default');
                     } finally {
@@ -2276,7 +2276,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('adds buttons', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufTUI(editor);
+                        BuffeeTUI(editor);
                         editor.Model.text = '\n\n\n';
                         const id = editor.TUI.addButton({
                             row: 1, col: 2, label: ' OK '
@@ -2291,7 +2291,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('adds buttons with borders', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufTUI(editor);
+                        BuffeeTUI(editor);
                         editor.Model.text = '\n\n\n\n';
                         const id = editor.TUI.addButton({
                             row: 1, col: 2, label: 'OK', border: true
@@ -2307,7 +2307,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('handles navigation', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufTUI(editor);
+                        BuffeeTUI(editor);
                         editor.Model.text = '\n\n\n\n';
                         editor.TUI.addButton({ row: 1, col: 2, label: 'A' });
                         editor.TUI.addButton({ row: 2, col: 2, label: 'B' });
@@ -2323,7 +2323,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('clears elements', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufTUI(editor);
+                        BuffeeTUI(editor);
                         editor.Model.text = '\n\n\n';
                         editor.TUI.addButton({ row: 1, col: 2, label: 'Test' });
                         editor.TUI.clear();
@@ -2339,7 +2339,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('initializes ChunkLoader extension', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufChunkLoader(editor);
+                        BuffeeChunkLoader(editor);
                         assertTrue(!!editor.ChunkLoader, 'ChunkLoader should be attached to editor');
                         assertFalse(editor.ChunkLoader.enabled, 'Should be disabled by default');
                     } finally {
@@ -2350,7 +2350,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('activates chunked mode', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufChunkLoader(editor);
+                        BuffeeChunkLoader(editor);
                         editor.ChunkLoader.activate(1000);
                         assertTrue(editor.ChunkLoader.enabled, 'Should be enabled after activate');
                         assertEqual(editor.ChunkLoader.totalLines, 0, 'Should start with 0 lines');
@@ -2362,7 +2362,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('tracks total lines after append', async () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufChunkLoader(editor);
+                        BuffeeChunkLoader(editor);
                         editor.ChunkLoader.activate(1000);
 
                         // Append some lines
@@ -2376,7 +2376,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('clears chunk data', async () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        VbufChunkLoader(editor);
+                        BuffeeChunkLoader(editor);
                         editor.ChunkLoader.activate(1000);
                         await editor.ChunkLoader.appendLines(['line1', 'line2']);
                         assertEqual(editor.ChunkLoader.totalLines, 2, 'Should have 2 lines');
