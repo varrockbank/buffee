@@ -11,7 +11,7 @@
  * @returns {Object} The Syntax API object
  */
 function BuffeeSyntax(vbuf) {
-  const { $e, renderHooks } = vbuf._internals;
+  const { $e, $textLayer, renderHooks } = vbuf._internals;
   const { Viewport, Model, History } = vbuf;
 
   // State cache: stateCache[lineIndex] = startState for that line
@@ -257,11 +257,14 @@ function BuffeeSyntax(vbuf) {
     // Ensure we have state cache up to viewport end
     ensureStateCache(viewport.start + viewport.size);
 
+    // Use $textLayer which contains the pre elements (not $container which is $e)
+    const lineContainer = $textLayer || $container;
+
     for (let i = 0; i < viewport.size; i++) {
       const absLine = viewport.start + i;
       if (absLine >= Model.lines.length) break;
 
-      const lineEl = $container.children[i];
+      const lineEl = lineContainer.children[i];
       if (!lineEl) continue;
 
       const text = Model.lines[absLine] || '';

@@ -1,7 +1,7 @@
 /**
  * @fileoverview Buffee - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 5.7.2-alpha.1
+ * @version 6.0.0-alpha.1
  */
 
 /**
@@ -46,7 +46,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "5.7.2-alpha.1";
+  this.version = "6.0.0-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -90,8 +90,16 @@ function Buffee(node, config = {}) {
   const zIndexCursor = 300;
   const zIndexElements = 400;
 
+  // Text layer - contains all pre elements for line content
+  const $textLayer = document.createElement("div");
+  $textLayer.className = "wb-layer-text";
+  Object.assign($textLayer.style, {
+    position: 'relative',
+    zIndex: zIndexText
+  });
+  $e.appendChild($textLayer);
+
   // Element layer - for UI elements (buttons, prompts, etc.) added by extensions
-  // Appended later (after line containers) to not interfere with children indexing
   const $elementLayer = document.createElement("div");
   $elementLayer.className = "wb-layer-elements";
   Object.assign($elementLayer.style, {
@@ -103,9 +111,9 @@ function Buffee(node, config = {}) {
     zIndex: zIndexElements,
     pointerEvents: 'none'  // Allow clicks to pass through to elements below
   });
-  let elementLayerAppended = false;
+  $e.appendChild($elementLayer);
 
-  // Cursor overlay - shows head position distinctly within a selection (appended after line containers in render)
+  // Cursor layer - shows head position distinctly within a selection
   const $cursor = document.createElement("div");
   $cursor.className = "wb-cursor";
   Object.assign($cursor.style, {
@@ -116,6 +124,7 @@ function Buffee(node, config = {}) {
     fontSize: lineHeight+'px',
     zIndex: zIndexCursor
   });
+  $e.appendChild($cursor);
 
   const $status = node.querySelector('.wb-status');
   Object.assign($status.style, {
@@ -145,7 +154,6 @@ function Buffee(node, config = {}) {
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
   let lastViewportSize = 0; // Track viewport size for delta-based updates
-  let cursorAppended = false;
 
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
@@ -1097,27 +1105,14 @@ function Buffee(node, config = {}) {
         for (let i = 0; i < delta; i++) {
           fragmentLines.appendChild(document.createElement("pre"));
         }
-        $e.appendChild(fragmentLines);
+        $textLayer.appendChild(fragmentLines);
         addSelections(lastViewportSize, Viewport.size);
-        if (!cursorAppended) {
-          $e.appendChild($cursor);
-          cursorAppended = true;
-        }
-        if (!elementLayerAppended) {
-          $e.appendChild($elementLayer);
-          elementLayerAppended = true;
-        }
       } else if (delta < 0) {
         // Remove excess line containers and selections
-        // Temporarily remove cursor and element layer so they're not affected by lastChild removal
-        if (elementLayerAppended) $elementLayer.remove();
-        if (cursorAppended) $cursor.remove();
         for (let i = 0; i < -delta; i++) {
-          $e.lastChild?.remove();
+          $textLayer.lastChild?.remove();
           $selections.pop()?.remove();
         }
-        if (cursorAppended) $e.appendChild($cursor);
-        if (elementLayerAppended) $e.appendChild($elementLayer);
       }
 
       lastViewportSize = Viewport.size;
@@ -1130,7 +1125,7 @@ function Buffee(node, config = {}) {
 
     // Update contents of line containers
     for(let i = 0; i < Viewport.size; i++)
-      $e.children[i].textContent = Viewport.lines[i] || null;
+      $textLayer.children[i].textContent = Viewport.lines[i] || null;
 
     // Call extension hooks for content overlay
     for (const hook of renderHooks.onRenderContent) {
@@ -1324,6 +1319,7 @@ function Buffee(node, config = {}) {
   this._internals = {
     get head() { return head; },
     $e,
+    $textLayer,
     $elementLayer,
     render,
     renderHooks,
