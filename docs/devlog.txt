@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 6.0.1-alpha.1 [2025-12-17]
+*** feature
+- autoFitViewport: automatically size viewport to container height with ResizeObserver
+
 ** 6.0.0-alpha.1 [2025-12-17]
 *** refactor
 - render text in separate layer ($textLayer). cursor and element layers appended immediately.

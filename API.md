@@ -44,7 +44,7 @@ Layout the HTML for the editor.
   position: fixed; left: 0; top: 1px;
   width: 0; height: 1px; opacity: 0; pointer-events: none;
 }
-.wb .wb-lines > pre::before { content: "\200B"; }
+.wb .wb-lines pre::before { content: "\200B"; }
 .wb .wb-lines pre { margin: 0; overflow: hidden; }
 .wb .wb-selection {
   background-color: #EDAD10;
@@ -120,6 +120,33 @@ For `ch` units to work correctly, the container's `font-size` must match `lineHe
 - Height = `initialViewportSize` × `lineHeight` pixels
 - Width = specified width minus gutter, padding, and border
 
+### Auto-fit Viewport
+
+Use `autoFitViewport: true` to automatically size the viewport to fill the container's available height:
+
+```javascript
+new Buffee(el, { autoFitViewport: true });
+```
+
+The editor will:
+- Calculate how many lines fit based on container height and `lineHeight`
+- Update automatically when the container is resized (via ResizeObserver)
+- Render an extra partial line if space permits (to avoid wasted space)
+
+**Container requirements:**
+- The container must have a defined height (e.g., `height: 300px` or `height: 100%` with a sized parent)
+- Use `overflow: hidden` on the container to clip the partial line
+
+```html
+<div style="height: 400px; overflow: hidden;">
+  <blockquote class="wb no-select" tabindex="0" id="editor" style="height: 100%;">
+    ...
+  </blockquote>
+</div>
+```
+
+**Note:** When `autoFitViewport` is enabled, `initialViewportSize` is ignored.
+
 ## Initialize
 
 ```javascript
@@ -146,6 +173,7 @@ const editor = new Buffee(document.getElementById('editor'), {
 | `expandtab` | number | `4` | Tab width (0 = hard tabs) |
 | `showGutter` | boolean | `true` | Show line numbers |
 | `showStatusLine` | boolean | `true` | Show status bar |
+| `autoFitViewport` | boolean | `false` | Auto-size viewport to container height |
 | `logger` | function | `console.log` | Custom logger |
 
 ---

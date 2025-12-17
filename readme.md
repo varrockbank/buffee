@@ -26,6 +26,34 @@ See `comparison.html` and `performance.html` for more on Buffee's niche.
 
 ## Usage
 
+### Required CSS
+
+```css
+.wb {
+  background-color: #282C34;
+  color: #B2B2B2;
+  position: relative;
+  outline: none;
+  font-family: monospace;
+}
+.no-select { user-select: none; }
+.wb-clipboard-bridge {
+  position: fixed; left: 0; top: 1px;
+  width: 0; height: 1px; opacity: 0; pointer-events: none;
+}
+.wb .wb-lines pre::before { content: "\200B"; }
+.wb .wb-lines pre { margin: 0; overflow: hidden; }
+.wb .wb-selection {
+  background-color: #EDAD10;
+  position: absolute;
+  mix-blend-mode: difference;
+}
+.wb .wb-cursor { background-color: #FF6B6B; }
+.wb .wb-status span { padding-right: 4px; }
+```
+
+### Required HTML
+
 Editor instances bind to DOM node with this structure:
 
 ```html
@@ -52,6 +80,16 @@ Editor instances bind to DOM node with this structure:
   const editorInstance = new Buffee(document.getElementById("playground"), <config>);
 </script>
 ```
+
+### Auto-fit Viewport
+
+To automatically size the editor to fill its container height:
+
+```javascript
+new Buffee(el, { autoFitViewport: true });
+```
+
+The container must have a defined height. The editor will resize automatically when the container changes.
 
 ### Model-view-controller API
 

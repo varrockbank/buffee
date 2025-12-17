@@ -1,7 +1,7 @@
 /**
  * @fileoverview Buffee - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 6.0.0-alpha.1
+ * @version 6.0.1-alpha.1
  */
 
 /**
@@ -17,6 +17,7 @@
  * @property {function(string): void} [logger=console] - Logger with log and warning methods
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
+ * @property {boolean} [autoFitViewport=false] - Automatically size viewport to fit container height
  */
 
 /**
@@ -46,7 +47,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "6.0.0-alpha.1";
+  this.version = "6.0.1-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -62,6 +63,7 @@ function Buffee(node, config = {}) {
     logger = console,
     showGutter = true,
     showStatusLine = true,
+    autoFitViewport = false,
   } = config;
 
   let gutterSize = initialGutterSize;
@@ -153,7 +155,8 @@ function Buffee(node, config = {}) {
   });
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
-  let lastViewportSize = 0; // Track viewport size for delta-based updates
+  let lastDisplayLines = 0; // Track display lines for delta-based updates
+  let renderExtraLine = false; // When autoFitViewport, render +1 line for partial space
 
   const fragmentLines = document.createDocumentFragment();
   const fragmentSelections = document.createDocumentFragment();
@@ -990,7 +993,7 @@ function Buffee(node, config = {}) {
     /** @type {number} Index of the first visible line (0-indexed) */
     start: 0,
     /** @type {number} Number of visible lines */
-    size: initialViewportSize,
+    size: autoFitViewport ? 0 : initialViewportSize,
 
     /**
      * Index of the last visible line.
@@ -1086,8 +1089,11 @@ function Buffee(node, config = {}) {
       $gutter.style.width = gutterSize + gutterPadding + 'ch';
     }
 
+    // Display size includes extra partial line when autoFitViewport
+    const displayLines = Viewport.size + (renderExtraLine ? 1 : 0);
+
     $gutter.textContent = null;
-    for (let i = 0; i < Viewport.size; i++) {
+    for (let i = 0; i < displayLines; i++) {
       const div = document.createElement("div")
       div.textContent = Viewport.start + i + 1;
       fragmentGutters.appendChild(div);
@@ -1098,7 +1104,7 @@ function Buffee(node, config = {}) {
     // Renders the containers for the viewport lines, as well as selections and highlights
     // Only adds/removes the delta of elements when viewport size changes
     if(renderLineContainers) {
-      const delta = Viewport.size - lastViewportSize;
+      const delta = displayLines - lastDisplayLines;
 
       if (delta > 0) {
         // Add new line containers and selections
@@ -1106,7 +1112,7 @@ function Buffee(node, config = {}) {
           fragmentLines.appendChild(document.createElement("pre"));
         }
         $textLayer.appendChild(fragmentLines);
-        addSelections(lastViewportSize, Viewport.size);
+        addSelections(lastDisplayLines, displayLines);
       } else if (delta < 0) {
         // Remove excess line containers and selections
         for (let i = 0; i < -delta; i++) {
@@ -1115,7 +1121,7 @@ function Buffee(node, config = {}) {
         }
       }
 
-      lastViewportSize = Viewport.size;
+      lastDisplayLines = displayLines;
 
       // Call extension hooks for container rebuild
       for (const hook of renderHooks.onContainerRebuild) {
@@ -1124,8 +1130,10 @@ function Buffee(node, config = {}) {
     }
 
     // Update contents of line containers
-    for(let i = 0; i < Viewport.size; i++)
-      $textLayer.children[i].textContent = Viewport.lines[i] || null;
+    for(let i = 0; i < displayLines; i++) {
+      const lineIndex = Viewport.start + i;
+      $textLayer.children[i].textContent = Model.lines[lineIndex] ?? null;
+    }
 
     // Call extension hooks for content overlay
     for (const hook of renderHooks.onRenderContent) {
@@ -1343,7 +1351,27 @@ function Buffee(node, config = {}) {
     render(true);
   };
 
-  render(true);
+  // Auto-fit viewport to container height
+  if (autoFitViewport) {
+    const $status = node.querySelector('.wb-status');
+    const fitViewport = () => {
+      const statusHeight = showStatusLine && $status ? $status.offsetHeight : 0;
+      const availableHeight = node.clientHeight - statusHeight - (editorPaddingPX * 2);
+      const exactLines = availableHeight / lineHeight;
+      const newSize = Math.floor(exactLines);
+      const hasPartialSpace = exactLines > newSize;
+      if (newSize > 0 && (newSize !== Viewport.size || hasPartialSpace !== renderExtraLine)) {
+        Viewport.size = newSize;
+        renderExtraLine = hasPartialSpace;
+        render(true);
+      }
+    };
+    // Use requestAnimationFrame to ensure layout is complete before measuring
+    requestAnimationFrame(fitViewport);
+    new ResizeObserver(fitViewport).observe(node);
+  } else {
+    render(true);
+  }
 
   // Reading clipboard from the keydown listener involves a different security model.
   node.addEventListener('paste', e => {

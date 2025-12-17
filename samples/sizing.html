@@ -114,6 +114,43 @@
     </div>
   </blockquote>
 
+  <h2>Auto-fit to container height (no status)</h2>
+  <p><code>new Buffee(el, { autoFitViewport: true, showStatusLine: false })</code></p>
+  <p>Viewport automatically sizes to fill the 300px container. Drag bottom-right to resize.</p>
+  <div style="height: 300px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-autofit" style="height: 100%; width: 100%;">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div style="display: flex; height: 100%;">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+      </div>
+      <div class="wb-status" style="display: none;">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+  </div>
+
+  <h2>Auto-fit to container height (with status)</h2>
+  <p><code>new Buffee(el, { autoFitViewport: true })</code></p>
+  <div style="height: 300px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-autofit-status" style="height: 100%; width: 100%; display: flex; flex-direction: column;">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div style="display: flex; flex: 1; overflow: hidden;">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+      </div>
+      <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+        <div><span class="wb-linecount"></span></div>
+        <div style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+  </div>
+
   <script>
     // Generate a ruler string: 01234567890123456789...
     function ruler(n) {
@@ -163,6 +200,24 @@
       colorSecondary: "#212026"
     });
     edFull.Model.text = ruler(200) + '\n// Full width - resize window to test\nLine 3';
+
+    // Auto-fit viewport (no status)
+    const edAutofit = new Buffee(document.getElementById('editor-autofit'), {
+      autoFitViewport: true,
+      showStatusLine: false,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edAutofit.Model.text = Array.from({length: 20}, (_, i) => `Line ${i + 1}`).join('\n');
+
+    // Auto-fit viewport (with status)
+    const edAutofitStatus = new Buffee(document.getElementById('editor-autofit-status'), {
+      autoFitViewport: true,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edAutofitStatus.Model.text = '// Auto-fit viewport (with status)\n// Drag the bottom-right corner to resize\n' +
+      Array.from({length: 50}, (_, i) => `Line ${i + 3}`).join('\n');
   </script>
 </body>
 </html>
