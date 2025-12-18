@@ -47,22 +47,21 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.1-alpha.1";
+  this.version = "7.7.2-alpha.1";
 
   // Extract configuration with defaults
-  // Auto-fit viewport by default unless viewportRows is explicitly specified
-  const viewportRowsSpecified = 'viewportRows' in config;
   const {
-    viewportRows = 20,
+    viewportRows = 0,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
     gutterSize: initialGutterSize = 2,
     showGutter = true,
     showStatusLine = true,
-    autoFitViewport = !viewportRowsSpecified,
     viewportCols,
     advanced = {}
   } = config;
+
+  const autoFitViewport = !viewportRows;
 
   // Advanced configuration with defaults
   const {
@@ -909,7 +908,7 @@ function Buffee(node, config = {}) {
     /** @type {number} Index of the first visible line (0-indexed) */
     start: 0,
     /** @type {number} Number of visible lines */
-    size: autoFitViewport ? 0 : viewportRows,
+    size: viewportRows,
 
     /**
      * Index of the last visible line.

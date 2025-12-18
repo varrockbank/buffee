@@ -111,7 +111,7 @@ Auto-fit is enabled by default. The editor will:
 </div>
 ```
 
-To disable auto-fit, specify `viewportRows` or explicitly set `autoFitViewport: false`.
+To disable auto-fit, specify `viewportRows`.
 
 ## Initialize
 
@@ -135,7 +135,6 @@ const editor = new Buffee(document.getElementById('editor'), {
 | `expandtab` | number | `4` | Tab width (0 = hard tabs) |
 | `showGutter` | boolean | `true` | Show line numbers |
 | `showStatusLine` | boolean | `true` | Show status bar |
-| `autoFitViewport` | boolean | `true`* | Auto-size viewport to container (*false if viewportRows specified) |
 | `logger` | function | `console.log` | Custom logger |
 
 ---

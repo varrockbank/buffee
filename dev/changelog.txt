@@ -1,5 +1,9 @@
 * Project Devlog 
 
+** 7.7.2-alpha.1 [2025-12-18]  gz+min: 4.70 KB (-0.00), min: 13.80 KB (-0.04)
+*** refactor(config)
+- default to auto-fit viewport iff viewportRows not specified
+
 ** 7.7.1-alpha.1 [2025-12-18]  gz+min: 4.75 KB (+0.01), min: 13.86 KB (-0.11)
 *** refactor(config)
 - carve out gutter padding to CSS variable
