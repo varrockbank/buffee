@@ -8,4 +8,3 @@
 13. integration testing 
 14. status line is broken 
 15. audit things in _internals that are used elsewhere 
-17. missing link to tests in nav 

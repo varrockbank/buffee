@@ -3,1058 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DSL Playground</title>
+    <title>buffee - Tests</title>
+    <link rel="stylesheet" href="../reset.css">
+    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="lib/vs2015.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        button {
-            background-color: #007acc;
-            color: #ffffff;
-            border: none;
-            border-radius: 4px;
-            padding: 0.4rem 0.8rem;
-            font-family: inherit;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        button:hover {
-            background-color: #005a9e;
-        }
-
-        button:active {
-            background-color: #004578;
-        }
-
-        button:disabled {
-            background-color: #3e3e42;
-            color: #858585;
-            cursor: not-allowed;
-        }
-
-        #js-output.stale {
-            opacity: 0.5;
-        }
-
-        .status-message {
-            font-size: 0.8rem;
-            color: #858585;
-            display: none;
-            margin-right: 0.5rem;
-        }
-
-        .status-message.visible {
-            display: inline;
-        }
-
-        .status-message.warning {
-            color: #daa520;
-        }
-
-        .status-message.success {
-            color: #4CAF50;
-        }
-
-        .warning-icon {
-            margin-right: 0.25rem;
-        }
-
-        .success-icon {
-            margin-right: 0.25rem;
-        }
-
-        .tabs-wrapper {
-            background-color: #2d2d30;
-            width: 100%;
-        }
-
-        .tabs {
-            display: flex;
-            align-items: center;
-            padding-top: 5px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        #test-stale-warning {
-            margin-left: auto;
-            margin-right: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .tab {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            background-color: transparent;
-            border: none;
-            color: #858585;
-            font-family: inherit;
-            font-size: 0.9rem;
-            border-bottom: 2px solid transparent;
-            border-top-left-radius: 16px;
-            border-top-right-radius: 16px;
-            border-bottom-left-radius: 0px;
-            border-bottom-right-radius: 0px;
-            transition: all 0.2s;
-        }
-
-        .tab:hover {
-            color: #cccccc;
-            background-color: #3e3e42;
-        }
-
-        .tab.active {
-            color: #ffffff;
-            background-color: #1e1e1e;
-            border-bottom-color: #1e1e1e;
-        }
-
-        .tab-content {
-            display: none;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .tab-content.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .subtabs {
-            background-color: #252526;
-            display: flex;
-            border-bottom: 1px solid #3e3e42;
-        }
-
-        .subtab {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            background-color: transparent;
-            border: none;
-            color: #858585;
-            font-family: inherit;
-            font-size: 0.85rem;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .subtab:hover {
-            color: #cccccc;
-            background-color: #3e3e42;
-        }
-
-        .subtab.active {
-            color: #ffffff;
-            border-bottom-color: #007acc;
-        }
-
-        .subtab-content {
-            display: none;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .subtab-content.active {
-            display: flex;
-            flex-direction: column;
-        }
-
-        main {
-            flex: 1;
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            overflow: hidden;
-        }
-
-        #tab-tests main {
-            flex-direction: column;
-            overflow-y: auto;
-            width: 100%;
-        }
-
-        #tab-tests main > * {
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            width: 100%;
-        }
-
-        #tab-source main {
-            flex-direction: row;
-        }
-
-        #tab-grammar main {
-            flex-direction: column;
-            overflow-y: auto;
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        #tab-extensions main {
-            flex-direction: column;
-            overflow-y: auto;
-            width: 100%;
-        }
-
-        #tab-extensions main > * {
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-            width: 100%;
-        }
-
-        .pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .pane-header {
-            font-size: 0.9rem;
-            color: #d4d4d4;
-            margin-bottom: 0.5rem;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-height: 32px;
-        }
-
-        .pane-content {
-            flex: 1;
-            overflow: auto;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100%;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            border: 1px solid #3e3e42;
-            border-radius: 4px;
-            padding: 1rem;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            resize: none;
-            outline: none;
-        }
-
-        textarea:focus {
-            border-color: #007acc;
-        }
-
-        .editor-wrapper {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            background-color: #1e1e1e;
-            border: 1px solid #3e3e42;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .editor-wrapper:focus-within {
-            border-color: #007acc;
-        }
-
-        .line-numbers {
-            background-color: #252526;
-            color: #858585;
-            padding: 1rem 0.75rem 1rem 1rem;
-            text-align: right;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            user-select: none;
-            white-space: pre;
-            border-right: 1px solid #3e3e42;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .editor-wrapper textarea {
-            border: none;
-            border-radius: 0;
-            flex: 1;
-        }
-
-        .editor-wrapper textarea:focus {
-            border: none;
-            outline: none;
-        }
-
-        .dsl-editor-container {
-            flex: 1;
-            position: relative;
-            background-color: #1e1e1e;
-            overflow: hidden;
-        }
-
-        .dsl-editor-textarea {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 1rem;
-            margin: 0;
-            border: none;
-            background: transparent;
-            color: transparent;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            resize: none;
-            outline: none;
-            white-space: pre;
-            overflow-wrap: normal;
-            overflow-x: auto;
-            overflow-y: auto;
-            z-index: 2;
-            caret-color: #d4d4d4;
-        }
-
-        .dsl-editor-textarea::selection {
-            background: rgba(237, 173, 16, 0.3);
-        }
-
-        .dsl-editor-textarea::placeholder {
-            color: #858585;
-        }
-
-        .dsl-editor-highlight {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 1rem;
-            margin: 0;
-            border: none;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre;
-            overflow-wrap: normal;
-            overflow-x: hidden;
-            overflow-y: hidden;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        /* DSL Syntax Highlighting */
-        .dsl-keyword {
-            color: #FFB74D;
-            font-weight: 600;
-        }
-
-        .dsl-string {
-            color: #64B5F6;
-        }
-
-        .dsl-number {
-            color: #64B5F6;
-        }
-
-        .dsl-modifier {
-            color: #F48FB1;
-        }
-
-        .dsl-quantifier {
-            color: #9575CD;
-        }
-
-        .dsl-special-key {
-            color: #64B5F6;
-        }
-
-        .dsl-comment {
-            color: #6A9955;
-            font-style: italic;
-        }
-
-        .dsl-javascript {
-            color: #d4d4d4;
-        }
-
-        #js-output {
-            width: 100%;
-            height: 100%;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            border: 1px solid #3e3e42;
-            border-radius: 4px;
-            padding: 1rem;
-            font-family: inherit;
-            font-size: 14px;
-            line-height: 1.5;
-            overflow: auto;
-            white-space: pre;
-        }
-
-        #js-output .hljs {
-            background: transparent;
-            padding: 0;
-        }
-
-        .loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #858585;
-        }
-
-        .error {
-            color: #f48771;
-            padding: 1rem;
-        }
-
-        /* Error warning in header */
-        #error-warning {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .error-warning-text {
-            font-size: 0.85rem;
-            color: #daa520;
-            font-weight: 600;
-        }
-
-        .error-details-btn {
-            background-color: #daa520;
-            color: #1e1e1e;
-            border: none;
-            border-radius: 3px;
-            padding: 0.3rem 0.6rem;
-            font-size: 0.8rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .error-details-btn:hover {
-            background-color: #c99000;
-        }
-
-        /* Test error banner */
-        .test-error-banner {
-            background-color: #3a2e1e;
-            border: 2px solid #daa520;
-            border-radius: 6px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .test-error-banner .warning-icon {
-            font-size: 1.5rem;
-            color: #daa520;
-        }
-
-        .test-error-banner #test-error-text {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #daa520;
-            flex: 1;
-        }
-
-        .test-error-banner .error-details-btn {
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-        }
-
-        /* Yellow border for JS output when errors exist */
-        #js-output.has-errors {
-            border: 3px solid #daa520;
-        }
-
-        /* Modal styles */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .compile-errors-modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            background: #1e1e1e;
-            border: 2px solid #f44336;
-            border-radius: 8px;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .compile-errors-modal.active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .modal-header {
-            background: #2d2d30;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #f44336;
-            font-weight: bold;
-            color: #f44336;
-        }
-
-        .modal-close {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-
-        .modal-close:hover {
-            background: #d32f2f;
-        }
-
-        .modal-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .error-item {
-            background-color: #2d2d30;
-            border-left: 3px solid #f44336;
-            padding: 0.75rem;
-            margin: 0.75rem 0;
-            border-radius: 3px;
-        }
-
-        .error-location {
-            font-size: 0.9rem;
-            color: #4EC9B0;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .error-code {
-            font-family: 'Courier New', monospace;
-            background-color: #1e1e1e;
-            padding: 0.5rem;
-            border-radius: 3px;
-            margin: 0.5rem 0;
-            color: #f48771;
-            border: 1px solid #3e3e42;
-        }
-
-        .error-message {
-            font-size: 0.9rem;
-            color: #d4d4d4;
-            margin-top: 0.5rem;
-        }
-
-        /* Test runner styles */
-        .test-suite {
-            margin-bottom: 20px;
-            border: 1px solid #3e3e3e;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .test-suite-header {
-            background: #2d2d30;
-            padding: 12px 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .test-suite-header:hover {
-            background: #3e3e42;
-        }
-        .test-suite-body {
-            padding: 16px;
-        }
-        .test-case {
-            padding: 8px 12px;
-            margin: 4px 0;
-            border-radius: 3px;
-            display: flex;
-            align-items: center;
-        }
-        .test-case.pass {
-            background: #1e3a1e;
-            border-left: 3px solid #4CAF50;
-        }
-        .test-case.fail {
-            background: #3a1e1e;
-            border-left: 3px solid #f44336;
-        }
-        .test-case.skipped {
-            background: #2a2a2a;
-            border-left: 3px solid #757575;
-            opacity: 0.6;
-        }
-        .test-case.has-compile-error {
-            border: 2px solid #daa520;
-            border-left: 3px solid #daa520;
-        }
-        .test-case.pass.has-compile-error {
-            border-left-color: #4CAF50;
-        }
-        .test-case.fail.has-compile-error {
-            border-left-color: #f44336;
-        }
-        .test-icon {
-            margin-right: 12px;
-            font-weight: bold;
-        }
-        .test-icon.pass { color: #4CAF50; }
-        .test-icon.fail { color: #f44336; }
-        .test-icon.skipped { color: #757575; }
-        .compile-error-icon {
-            color: #daa520;
-            font-weight: bold;
-            margin-left: 4px;
-        }
-        .test-message {
-            flex: 1;
-        }
-        .test-description {
-            margin-top: 4px;
-            font-size: 12px;
-            opacity: 0.7;
-            font-style: italic;
-        }
-        .test-error {
-            margin-top: 8px;
-            padding: 8px;
-            background: #2d2d30;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #f44336;
-            white-space: pre-wrap;
-        }
-        .summary-divider {
-            width: 1px;
-            background: #3e3e3e;
-            align-self: stretch;
-            margin: 0 8px;
-        }
-        .summary-timing {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            margin-left: auto;
-        }
-        .summary-timing .icon {
-            font-size: 16px;
-            opacity: 0.7;
-        }
-        .summary-timing .duration {
-            font-size: 16px;
-            font-weight: 600;
-            color: #4EC9B0;
-        }
-        .summary-timing .details {
-            font-size: 11px;
-            opacity: 0.5;
-        }
-        .summary {
-            background: #252526;
-            padding: 10px 16px;
-            border-radius: 4px;
-            border: 1px solid #3e3e3e;
-            display: flex;
-            gap: 24px;
-            align-items: center;
-        }
-        .summary-item {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-        }
-        .summary-number {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        .summary-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            opacity: 0.6;
-        }
-        .run-tests-btn {
-            background: #0e639c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .run-tests-btn:hover {
-            background: #1177bb;
-        }
-        .collapsed .test-suite-body {
-            display: none;
-        }
-        .toggle-icon {
-            transition: transform 0.2s;
-        }
-        .collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
-        .editor-container {
-            display: none;
-        }
-        .wb {
-            background-color: #282C34;
-            color: #B2B2B2;
-            position: relative;
-            outline: none;
-            font-family: monospace;
-            border: 1px solid black;
-        }
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-        .wb-clipboard-bridge {
-            position: fixed;
-            left: 0;
-            top: 1px;
-            width: 0;
-            height: 1px;
-            opacity: 0;
-            pointer-events: none;
-        }
-        .wb .wb-lines pre::before {
-            content: "\200B";
-        }
-        .wb .wb-lines pre {
-            margin: 0;
-            overflow: hidden;
-        }
-        .wb .wb-selection {
-            left: 0ch;
-            top: 0ch;
-            background-color: #EDAD10;
-            position: absolute;
-            mix-blend-mode: difference;
-        }
-        .wb .wb-status span {
-            padding-right: 4px;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-            20%, 40%, 60%, 80% { transform: translateX(4px); }
-        }
-        .shake {
-            animation: shake 0.5s;
-        }
-        .walkthrough-btn {
-            background: #9c640e;
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 8px;
-        }
-        .walkthrough-btn:hover {
-            background: #bb7711;
-        }
-        .walkthrough-na {
-            color: #666;
-            font-size: 12px;
-            margin-left: 8px;
-            font-style: italic;
-        }
-        .walkthrough-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .walkthrough-backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .walkthrough-panel {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            width: 0;
-            background: #1e1e1e;
-            border-left: 2px solid #4EC9B0;
-            z-index: 1000;
-            overflow: hidden;
-            transition: width 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-        .walkthrough-panel.active {
-            width: max(1200px, 70vw);
-        }
-        .walkthrough-header {
-            background: #2d2d30;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #3e3e3e;
-        }
-        .walkthrough-close {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .walkthrough-body {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-        }
-        .walkthrough-left {
-            flex: 1;
-            background: #252526;
-            border-right: 1px solid #3e3e3e;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .walkthrough-right {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .code-view {
-            flex: 1;
-            overflow: auto;
-            padding: 16px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        .code-view pre {
-            margin: 0;
-            color: #d4d4d4;
-        }
-        .code-line {
-            padding: 2px 8px;
-            line-height: 1.6;
-        }
-        .code-line.step-line {
-            cursor: pointer;
-            border-left: 3px solid transparent;
-            padding-left: 5px;
-        }
-        .code-line.step-line:hover {
-            background: #2d2d30;
-        }
-        .code-line.step-line.current {
-            background: #0e639c;
-            border-left-color: #4EC9B0;
-            color: white;
-            font-weight: bold;
-        }
-        .code-line.step-line.completed {
-            background: #1e3a1e;
-            border-left-color: #4CAF50;
-        }
-        .code-line.error-line {
-            background: #3a1e1e;
-            border-left: 3px solid #f44336;
-            padding-left: 5px;
-        }
-        .error-marker {
-            display: inline-block;
-            margin-left: 8px;
-            color: #f44336;
-            font-weight: bold;
-            float: right;
-        }
-        .code-line.success-line {
-            background: #1e3a1e;
-            border-left: 3px solid #4CAF50;
-            padding-left: 5px;
-        }
-        .success-marker {
-            display: inline-block;
-            margin-left: 8px;
-            color: #4CAF50;
-            font-weight: bold;
-            float: right;
-        }
-        .step-marker {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            line-height: 20px;
-            text-align: center;
-            margin-left: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            color: black;
-            background-color: #4EC9B0;
-            border-radius: 50%;
-            float: right;
-        }
-        .step-controls-panel {
-            background: #2d2d30;
-            padding: 12px 16px;
-            border-top: 1px solid #3e3e3e;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .step-btn {
-            background: #0e639c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .step-btn:hover {
-            background: #1177bb;
-        }
-        .step-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        .step-info {
-            flex: 1;
-            font-size: 13px;
-            color: #d4d4d4;
-        }
-        .editor-view-container {
-            flex: 1;
-            padding: 16px;
-            overflow: auto;
-        }
-        .walkthrough-code-tab {
-            padding: 8px 16px;
-            cursor: pointer;
-            background-color: transparent;
-            border: none;
-            color: #858585;
-            font-family: inherit;
-            font-size: 0.85rem;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .walkthrough-code-tab:hover {
-            color: #cccccc;
-            background-color: #3e3e42;
-        }
-        .walkthrough-code-tab.active {
-            color: #ffffff;
-            border-bottom-color: #4EC9B0;
-        }
-
-        .walkthrough-compile-warning {
-            background-color: #3a2e1e;
-            border-bottom: 2px solid #daa520;
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .walkthrough-compile-warning .warning-icon {
-            font-size: 1rem;
-            color: #daa520;
-        }
-
-        .walkthrough-compile-warning #walkthrough-compile-warning-text {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #daa520;
-        }
-
-        @media (max-width: 1300px) {
-            .walkthrough-panel.active {
-                width: calc(100vw - 100px);
-            }
-        }
+        body { max-width: 1200px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 4px; border-bottom: 1px solid #ccc; margin-bottom: 1rem; }
+        .tab { padding: 8px 16px; cursor: pointer; background: #f4f4f4; border: 1px solid #ccc; border-bottom: none; border-radius: 4px 4px 0 0; color: #333; }
+        .tab:hover { background: #e8e8e8; color: #000; }
+        .tab.active { background: white; border-bottom: 1px solid white; margin-bottom: -1px; font-weight: bold; color: #000; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        #tab-source.active { display: flex; flex-direction: column; }
+        #test-stale-warning { margin-left: auto; color: #b8860b; font-size: 0.9rem; }
+
+        /* Summary bar */
+        .summary { display: flex; gap: 24px; align-items: center; padding: 12px 0; margin-bottom: 1rem; flex-wrap: wrap; }
+        .summary-item { display: flex; align-items: baseline; gap: 6px; }
+        .summary-number { font-size: 1.5rem; font-weight: bold; }
+        .summary-label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; }
+        .summary-timing { margin-left: auto; font-size: 0.9rem; }
+        .summary-timing .duration { font-weight: bold; color: #0e639c; }
+
+        /* Test results */
+        .test-suite { margin-bottom: 16px; border: 1px solid black; }
+        .test-suite-header { padding: 8px 12px; cursor: pointer; display: flex; justify-content: space-between; font-weight: 600; }
+        .test-suite-header:hover { background: #f4f4f4; }
+        .test-suite-body { padding: 8px 12px; }
+        .collapsed .test-suite-body { display: none; }
+        .toggle-icon { transition: transform 0.2s; }
+        .collapsed .toggle-icon { transform: rotate(-90deg); }
+
+        .test-case { padding: 4px 0; display: flex; align-items: center; }
+        .test-case.skipped { opacity: 0.5; }
+        .test-icon { margin-right: 8px; }
+        .test-icon.pass { color: #28a745; }
+        .test-icon.fail { color: #dc3545; }
+        .test-icon.skipped { color: #6c757d; }
+        .compile-error-icon { color: #b8860b; margin-left: 4px; }
+        .test-message { flex: 1; }
+        .test-description { margin-top: 2px; font-size: 0.85rem; opacity: 0.7; font-style: italic; }
+        .test-error { margin-top: 8px; padding: 8px; background: #fff; border: 1px solid #dc3545; font-family: monospace; font-size: 0.85rem; color: #dc3545; white-space: pre-wrap; }
+
+        .walkthrough-btn { margin-left: 8px; font-size: 0.75rem; padding: 2px 8px; }
+        .walkthrough-na { color: #999; font-size: 0.75rem; margin-left: 8px; font-style: italic; }
+
+        /* Error banner */
+        .test-error-banner { background: #fff3cd; border: 2px solid #b8860b; border-radius: 4px; padding: 12px 16px; margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
+        .test-error-banner .warning-icon { font-size: 1.25rem; color: #b8860b; }
+        .test-error-banner #test-error-text { font-weight: 600; color: #856404; flex: 1; }
+        .error-details-btn { background: #b8860b; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; }
+        .error-details-btn:hover { background: #9a7209; }
+
+        /* Buttons */
+        button:not(.walkthrough-btn):not(.tab):not(.walkthrough-code-tab) { background: #0e639c; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+        button:not(.walkthrough-btn):not(.tab):not(.walkthrough-code-tab):hover { background: #1177bb; }
+        button:not(.walkthrough-btn):not(.tab):not(.walkthrough-code-tab):disabled { background: #ccc; color: #666; cursor: not-allowed; }
+        .run-tests-btn { margin-left: auto; }
+
+        /* Source tab */
+        #tab-source main { display: flex; gap: 1rem; }
+        .pane { width: 50%; display: flex; flex-direction: column; }
+        .pane-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; min-height: 32px; }
+        .pane-content { width: 100%; }
+        .editor-wrapper { display: flex; height: 100%; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+        .line-numbers { background: #f4f4f4; padding: 1rem 0.75rem; text-align: right; font-family: monospace; font-size: 14px; line-height: 1.5; user-select: none; border-right: 1px solid #ccc; color: #666; }
+        .dsl-editor-container { flex: 1; position: relative; }
+        .dsl-editor-textarea { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 1rem; border: none; background: transparent; color: transparent; font-family: monospace; font-size: 14px; line-height: 1.5; resize: none; outline: none; white-space: pre; z-index: 2; caret-color: #333; }
+        .dsl-editor-textarea::selection { background: rgba(14, 99, 156, 0.3); }
+        .dsl-editor-highlight { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 1rem; background: white; font-family: monospace; font-size: 14px; line-height: 1.5; white-space: pre; overflow: hidden; z-index: 1; pointer-events: none; }
+
+        /* DSL syntax colors */
+        .dsl-keyword { color: #0e639c; font-weight: 600; }
+        .dsl-string { color: #a31515; }
+        .dsl-number { color: #098658; }
+        .dsl-quantifier { color: #811f3f; }
+        .dsl-special-key { color: #0e639c; }
+        .dsl-comment { color: #008000; font-style: italic; }
+        .dsl-javascript { color: #333; }
+
+        #js-output { height: 100%; border: 1px solid #ccc; background: #f8f8f8; }
+        #js-output.stale { opacity: 0.5; }
+        #js-output.has-errors { border: 3px solid #b8860b; }
+        #js-output .hljs { background: transparent; padding: 0; }
+        #error-warning { display: flex; align-items: center; gap: 0.5rem; }
+        .error-warning-text { color: #b8860b; font-weight: 600; font-size: 0.9rem; }
+        .status-message { display: none; font-size: 0.85rem; }
+        .status-message.visible { display: inline; }
+        .status-message.success { color: #28a745; }
+
+        /* Grammar tab */
+        #tab-grammar main { font-family: monospace; font-size: 14px; line-height: 1.6; white-space: pre; overflow-x: auto; }
+        .g-nt { color: #098658; }  /* non-terminal */
+        .g-kw { color: #0e639c; font-weight: 600; }  /* keyword */
+        .g-str { color: #a31515; }  /* string */
+        .g-q { color: #811f3f; }  /* quantifier */
+        .g-arr { color: #28a745; }  /* arrow */
+        .g-dim { opacity: 0.6; }  /* dimmed */
+
+        /* Modal */
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+        .compile-errors-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 800px; max-height: 80vh; background: white; border: 2px solid #dc3545; border-radius: 8px; z-index: 1000; opacity: 0; pointer-events: none; display: flex; flex-direction: column; }
+        .compile-errors-modal.active { opacity: 1; pointer-events: auto; }
+        .modal-header { padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dc3545; font-weight: bold; color: #dc3545; }
+        .modal-close { background: #dc3545; }
+        .modal-close:hover { background: #c82333; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 1rem; }
+        .error-item { background: #f8f8f8; border-left: 3px solid #dc3545; padding: 0.75rem; margin: 0.75rem 0; }
+        .error-location { color: #0e639c; font-weight: 600; margin-bottom: 0.5rem; }
+        .error-code { font-family: monospace; background: #fff; padding: 0.5rem; border: 1px solid #ccc; margin: 0.5rem 0; color: #dc3545; }
+        .error-message { margin-top: 0.5rem; }
+
+        /* Hidden test editor */
+        .editor-container { display: none; }
+
+        /* Buffee editor */
+        .wb { background-color: #282C34; color: #B2B2B2; position: relative; outline: none; font-family: monospace; display: flex; flex-direction: column; }
+        .wb-content { display: flex; flex: 1; overflow: hidden; }
+        .no-select { user-select: none; }
+        .wb-clipboard-bridge { position: fixed; left: 0; top: 1px; width: 0; height: 1px; opacity: 0; pointer-events: none; }
+        .wb .wb-lines pre::before { content: "\200B"; }
+        .wb .wb-lines pre { margin: 0; overflow: hidden; }
+        .wb .wb-selection { background-color: #EDAD10; position: absolute; mix-blend-mode: difference; }
+        .wb .wb-cursor { background-color: #FF6B6B; mix-blend-mode: difference; }
+        .wb .wb-status span { padding-right: 4px; }
+
+        /* DSL editor specific */
+        #dsl-editor { border: 1px solid #ccc; background: white; color: #333; width: 100%; }
+        #dsl-editor .wb-gutter { background: #f4f4f4; color: #666; }
+        #dsl-editor .wb-lines { flex: 1; overflow: hidden; }
+
+        /* Walkthrough panel */
+        .walkthrough-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .walkthrough-backdrop.active { opacity: 1; pointer-events: auto; }
+        .walkthrough-panel { position: fixed; top: 0; bottom: 0; right: 0; width: 0; background: white; border-left: 3px solid #0e639c; z-index: 1000; overflow: hidden; transition: width 0.3s; display: flex; flex-direction: column; color: #333; }
+        .walkthrough-panel.active { width: max(1000px, 60vw); }
+        .walkthrough-header { background: #f4f4f4; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; }
+        .walkthrough-close { background: #dc3545; }
+        .walkthrough-body { display: flex; flex: 1; min-height: 0; }
+        .walkthrough-left { flex: 1; background: #f8f8f8; border-right: 1px solid #ccc; display: flex; flex-direction: column; }
+        .walkthrough-right { flex: 1; display: flex; flex-direction: column; }
+        .walkthrough-code-tab { padding: 8px 16px; cursor: pointer; background: transparent; border: none; color: #666; font-size: 0.85rem; border-bottom: 2px solid transparent; }
+        .walkthrough-code-tab:hover { color: #333; background: #eee; }
+        .walkthrough-code-tab.active { color: #000; border-bottom-color: #0e639c; font-weight: bold; }
+        .walkthrough-compile-warning { background: #fff3cd; border-bottom: 2px solid #b8860b; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .walkthrough-compile-warning .warning-icon { color: #b8860b; }
+        #walkthrough-compile-warning-text { color: #856404; font-weight: 600; }
+        .code-view { flex: 1; overflow: auto; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.5; background: white; }
+        .code-view pre { margin: 0; color: #333; }
+
+        /* Highlight.js light theme for walkthrough */
+        .code-view .hljs { color: #333; }
+        .code-view .hljs-keyword { color: #0e639c; font-weight: 600; }
+        .code-view .hljs-string { color: #a31515; }
+        .code-view .hljs-number { color: #098658; }
+        .code-view .hljs-function { color: #795e26; }
+        .code-view .hljs-title { color: #795e26; }
+        .code-view .hljs-params { color: #333; }
+        .code-view .hljs-comment { color: #008000; font-style: italic; }
+        .code-view .hljs-built_in { color: #0e639c; }
+        .code-view .hljs-literal { color: #0e639c; }
+        .code-view .hljs-attr { color: #e50000; }
+        .code-view .hljs-property { color: #001080; }
+        .code-view .hljs-punctuation { color: #333; }
+        .code-line { padding: 2px 8px; line-height: 1.6; }
+        .code-line.step-line { cursor: pointer; border-left: 3px solid transparent; padding-left: 5px; }
+        .code-line.step-line:hover { background: #f0f0f0; }
+        .code-line.step-line.current { background: #cce5ff; border-left-color: #0e639c; font-weight: bold; }
+        .code-line.step-line.completed { background: #d4edda; border-left-color: #28a745; }
+        .code-line.error-line { background: #f8d7da; border-left: 3px solid #dc3545; padding-left: 5px; }
+        .code-line.success-line { background: #d4edda; border-left: 3px solid #28a745; padding-left: 5px; }
+        .error-marker, .success-marker, .step-marker { float: right; margin-left: 8px; font-weight: bold; }
+        .error-marker { color: #dc3545; }
+        .success-marker { color: #28a745; }
+        .step-marker { width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 11px; color: white; background: #0e639c; border-radius: 50%; display: inline-block; }
+        .editor-view-container { flex: 1; padding: 16px; overflow: auto; background: #f8f8f8; }
+        .step-controls-panel { background: #f4f4f4; padding: 12px 16px; border-top: 1px solid #ccc; display: flex; gap: 8px; align-items: center; }
+        .step-btn { background: #0e639c; padding: 8px 16px; font-size: 13px; }
+        .step-btn:disabled { background: #ccc; color: #666; opacity: 0.7; }
+        .step-info { flex: 1; font-size: 13px; color: #333; }
+
+        @media (max-width: 1300px) { .walkthrough-panel.active { width: calc(100vw - 100px); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-4px); } 50% { transform: translateX(4px); } }
+        .shake { animation: shake 0.4s; }
     </style>
 </head>
 <body>
-    <div class="tabs-wrapper">
-        <div class="tabs">
-            <button class="tab active" data-tab="tests">Tests</button>
-            <button class="tab" data-tab="extensions">Extensions</button>
-            <button class="tab" data-tab="source">Source</button>
-            <button class="tab" data-tab="grammar">Grammar</button>
-            <span id="test-stale-warning" class="status-message warning" style="display: none;"><span class="warning-icon">⚠</span>source spec has changed, consider recompiling</span>
-        </div>
+    <nav id="nav"></nav>
+    <script>
+        fetch('../navigation.html')
+            .then(r => r.text())
+            .then(html => document.getElementById('nav').innerHTML = html);
+    </script>
+    <p><a href="../index.html">home</a> / Tests</p>
+    <h1>Unit Test Runner</h1>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="tests">Tests</button>
+        <button class="tab" data-tab="extensions">Extensions</button>
+        <button class="tab" data-tab="source">Source</button>
+        <button class="tab" data-tab="grammar">Grammar</button>
+        <span id="test-stale-warning" class="status-message warning" style="display: none;"><span class="warning-icon">⚠</span> source spec changed, recompile</span>
     </div>
     <div id="tab-tests" class="tab-content active">
         <main>
@@ -1069,19 +222,19 @@
                     <div class="summary-label">Total</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" style="color: #4CAF50" id="passed-tests">0</div>
+                    <div class="summary-number" style="color: #28a745" id="passed-tests">0</div>
                     <div class="summary-label">Passed</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" style="color: #f44336" id="failed-tests">0</div>
+                    <div class="summary-number" style="color: #dc3545" id="failed-tests">0</div>
                     <div class="summary-label">Failed</div>
                 </div>
                 <div class="summary-item" id="compile-errors-summary">
-                    <div class="summary-number" style="color: #daa520" id="compile-error-tests">0</div>
+                    <div class="summary-number" style="color: #b8860b" id="compile-error-tests">0</div>
                     <div class="summary-label">with compile errors</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" style="color: #757575" id="skipped-tests">0</div>
+                    <div class="summary-number" style="color: #6c757d" id="skipped-tests">0</div>
                     <div class="summary-label">Skipped</div>
                 </div>
                 <div id="test-timing" class="summary-timing"></div>
@@ -1118,15 +271,14 @@
                     <div class="summary-label">Total</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" style="color: #4CAF50" id="ext-passed-tests">0</div>
+                    <div class="summary-number" style="color: #28a745" id="ext-passed-tests">0</div>
                     <div class="summary-label">Passed</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-number" style="color: #f44336" id="ext-failed-tests">0</div>
+                    <div class="summary-number" style="color: #dc3545" id="ext-failed-tests">0</div>
                     <div class="summary-label">Failed</div>
                 </div>
                 <div id="ext-test-timing" class="summary-timing"></div>
-                <button id="run-ext-tests-btn" class="run-tests-btn">Run Extension Tests</button>
             </div>
             <div id="ext-test-results"></div>
         </main>
@@ -1138,17 +290,21 @@
                     <span>Source DSL</span>
                     <div>
                         <span id="status-uptodate" class="status-message success"><span class="success-icon">✓</span>Generated JavaScript is up to date</span>
-                        <button id="generate-btn">Compile and Run Tests</button>
+                        <button id="generate-btn" class="walkthrough-btn">Compile and Run Tests</button>
                     </div>
                 </div>
                 <div class="pane-content">
-                    <div class="editor-wrapper">
-                        <div class="line-numbers" id="dsl-line-numbers">1</div>
-                        <div class="dsl-editor-container">
-                            <div id="dsl-highlight" class="dsl-editor-highlight"></div>
-                            <textarea id="dsl-content" class="dsl-editor-textarea" spellcheck="false" placeholder="Loading DSL content..."></textarea>
+                    <blockquote class="wb no-select" tabindex="0" id="dsl-editor">
+                        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+                        <div class="wb-content">
+                            <div class="wb-gutter"></div>
+                            <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
                         </div>
-                    </div>
+                        <div class="wb-status" style="display: none;">
+                            <div><span class="wb-linecount"></span></div>
+                            <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+                        </div>
+                    </blockquote>
                 </div>
             </div>
             <div class="pane">
@@ -1160,43 +316,52 @@
                     </div>
                 </div>
                 <div class="pane-content">
-                    <div id="js-output"></div>
+                    <blockquote class="wb no-select" tabindex="0" id="js-output">
+                        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+                        <div class="wb-content">
+                            <div class="wb-gutter"></div>
+                            <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+                        </div>
+                        <div class="wb-status" style="display: none;">
+                            <div><span class="wb-linecount"></span></div>
+                            <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+                        </div>
+                    </blockquote>
                 </div>
             </div>
         </main>
     </div>
     <div id="tab-grammar" class="tab-content">
-        <main>
-            <div style="width: 100%; flex: 1; font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 14px; line-height: 1.6; background: #1e1e1e; color: #d4d4d4; overflow-y: auto; white-space: pre;">A domain specific language for testing the text editor state
-<span style="color: #81C784;">&lt;command&gt;</span>          ::= <span style="color: #81C784;">&lt;press-command&gt;</span> | <span style="color: #81C784;">&lt;type&gt;</span> | <span style="color: #81C784;">&lt;expect-cursor&gt;</span> | <span style="color: #81C784;">&lt;expect-selection&gt;</span>
-<span style="color: #81C784;">&lt;type&gt;</span>             ::= <span style="color: #FFB74D;">TYPE</span> <span style="color: #64B5F6;">"text"</span>
-<span style="color: #81C784;">&lt;press-command&gt;</span>    ::= <span style="color: #81C784;">&lt;press&gt;</span> <span style="color: #9575CD;">[quantification]</span> [<span style="color: #FFB74D;">with</span> <span style="color: #64B5F6;">&lt;modifiers&gt;</span>]
-                     | <span style="color: #81C784;">&lt;press&gt;</span> [<span style="color: #FFB74D;">with</span> <span style="color: #64B5F6;">&lt;modifiers&gt;</span>] <span style="color: #9575CD;">[quantification]</span>
-<span style="color: #81C784;">&lt;press&gt;</span>            ::= <span style="color: #FFB74D;">PRESS</span> (<span style="color: #81C784;">&lt;char&gt;</span> | <span style="color: #81C784;">&lt;special-key&gt;</span>) | <span style="color: #81C784;">&lt;special-key&gt;</span>
-<span style="color: #81C784;">&lt;expect-cursor&gt;</span>    ::= <span style="color: #FFB74D;">EXPECT</span> <span style="color: #9575CD;">cursor</span> <span style="color: #FFB74D;">at</span> <span style="color: #9575CD;">&lt;row&gt;</span><span style="opacity: 0.6;">,</span><span style="color: #9575CD;">&lt;col&gt;</span>
-<span style="color: #81C784;">&lt;expect-selection&gt;</span> ::= <span style="color: #FFB74D;">EXPECT</span> <span style="color: #9575CD;">selection</span> <span style="color: #FFB74D;">at</span> <span style="color: #9575CD;">&lt;startRow&gt;</span><span style="opacity: 0.6;">,</span><span style="color: #9575CD;">&lt;startCol&gt;</span><span style="opacity: 0.6;">-</span><span style="color: #9575CD;">&lt;endRow&gt;</span><span style="opacity: 0.6;">,</span><span style="color: #9575CD;">&lt;endCol&gt;</span>
-<span style="color: #81C784;">&lt;char&gt;</span>             ::= <span style="color: #64B5F6;">a</span> | <span style="color: #64B5F6;">" "</span> | <span style="color: #64B5F6;">';'</span> | ...
-<span style="color: #81C784;">&lt;special-key&gt;</span>      ::= <span style="color: #64B5F6;">backspace</span> | <span style="color: #64B5F6;">enter</span> | <span style="color: #64B5F6;">left</span> | <span style="color: #64B5F6;">right</span> | <span style="color: #64B5F6;">up</span> | <span style="color: #64B5F6;">down</span>
-<span style="color: #81C784;">&lt;quantification&gt;</span>   ::= <span style="color: #9575CD;">once</span> | <span style="color: #9575CD;">N time(s)</span> <span style="opacity: 0.6;">(default: once)</span>
-<span style="color: #81C784;">&lt;modifiers&gt;</span>        ::= <span style="color: #64B5F6;">shift</span> | <span style="color: #64B5F6;">meta</span> | <span style="color: #64B5F6;">meta, shift</span>
+        <main>A domain specific language for testing the text editor state
 
-Examples in Normalized Form <span style="color: #4CAF50;">      →</span>  Transpilation
-<span style="color: #FFB74D;">TYPE</span> <span style="color: #64B5F6;">"Hello"</span>                      <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">type</span>(<span style="color: #64B5F6;">'Hello'</span>);
-<span style="color: #FFB74D;">PRESS</span> <span style="color: #64B5F6;">a</span> <span style="color: #9575CD;">once</span>                      <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">'a'</span>).<span style="color: #9575CD;">once()</span>;
-<span style="color: #FFB74D;">PRESS</span> <span style="color: #64B5F6;">";"</span>                         <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">';'</span>).<span style="color: #9575CD;">once()</span>;
-<span style="color: #FFB74D;">PRESS</span> <span style="color: #64B5F6;">' '</span>                         <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">' '</span>).<span style="color: #9575CD;">times(1)</span>;
-<span style="color: #64B5F6;">enter</span> <span style="color: #9575CD;">1 time</span>                      <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">Key.Enter</span>).<span style="color: #9575CD;">once()</span>;
-<span style="color: #64B5F6;">backspace</span>                         <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">Key.Backspace</span>).<span style="color: #9575CD;">times(3)</span>;
-<span style="color: #64B5F6;">left</span> <span style="color: #9575CD;">3 times</span> <span style="color: #FFB74D;">with</span> <span style="color: #64B5F6;">meta</span>            <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">Key.ArrowLeft</span>).<span style="color: #64B5F6;">withMetaKey()</span>.<span style="color: #9575CD;">once()</span>;
-<span style="color: #64B5F6;">right</span> <span style="color: #FFB74D;">with</span> <span style="color: #64B5F6;">meta</span>, <span style="color: #64B5F6;">shift</span>            <span style="color: #4CAF50;">→</span>  fixture.<span style="color: #FFB74D;">press</span>(<span style="color: #64B5F6;">Key.ArrowRight</span>).<span style="color: #64B5F6;">withMetaKey()</span>.<span style="color: #64B5F6;">withShiftKey()</span>.<span style="color: #9575CD;">once()</span>;
-<span style="color: #FFB74D;">EXPECT</span> <span style="color: #9575CD;">cursor</span> <span style="color: #FFB74D;">at</span> <span style="color: #9575CD;">0,5</span>              <span style="color: #4CAF50;">→</span>  <span style="color: #FFB74D;">expect</span>(fixture).<span style="color: #9575CD;">toHaveCursorAt</span>(<span style="color: #9575CD;">0</span>, <span style="color: #9575CD;">5</span>);
-<span style="color: #FFB74D;">EXPECT</span> <span style="color: #9575CD;">selection</span> <span style="color: #FFB74D;">at</span> <span style="color: #9575CD;">1,2-4,5</span>       <span style="color: #4CAF50;">→</span>  <span style="color: #FFB74D;">expect</span>(fixture).<span style="color: #9575CD;">toHaveSelectionAt</span>(<span style="color: #9575CD;">1</span>, <span style="color: #9575CD;">2</span>, <span style="color: #9575CD;">4</span>, <span style="color: #9575CD;">5</span>);
+<span class="g-nt">&lt;command&gt;</span>          ::= <span class="g-nt">&lt;press-command&gt;</span> | <span class="g-nt">&lt;type&gt;</span> | <span class="g-nt">&lt;expect-cursor&gt;</span> | <span class="g-nt">&lt;expect-selection&gt;</span>
+<span class="g-nt">&lt;type&gt;</span>             ::= <span class="g-kw">TYPE</span> <span class="g-str">"text"</span>
+<span class="g-nt">&lt;press-command&gt;</span>    ::= <span class="g-nt">&lt;press&gt;</span> <span class="g-q">[quantification]</span> [<span class="g-kw">with</span> <span class="g-str">&lt;modifiers&gt;</span>]
+                     | <span class="g-nt">&lt;press&gt;</span> [<span class="g-kw">with</span> <span class="g-str">&lt;modifiers&gt;</span>] <span class="g-q">[quantification]</span>
+<span class="g-nt">&lt;press&gt;</span>            ::= <span class="g-kw">PRESS</span> (<span class="g-nt">&lt;char&gt;</span> | <span class="g-nt">&lt;special-key&gt;</span>) | <span class="g-nt">&lt;special-key&gt;</span>
+<span class="g-nt">&lt;expect-cursor&gt;</span>    ::= <span class="g-kw">EXPECT</span> <span class="g-q">cursor</span> <span class="g-kw">at</span> <span class="g-q">&lt;row&gt;</span><span class="g-dim">,</span><span class="g-q">&lt;col&gt;</span>
+<span class="g-nt">&lt;expect-selection&gt;</span> ::= <span class="g-kw">EXPECT</span> <span class="g-q">selection</span> <span class="g-kw">at</span> <span class="g-q">&lt;startRow&gt;</span><span class="g-dim">,</span><span class="g-q">&lt;startCol&gt;</span><span class="g-dim">-</span><span class="g-q">&lt;endRow&gt;</span><span class="g-dim">,</span><span class="g-q">&lt;endCol&gt;</span>
+<span class="g-nt">&lt;char&gt;</span>             ::= <span class="g-str">a</span> | <span class="g-str">" "</span> | <span class="g-str">';'</span> | ...
+<span class="g-nt">&lt;special-key&gt;</span>      ::= <span class="g-str">backspace</span> | <span class="g-str">enter</span> | <span class="g-str">left</span> | <span class="g-str">right</span> | <span class="g-str">up</span> | <span class="g-str">down</span>
+<span class="g-nt">&lt;quantification&gt;</span>   ::= <span class="g-q">once</span> | <span class="g-q">N time(s)</span> <span class="g-dim">(default: once)</span>
+<span class="g-nt">&lt;modifiers&gt;</span>        ::= <span class="g-str">shift</span> | <span class="g-str">meta</span> | <span class="g-str">meta, shift</span>
 
-<span style="opacity: 0.7;">JavaScript pass-through for lines ending with ";", starting with "//" and empty lines:</span>
-expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect(3+5).toBe(8);
-// This is a comment            <span style="color: #4CAF50;">→</span>  // This is a comment
-(empty line)                    <span style="color: #4CAF50;">→</span>  (empty line)</div>
-        </main>
+Examples in Normalized Form        <span class="g-arr">→</span>  Transpilation
+<span class="g-kw">TYPE</span> <span class="g-str">"Hello"</span>                       <span class="g-arr">→</span>  fixture.<span class="g-kw">type</span>(<span class="g-str">'Hello'</span>);
+<span class="g-kw">PRESS</span> <span class="g-str">a</span> <span class="g-q">once</span>                       <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">'a'</span>).<span class="g-q">once()</span>;
+<span class="g-kw">PRESS</span> <span class="g-str">";"</span>                          <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">';'</span>).<span class="g-q">once()</span>;
+<span class="g-kw">PRESS</span> <span class="g-str">' '</span>                          <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">' '</span>).<span class="g-q">times(1)</span>;
+<span class="g-str">enter</span> <span class="g-q">1 time</span>                       <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">Key.Enter</span>).<span class="g-q">once()</span>;
+<span class="g-str">backspace</span>                          <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">Key.Backspace</span>).<span class="g-q">times(3)</span>;
+<span class="g-str">left</span> <span class="g-q">3 times</span> <span class="g-kw">with</span> <span class="g-str">meta</span>             <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">Key.ArrowLeft</span>).<span class="g-str">withMetaKey()</span>.<span class="g-q">once()</span>;
+<span class="g-str">right</span> <span class="g-kw">with</span> <span class="g-str">meta</span>, <span class="g-str">shift</span>             <span class="g-arr">→</span>  fixture.<span class="g-kw">press</span>(<span class="g-str">Key.ArrowRight</span>).<span class="g-str">withMetaKey()</span>.<span class="g-str">withShiftKey()</span>.<span class="g-q">once()</span>;
+<span class="g-kw">EXPECT</span> <span class="g-q">cursor</span> <span class="g-kw">at</span> <span class="g-q">0,5</span>               <span class="g-arr">→</span>  <span class="g-kw">expect</span>(fixture).<span class="g-q">toHaveCursorAt</span>(<span class="g-q">0</span>, <span class="g-q">5</span>);
+<span class="g-kw">EXPECT</span> <span class="g-q">selection</span> <span class="g-kw">at</span> <span class="g-q">1,2-4,5</span>        <span class="g-arr">→</span>  <span class="g-kw">expect</span>(fixture).<span class="g-q">toHaveSelectionAt</span>(<span class="g-q">1</span>, <span class="g-q">2</span>, <span class="g-q">4</span>, <span class="g-q">5</span>);
+
+<span class="g-dim">JavaScript pass-through for lines ending with ";", starting with "//" and empty lines:</span>
+expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).toBe(8);
+// This is a comment               <span class="g-arr">→</span>  // This is a comment
+(empty line)                       <span class="g-arr">→</span>  (empty line)</main>
     </div>
 
     <!-- Compile Errors Modal -->
@@ -1227,7 +392,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                     <span class="warning-icon">⚠</span>
                     <span id="walkthrough-compile-warning-text">Compiled with errors</span>
                 </div>
-                <div style="background: #2d2d30; border-bottom: 1px solid #3e3e3e; display: flex; align-items: center;">
+                <div style="background: #f4f4f4; border-bottom: 1px solid #ccc; display: flex; align-items: center;">
                     <button class="walkthrough-code-tab active" data-code-tab="js">Generated JavaScript</button>
                     <button class="walkthrough-code-tab" data-code-tab="dsl">Source DSL</button>
                     <button id="copy-dsl-btn" style="margin-left: auto; margin-right: 12px; display: none; padding: 4px 12px; font-size: 12px;" onclick="copyDSLSource()">Copy to clipboard</button>
@@ -1236,7 +401,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 <div class="code-view" id="walkthrough-code-dsl" style="display: none;"></div>
             </div>
             <div class="walkthrough-right">
-                <div style="padding: 12px 16px; background: #2d2d30; border-bottom: 1px solid #3e3e3e;">
+                <div style="padding: 12px 16px; background: #f4f4f4; border-bottom: 1px solid #ccc;">
                     <strong>System-under-test</strong>
                     <div style="margin-top: 4px; font-size: 11px; opacity: 0.6; font-style: italic;">note: you can only observe but not interact with this editor</div>
                 </div>
@@ -1445,28 +610,63 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
         // Source tab logic
         const transpiler = new DSLTranspiler();
         const generator = new SpecGenerator(transpiler);
-        const textarea = document.getElementById('dsl-content');
-        const highlightDiv = document.getElementById('dsl-highlight');
-        const outputDiv = document.getElementById('js-output');
+        const outputEl = document.getElementById('js-output');
         const generateBtn = document.getElementById('generate-btn');
         const statusUpToDate = document.getElementById('status-uptodate');
 
+        let dslEditor = null;
         let lastGeneratedSource = '';
 
-        // Helper functions for overlay editor
+        // Helper functions for Buffee editor
         function getEditorContent() {
-            return textarea.value || '';
+            return dslEditor ? dslEditor.Model.lines.join('\n') : '';
         }
 
         function setEditorContent(text) {
-            textarea.value = text;
-            updateHighlighting();
+            if (dslEditor) dslEditor.Model.text = text;
         }
 
-        function updateHighlighting() {
-            const text = textarea.value;
-            const highlighted = highlightDSL(text);
-            highlightDiv.innerHTML = highlighted || '';
+        let jsOutputEditor = null;
+
+        // Initialize DSL editor after DOM is ready
+        function initDSLEditor() {
+            const dslEditorEl = document.getElementById('dsl-editor');
+            dslEditor = new Buffee(dslEditorEl, {
+                colorPrimary: "#333",
+                colorSecondary: "#f4f4f4",
+                showGutter: true,
+                showStatusLine: false,
+                viewportRows: 20
+            });
+
+            // Initialize JS output editor (read-only, different dimensions)
+            const jsOutputEl = document.getElementById('js-output');
+            jsOutputEditor = new Buffee(jsOutputEl, {
+                colorPrimary: "#333",
+                colorSecondary: "#e8e8e8",
+                showGutter: true,
+                showStatusLine: false,
+                viewportRows: 20
+            });
+            jsOutputEditor.editMode = 'navigate';
+
+            // Enable syntax highlighting for JavaScript
+            BuffeeSyntax(jsOutputEditor);
+            jsOutputEditor.Syntax.setLanguage('javascript');
+            jsOutputEditor.Syntax.setColors({
+                keyword: '#0e639c',
+                string: '#a31515',
+                comment: '#008000',
+                number: '#098658',
+                function: '#795e26',
+                type: '#267f99',
+                variable: '#001080',
+                constant: '#0e639c',
+                operator: '#333',
+                punctuation: '#333',
+                default: '#333'
+            });
+            jsOutputEditor.Syntax.enabled = true;
         }
 
         function updateUIState() {
@@ -1476,13 +676,14 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             generateBtn.disabled = isUpToDate;
 
             const testStaleWarning = document.getElementById('test-stale-warning');
+            const outputEl = document.getElementById('js-output');
 
             if (isUpToDate) {
-                outputDiv.classList.remove('stale');
+                outputEl.classList.remove('stale');
                 statusUpToDate.classList.add('visible');
                 if (testStaleWarning) testStaleWarning.style.display = 'none';
             } else {
-                outputDiv.classList.add('stale');
+                outputEl.classList.add('stale');
                 statusUpToDate.classList.remove('visible');
                 if (testStaleWarning) testStaleWarning.style.display = 'inline';
             }
@@ -1501,11 +702,12 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 const duplicates = result.duplicates || [];
 
                 // Display generated JavaScript
-                const highlighted = hljs.highlight(jsOutput, { language: 'javascript' }).value;
-                outputDiv.innerHTML = highlighted;
-                outputDiv.style.color = '';
-                outputDiv.dataset.plainJs = jsOutput; // Store plain JavaScript for eval
-                outputDiv.dataset.hasDuplicates = duplicates.length > 0 ? 'true' : 'false';
+                if (jsOutputEditor) {
+                    jsOutputEditor.Model.text = jsOutput;
+                }
+                const outputEl = document.getElementById('js-output');
+                outputEl.dataset.plainJs = jsOutput; // Store plain JavaScript for eval
+                outputEl.dataset.hasDuplicates = duplicates.length > 0 ? 'true' : 'false';
 
                 // Handle duplicate test names (fatal error)
                 if (duplicates.length > 0) {
@@ -1514,8 +716,8 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                     lastDuplicates = duplicates;
 
                     // Add red border to JS output for duplicates
-                    outputDiv.classList.add('has-errors');
-                    outputDiv.style.borderColor = '#f44336';
+                    outputEl.classList.add('has-errors');
+                    outputEl.style.borderColor = '#f44336';
 
                     // Show fatal error warning in header
                     const dupCount = duplicates.length;
@@ -1546,7 +748,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                     lastCompileErrors = errors;
 
                     // Add yellow border to JS output
-                    outputDiv.classList.add('has-errors');
+                    outputEl.classList.add('has-errors');
 
                     // Show warning in header
                     const errorCount = errors.length;
@@ -1575,8 +777,8 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                     lastCompileHadErrors = false;
                     lastCompileErrors = [];
                     lastDuplicates = [];
-                    outputDiv.classList.remove('has-errors');
-                    outputDiv.style.borderColor = '';
+                    outputEl.classList.remove('has-errors');
+                    outputEl.style.borderColor = '';
                     errorWarning.style.display = 'none';
                     errorsModalContent.innerHTML = '';
                 }
@@ -1586,10 +788,11 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             } catch (error) {
                 lastCompileHadErrors = false;
                 lastCompileErrors = [];
-                outputDiv.textContent = `Error: ${error.message}`;
-                outputDiv.style.color = '#f48771';
-                delete outputDiv.dataset.plainJs;
-                outputDiv.classList.remove('has-errors');
+                if (jsOutputEditor) {
+                    jsOutputEditor.Model.text = `Error: ${error.message}`;
+                }
+                delete outputEl.dataset.plainJs;
+                outputEl.classList.remove('has-errors');
                 errorWarning.style.display = 'none';
                 lastGeneratedSource = dslSource;
                 updateUIState();
@@ -1631,7 +834,6 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
                 const content = await response.text();
                 setEditorContent(content);
-                updateLineNumbers();
                 transpileDSL();
 
                 // Run tests after loading and transpiling
@@ -1646,7 +848,6 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 }
             } catch (error) {
                 setEditorContent(`Error loading DSL file: ${error.message}`);
-                updateLineNumbers();
                 console.error('Error loading DSL:', error);
             }
         }
@@ -1658,31 +859,22 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             testsCompiledSinceLastView = true;
         });
 
-        // Update line numbers
-        function updateLineNumbers() {
-            const lineNumbersDiv = document.getElementById('dsl-line-numbers');
-            const lines = getEditorContent().split('\n');
-            const lineCount = lines.length;
-            lineNumbersDiv.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('\n');
-        }
-
-        // Sync scroll between textarea, highlight div, and line numbers
-        textarea.addEventListener('scroll', () => {
-            const lineNumbersDiv = document.getElementById('dsl-line-numbers');
-            lineNumbersDiv.scrollTop = textarea.scrollTop;
-            highlightDiv.scrollTop = textarea.scrollTop;
-            highlightDiv.scrollLeft = textarea.scrollLeft;
-        });
-
-        // Handle input events - update highlighting in real-time
-        textarea.addEventListener('input', () => {
-            updateUIState();
-            updateLineNumbers();
-            updateHighlighting();
-        });
-
         // Load DSL when page loads
-        window.addEventListener('DOMContentLoaded', loadDSL);
+        window.addEventListener('DOMContentLoaded', () => {
+            initDSLEditor();
+
+            // Poll for content changes since Buffee doesn't have change events
+            let lastContent = '';
+            setInterval(() => {
+                const currentContent = getEditorContent();
+                if (currentContent !== lastContent) {
+                    lastContent = currentContent;
+                    updateUIState();
+                }
+            }, 500);
+
+            loadDSL();
+        });
 
         // Test runner logic - must be global for eval'd code
         window.runner = new TestRunner();
@@ -1763,7 +955,8 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
         async function runAllTests() {
             // Load tests from generated JavaScript
-            let generatedJS = outputDiv.dataset.plainJs || outputDiv.textContent;
+            const outputEl = document.getElementById('js-output');
+            let generatedJS = outputEl.dataset.plainJs || (jsOutputEditor ? jsOutputEditor.Model.lines.join('\n') : '');
 
             if (!generatedJS || generatedJS.startsWith('Error:')) {
                 const resultsContainer = document.getElementById('test-results');
@@ -2460,9 +1653,6 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
 
             renderExtensionResults(results);
         }
-
-        // Run extension tests when button is clicked
-        document.getElementById('run-ext-tests-btn').addEventListener('click', runExtensionTests);
 
         // Run extension tests on page load
         window.addEventListener('DOMContentLoaded', () => {

@@ -29,13 +29,13 @@ if [ "$BUFFEE_VERSION" != "$STYLE_VERSION" ]; then
 fi
 
 # Check that buffee.js and devlog.txt versions match
-DEVLOG_VERSION=$(grep '^\*\* ' dev/release.txt | head -1 | sed 's/^\*\* \([^ ]*\).*/\1/')
+DEVLOG_VERSION=$(grep '^\*\* ' dev/changelog.txt | head -1 | sed 's/^\*\* \([^ ]*\).*/\1/')
 
 if [ "$BUFFEE_VERSION" != "$DEVLOG_VERSION" ]; then
     echo "✗ Error: Version mismatch between buffee.js and docs/devlog.txt"
     echo "  buffee.js:     $BUFFEE_VERSION"
-    echo "  release.txt:    $DEVLOG_VERSION"
-    echo "  Please add a new entry to dev/release.txt for version $BUFFEE_VERSION"
+    echo "  changelog.txt:    $DEVLOG_VERSION"
+    echo "  Please add a new entry to dev/changelog.txt for version $BUFFEE_VERSION"
     exit 1
 fi
 
