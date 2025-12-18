@@ -2,7 +2,7 @@
  * @fileoverview BuffeeTUI - Terminal User Interface extension for Buffee.
  * Renders text-based UI elements (buttons, prompts, scrollboxes) by modifying line content.
  * Depends on BuffeeHighlights for rendering selection highlights.
- * @version 2.1.0
+ * @version 3.0.0
  */
 
 /**
@@ -102,9 +102,11 @@ function BuffeeTUI(vbuf) {
   const TUI = {
     get enabled() { return enabled; },
     set enabled(v) {
+      const wasEnabled = enabled;
       enabled = !!v;
       vbuf.interactive = enabled ? -1 : 1;  // -1 = read-only (no cursor/selection)
-      if (enabled && elements.length > 0) {
+      // Only reset currentIndex when transitioning from disabled to enabled
+      if (enabled && !wasEnabled && elements.length > 0) {
         currentIndex = 0;
       }
       render(true);
@@ -181,13 +183,17 @@ function BuffeeTUI(vbuf) {
 
     /**
      * Sets the current focused element by index.
+     * Wraps to 0 if index is out of bounds.
      * @param {number} idx - Index of element to focus
      */
     setCurrentIndex(idx) {
+      if (elements.length === 0) return;
       if (idx >= 0 && idx < elements.length) {
         currentIndex = idx;
-        render(true);
+      } else {
+        currentIndex = 0;
       }
+      render(true);
     },
 
     nextElement() {

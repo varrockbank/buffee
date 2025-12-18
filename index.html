@@ -355,10 +355,9 @@ const fileTemplate = `
         });
       });
 
-      // Focus the selected file's button
-      const selectedButtonId = fileElementIds[name];
-      const idx = tuiDemo.TUI.elements.findIndex(e => e.id === selectedButtonId);
-      if (idx !== -1) tuiDemo.TUI.setCurrentIndex(idx);
+      // Focus the selected file's button (files are at indices 0-4 in sorted order)
+      const fileIndex = fileNames.indexOf(name);
+      if (fileIndex !== -1) tuiDemo.TUI.setCurrentIndex(fileIndex);
 
       const lines = tuiDemo.Model.lines;
       const content = files[name] || [];
