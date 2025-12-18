@@ -106,6 +106,40 @@ if [ $? -eq 0 ]; then
     fi
 
     git add dist/buffee.min.js
+
+    # If changelog.txt is staged, append size info to the version line
+    if git diff --cached --name-only | grep -q "^dev/changelog.txt$"; then
+        if [ $OLD_SIZE -ne 0 ]; then
+            # Format the change values with sign
+            if [ $DIFF -gt 0 ]; then
+                DIFF_STR="+${DIFF_KB}"
+            elif [ $DIFF -lt 0 ]; then
+                DIFF_STR="${DIFF_KB}"
+            else
+                DIFF_STR="0"
+            fi
+            if [ $DIFF_GZIPPED -gt 0 ]; then
+                DIFF_GZ_STR="+${DIFF_GZIPPED_KB}"
+            elif [ $DIFF_GZIPPED -lt 0 ]; then
+                DIFF_GZ_STR="${DIFF_GZIPPED_KB}"
+            else
+                DIFF_GZ_STR="0"
+            fi
+            SIZE_INFO="  gz+min: ${GZIPPED_KB} KB (${DIFF_GZ_STR}), min: ${MINIFIED_KB} KB (${DIFF_STR})"
+        else
+            SIZE_INFO="  gz+min: ${GZIPPED_KB} KB, min: ${MINIFIED_KB} KB"
+        fi
+
+        # Append size info to the first version line (** X.X.X [date])
+        # Find line number of first version header, then append size info
+        LINE_NUM=$(grep -n '^\*\* ' dev/changelog.txt | head -1 | cut -d: -f1)
+        if [ -n "$LINE_NUM" ]; then
+            sed -i '' "${LINE_NUM}s/\]$/]${SIZE_INFO}/" dev/changelog.txt
+        fi
+        git add dev/changelog.txt
+        echo "✓ Updated changelog.txt with size info"
+    fi
+
     exit 0
 else
     echo "✗ Minification failed"
