@@ -93,6 +93,12 @@ CSS `transform: translateX()` is an alternative implementation but causes cursor
 
 The container uses `overflow-x: hidden` to prevent manual scrolling while allowing programmatic `scrollLeft`. The pre elements use `overflow: visible` so text can extend beyond the container width.
 
+### Scroll Buffer
+
+The text layer has a `rightScrollBuffer` (default `2ch`) padding on the right to ensure the cursor remains visible at line ends. The 2ch breakdown:
+- 1ch for the cursor sitting past the last character (on a "new line" position)
+- 1ch for any remaining space when container width isn't an exact multiple of character width
+
 ## Font and Cursor Drift
 
 The cursor is positioned using CSS `ch` units, which are based on the width of the "0" character. Some fonts have `ch` values that don't perfectly match their actual character widths, causing cursor drift over long lines.

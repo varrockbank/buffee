@@ -1,7 +1,7 @@
 /**
  * @fileoverview Buffee - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 6.1.2-alpha.1
+ * @version 6.1.3-alpha.1
  */
 
 /**
@@ -18,6 +18,12 @@
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
  * @property {boolean} [autoFitViewport=false] - Automatically size viewport to fit container height
+ * @property {BuffeeAdvancedConfig} [advanced={}] - Advanced configuration options
+ */
+
+/**
+ * @typedef {Object} BuffeeAdvancedConfig
+ * @property {string} [rightScrollBuffer='2ch'] - Extra space after line end for horizontal scrolling
  */
 
 /**
@@ -47,7 +53,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "6.1.2-alpha.1";
+  this.version = "6.1.3-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -64,7 +70,13 @@ function Buffee(node, config = {}) {
     showGutter = true,
     showStatusLine = true,
     autoFitViewport = false,
+    advanced = {}
   } = config;
+
+  // Advanced configuration with defaults
+  const {
+    rightScrollBuffer = '2ch'  // Extra space after line end for horizontal scrolling
+  } = advanced;
 
   let gutterSize = initialGutterSize;
   let indentation = initialIndentation;
@@ -97,7 +109,10 @@ function Buffee(node, config = {}) {
   $textLayer.className = "wb-layer-text";
   Object.assign($textLayer.style, {
     position: 'relative',
-    zIndex: zIndexText
+    zIndex: zIndexText,
+    display: 'inline-block',  // Width based on content, not container
+    minWidth: '100%',         // At least fill container
+    paddingRight: rightScrollBuffer  // Extra space to allow scrolling past end of line
   });
   $e.appendChild($textLayer);
 
