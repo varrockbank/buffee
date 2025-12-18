@@ -23,13 +23,92 @@
     <li>native - performant</li>
     <li>web
       <ol type="a">
-        <li>Monaco, VSCode - corporate/enterprise friendly, IDE, bulky, overkill</li>
+        <li>Monaco, VSCode - "enterprise-ready", near-IDE, bulky, overkill</li>
         <li>textarea - meant for single page of snippets and something form data</li>
         <li>microlibraries - embeddable, geared towards WYSIWYG, effectively enhanced textarea, not ideal for building IDEs</li>
         <li>Ace.js - embeddable, formidable, great, </li>
       </ol>
     </li>
   </ol>
+
+  <h2>Comparison Table</h2>
+  <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr style="background: #f4f4f4;">
+        <th></th>
+        <th>buffee</th>
+        <th>CodeMirror 6</th>
+        <th>Ace.js</th>
+        <th>VSCode</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Size (min+gzip)</strong></td>
+        <td>~4 KB</td>
+        <td>~150 KB</td>
+        <td>~100 KB</td>
+        <td>10 MB - 70 MB</td>
+      </tr>
+      <tr>
+        <td><strong>Dependencies</strong></td>
+        <td>0</td>
+        <td>0 (modular)</td>
+        <td>0</td>
+        <td>Many internal</td>
+      </tr>
+      <tr>
+        <td><strong>Large file support</strong></td>
+        <td>1B+ lines (chunked mode)</td>
+        <td>~1-2M lines (browser limit)</td>
+        <td>~4M lines</td>
+        <td>~1-2M lines (browser limit)</td>
+      </tr>
+      <tr>
+        <td><strong>Rendering</strong></td>
+        <td>Fixed-width terminal-style</td>
+        <td>Proportional</td>
+        <td>Proportional</td>
+        <td>Proportional</td>
+      </tr>
+      <tr>
+        <td><strong>Syntax highlighting</strong></td>
+        <td>Extension (regex or tree-sitter)</td>
+        <td>Lezer (incremental)</td>
+        <td>TextMate grammars</td>
+        <td>TextMate + Monarch</td>
+      </tr>
+      <tr>
+        <td><strong>Learning curve</strong></td>
+        <td>Low</td>
+        <td>Medium-High</td>
+        <td>Medium</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td><strong>Customization</strong></td>
+        <td>MVC API, hackable internals,
+          rendering hooks</td>
+        <td>Extension system</td>
+        <td>Configuration</td>
+        <td>Extension API</td>
+      </tr>
+      <tr>
+      <td><strong>Best for</strong></td>
+        <td>Embedded editors, TUIs, custom experiences</td>
+        <td>Code snippets</td>
+        <td>Code editors, Cloud IDEs</td>
+        <td>Being VSCode</td>
+      </tr>
+      <tr>
+        <td><strong>License</strong></td>
+        <td>Apache 2.0</td>
+        <td>MIT</td>
+        <td>BSD</td>
+        <td>MIT</td>
+      </tr>
+    </tbody>
+  </table>
 
   <h2><code>Monaco/VScode</code></h2>
 
@@ -55,7 +134,7 @@
   </p>
   <ol>
     <li>Compact: 4kb footprint and no dependencies</li>
-    <li>Hackable API and internals</li>
+    <li>MVC API, exposed internals, rendering hooks</li>
     <li>Embeddability: quintenssial text editor operations and not more (git, AI agent, multiplexing, terminal emulator)
   </li>
   </ol>
