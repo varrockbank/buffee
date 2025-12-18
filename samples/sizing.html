@@ -20,124 +20,86 @@
   <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Editor Sizing</p>
 
   <h1>Editor Sizing</h1>
-  <p>The editor uses monospace font. Set width on the container element via CSS.</p>
-  <p>Use <code>ch</code> units for predictable column counts, or <code>100%</code> to fill parent.</p>
-  <p>Height (number of lines) is set via the <code>initialViewportSize</code> option.</p>
+  <p>The editor uses monospace font. Set width via the <code>viewportCols</code> config option or CSS on the container.</p>
+  <p>Use <code>viewportCols: N</code> for exact text columns, or CSS <code>width: 100%</code> to fill parent.</p>
+  <p>Height (number of lines) is set via the <code>viewportRows</code> option.</p>
 
-  <h2>80 columns &times; 10 lines</h2>
-  <p>CSS: <code>width: 80ch;</code></p>
-  <blockquote class="wb no-select" tabindex="0" id="editor-80" style="border: 1px solid #444; width: 80ch;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h2>1 line editor (no status)</h2>
-  <p><code>new Buffee(el, { initialViewportSize: 1, showStatusLine: false })</code></p>
-  <blockquote class="wb no-select" tabindex="0" id="editor-1line" style="border: 1px solid #444; width: 40ch;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h2>40 columns (no gutter)</h2>
-  <p>CSS: <code>width: 40ch;</code></p>
-  <p><code>new Buffee(el, { showGutter: false })</code></p>
-  <blockquote class="wb no-select" tabindex="0" id="editor-40-clean" style="border: 1px solid #444; width: 40ch;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h2>40 columns &times; 5 lines</h2>
-  <p>CSS: <code>width: 40ch;</code></p>
-  <blockquote class="wb no-select" tabindex="0" id="editor-40" style="border: 1px solid #444; width: 40ch;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h2>100% width &times; 8 lines</h2>
-  <p>CSS: <code>width: 100%;</code></p>
-  <blockquote class="wb no-select" tabindex="0" id="editor-full" style="border: 1px solid #444; width: 100%;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
-
-  <h2>Auto-fit to container height (no status)</h2>
-  <p><code>new Buffee(el, { autoFitViewport: true, showStatusLine: false })</code></p>
-  <p>Viewport automatically sizes to fill the 300px container. Drag bottom-right to resize.</p>
-  <div style="height: 300px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
-    <blockquote class="wb no-select" tabindex="0" id="editor-autofit" style="height: 100%; width: 100%;">
+  <h2>1. Auto-rows, auto-cols</h2>
+  <p>Parent CSS: <code>div { width: 960px; height: 300px; padding: 20px; overflow: hidden; }</code></p>
+  <p>Editor CSS: <code>.wb { width: 100%; height: 100%; display: flex; flex-direction: column; }</code></p>
+  <p><code>new Buffee(el, { autoFitViewport: true })</code></p>
+  <p>Automatically determine rows/cols based on parent container (Drag bottom-right to resize parent).</p>
+  <div style="width: 960px; height: 300px; padding: 20px; border: 2px dashed #666; resize: both; overflow: hidden;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-auto-both" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
       <textarea class="wb-clipboard-bridge"></textarea>
-      <div style="display: flex; height: 100%;">
+      <div style="display: flex; flex: 1; overflow: hidden;">
         <div class="wb-gutter"></div>
         <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
       </div>
-      <div class="wb-status" style="display: none;">
+      <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
         <div><span class="wb-linecount"></span></div>
-        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+        <div style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
       </div>
     </blockquote>
   </div>
 
-  <h2>Auto-fit to container height (with status)</h2>
-  <p><code>new Buffee(el, { autoFitViewport: true })</code></p>
-  <div style="height: 300px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
-    <blockquote class="wb no-select" tabindex="0" id="editor-autofit-status" style="height: 100%; width: 100%; display: flex; flex-direction: column;">
+  <h2>2. Fixed-rows, fixed-cols</h2>
+  <p>Parent CSS: <code>div { background: #ccc; padding: 20px; }</code></p>
+  <p>Editor CSS: <code>width set by viewportCols config</code></p>
+  <p><code>new Buffee(el, { viewportRows: 10, viewportCols: 50 })</code></p>
+  <p>Width auto-calculated to fit exactly 50 text columns (plus gutter). Content extends beyond both dimensions.</p>
+  <div style="border: 2px solid #666; padding: 20px;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-fixed">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div style="display: flex;">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+      </div>
+      <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+        <div><span class="wb-linecount"></span></div>
+        <div style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+  </div>
+
+  <h2>3. Auto-rows, fixed-cols</h2>
+  <p>Parent CSS: <code>div { height: 300px; overflow: hidden; }</code></p>
+  <p>Editor CSS: <code>.wb { height: 100%; display: flex; flex-direction: column; }</code></p>
+  <p><code>new Buffee(el, { autoFitViewport: true, viewportCols: 40 })</code></p>
+  <div style="height: 300px; border: 2px dashed #666; padding: 20px; resize: vertical; overflow: hidden;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-auto-rows-fixed-cols" style="height: 100%; display: flex; flex-direction: column;">
       <textarea class="wb-clipboard-bridge"></textarea>
       <div style="display: flex; flex: 1; overflow: hidden;">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+      </div>
+      <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+        <div><span class="wb-linecount"></span></div>
+        <div style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+  </div>
+
+  <h2>4. Fixed-rows, auto-cols</h2>
+  <p>Parent CSS: <code>div { width: 640px; padding: 20px; resize: horizontal; overflow: hidden; }</code></p>
+  <p>Editor CSS: <code>.wb { width: 100%; }</code></p>
+  <p><code>new Buffee(el, { viewportRows: 8 })</code></p>
+  <div style="width: 640px; border: 2px dashed #666; padding: 20px; resize: horizontal; overflow: hidden;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-fixed-rows-auto-cols" style="width: 100%;">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div style="display: flex;">
         <div class="wb-gutter"></div>
         <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
       </div>
@@ -160,65 +122,43 @@
       return s;
     }
 
-    // 80 columns × 10 lines
-    const ed80 = new Buffee(document.getElementById('editor-80'), {
-      initialViewportSize: 10,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    ed80.Model.text = ruler(80) + '\n// 80 column editor\nLine 3\nLine 4\nLine 5';
-
-    // 1 line editor
-    const ed1Line = new Buffee(document.getElementById('editor-1line'), {
-      initialViewportSize: 1,
-      showStatusLine: false,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    ed1Line.Model.text = ruler(40);
-
-    // 40 columns no gutter
-    const ed40Clean = new Buffee(document.getElementById('editor-40-clean'), {
-      initialViewportSize: 5,
-      showGutter: false,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    ed40Clean.Model.text = ruler(40) + '\n// No gutter\nLine 3';
-
-    // 40 columns × 5 lines
-    const ed40 = new Buffee(document.getElementById('editor-40'), {
-      initialViewportSize: 5,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    ed40.Model.text = ruler(40) + '\n// 40 columns\nCompact editor';
-
-    // Full width × 8 lines
-    const edFull = new Buffee(document.getElementById('editor-full'), {
-      initialViewportSize: 8,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    edFull.Model.text = ruler(200) + '\n// Full width - resize window to test\nLine 3';
-
-    // Auto-fit viewport (no status)
-    const edAutofit = new Buffee(document.getElementById('editor-autofit'), {
-      autoFitViewport: true,
-      showStatusLine: false,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
-    });
-    edAutofit.Model.text = Array.from({length: 20}, (_, i) => `Line ${i + 1}`).join('\n');
-
-    // Auto-fit viewport (with status)
-    const edAutofitStatus = new Buffee(document.getElementById('editor-autofit-status'), {
+    // 1. Auto-rows and auto-cols (fills both dimensions)
+    const edAutoBoth = new Buffee(document.getElementById('editor-auto-both'), {
       autoFitViewport: true,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
-    edAutofitStatus.Model.text = '// Auto-fit viewport (with status)\n// Drag the bottom-right corner to resize\n' +
-      Array.from({length: 50}, (_, i) => `Line ${i + 3}`).join('\n');
+    edAutoBoth.Model.text = ruler(120) + '\n// Auto-rows and auto-cols\n// Drag corner to resize\n' +
+      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 2. Fixed-rows, fixed-cols
+    const edFixed = new Buffee(document.getElementById('editor-fixed'), {
+      viewportRows: 10,
+      viewportCols: 50,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edFixed.Model.text = ruler(40) + '\n' + Array.from({length: 15}, (_, i) => `Line ${i + 2}: This line is longer than 20 chars`).join('\n');
+
+    // 3. Auto-rows, fixed cols
+    const edAutoRowsFixedCols = new Buffee(document.getElementById('editor-auto-rows-fixed-cols'), {
+      autoFitViewport: true,
+      viewportCols: 40,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edAutoRowsFixedCols.Model.text = ruler(60) + '\n// Auto-rows, fixed 40 cols\n// Drag to resize height\n' +
+      Array.from({length: 30}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 4. Fixed-rows, auto-cols
+    const edFixedRowsAutoCols = new Buffee(document.getElementById('editor-fixed-rows-auto-cols'), {
+      viewportRows: 8,
+      colorPrimary: "#B2B2B2",
+      colorSecondary: "#212026"
+    });
+    edFixedRowsAutoCols.Model.text = ruler(120) + '\n// Fixed 8 rows, auto-cols\nLine 3\n' +
+      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
+
   </script>
 </body>
 </html>

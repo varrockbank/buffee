@@ -2059,7 +2059,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             `;
             document.body.appendChild(container);
             const el = container.querySelector('.wb');
-            const editor = new Buffee(el, { initialViewportSize: 10, ...opts });
+            const editor = new Buffee(el, { viewportRows: 10, ...opts });
             return { editor, container, cleanup: () => container.remove() };
         }
 

@@ -1,15 +1,6 @@
-* TODO Make width/height configuration more consistent
-Currently width is set via CSS on the container, while height is set via the `initialViewportSize` constructor option. Consider making these more consistent (both CSS, or both API).
+* DONE Make width/height configuration more consistent
+Height is set via `viewportRows`, width via `viewportCols`. Both are constructor options.
 
-* TODO Fix width sizing gotchas
-When users specify `width: 40ch`, they expect 40 characters of usable text area. Currently they get ~35 (with gutter) or ~38 (without gutter) because the width includes gutter, padding, and border.
-
-Additional caveat: `ch` units are based on the container's font-size, but vbuf sets `font-size: lineHeight` (default 24px) on `.wb-lines`. If the container has a different font-size, `ch` measurements won't match actual character widths.
-
-Possible solutions:
-- Add a `columns` constructor option that sets width on `.wb-lines` directly
-- Auto-calculate container width based on desired columns + gutter + padding
-- Use `box-sizing: content-box` on `.wb-lines` and set width there
-- Document the exact overhead so users can calculate (gutter ~5ch, padding ~1.5ch)
-- Set font-size on container to match lineHeight automatically
+* DONE Fix width sizing gotchas
+Added `viewportCols` constructor option that auto-calculates container width including gutter and padding.
 

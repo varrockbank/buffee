@@ -100,7 +100,7 @@ hello();`;
 
     // Default
     const edDefault = new Buffee(document.getElementById('editor-default'), {
-      initialViewportSize: 6,
+      viewportRows: 6,
       showGutter: true,
       showStatusLine: true,
       colorPrimary: "#B2B2B2",
@@ -110,7 +110,7 @@ hello();`;
 
     // No gutter
     const edNoGutter = new Buffee(document.getElementById('editor-no-gutter'), {
-      initialViewportSize: 6,
+      viewportRows: 6,
       showGutter: false,
       showStatusLine: true,
       colorPrimary: "#B2B2B2",
@@ -120,7 +120,7 @@ hello();`;
 
     // No status bar
     const edNoStatus = new Buffee(document.getElementById('editor-no-status'), {
-      initialViewportSize: 6,
+      viewportRows: 6,
       showGutter: true,
       showStatusLine: false,
       colorPrimary: "#B2B2B2",
@@ -130,7 +130,7 @@ hello();`;
 
     // Minimal
     const edMinimal = new Buffee(document.getElementById('editor-minimal'), {
-      initialViewportSize: 6,
+      viewportRows: 6,
       showGutter: false,
       showStatusLine: false,
       colorPrimary: "#B2B2B2",

@@ -128,7 +128,7 @@
     const logs = new Buffee(logsEl, {
       colorPrimary: "#87FF5F",
       colorSecondary: "#212026",
-      initialViewportSize: 8,
+      viewportRows: 8,
       showGutter: false
     });
 
@@ -140,7 +140,7 @@
     const editor = new Buffee(editorEl, {
       colorPrimary: "#E1D6F8",
       colorSecondary: "#38274D",
-      initialViewportSize: 15,
+      viewportRows: 15,
       logger: log
     });
     BuffeeChunkLoader(editor);

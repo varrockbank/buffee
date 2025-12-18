@@ -32,7 +32,7 @@
   <p>Press <kbd>Tab</kbd> to navigate, <kbd>Enter</kbd> to activate</p>
 
   <h2>Buttons (no border)</h2>
-  <pre>new Buffee(el, { initialViewportSize: 3, showGutter: false })
+  <pre>new Buffee(el, { viewportRows: 3, showGutter: false })
 TUI.addButton({ row: 1, col: 20, label: '[Save]' })</pre>
   <blockquote class="wb no-select" tabindex="0" id="buttons-plain" style="border: 1px solid #444; width: 500px;">
     <textarea class="wb-clipboard-bridge"></textarea>
@@ -51,7 +51,7 @@ TUI.addButton({ row: 1, col: 20, label: '[Save]' })</pre>
   </blockquote>
 
   <h2>Buttons (with border)</h2>
-  <pre>new Buffee(el, { initialViewportSize: 5, showGutter: false })
+  <pre>new Buffee(el, { viewportRows: 5, showGutter: false })
 TUI.addButton({ row: 1, col: 2, label: ' OK ', border: true })</pre>
   <blockquote class="wb no-select" tabindex="0" id="buttons-border" style="border: 1px solid #444; width: 500px;">
     <textarea class="wb-clipboard-bridge"></textarea>
@@ -70,7 +70,7 @@ TUI.addButton({ row: 1, col: 2, label: ' OK ', border: true })</pre>
   </blockquote>
 
   <h2>Prompt (type to input, Enter to submit)</h2>
-  <pre>new Buffee(el, { initialViewportSize: 8, showGutter: false })
+  <pre>new Buffee(el, { viewportRows: 8, showGutter: false })
 TUI.addPrompt({ row: 1, col: 2, width: 30, title: 'Search' })
 TUI.handleKeyDown(e.key)</pre>
   <blockquote class="wb no-select" tabindex="0" id="prompt-demo" style="border: 1px solid #444; width: 500px;">
@@ -90,7 +90,7 @@ TUI.handleKeyDown(e.key)</pre>
   </blockquote>
 
   <h2>ScrollBox (Arrow keys to scroll)</h2>
-  <pre>new Buffee(el, { initialViewportSize: 10, showGutter: false })
+  <pre>new Buffee(el, { viewportRows: 10, showGutter: false })
 TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [...] })</pre>
   <blockquote class="wb no-select" tabindex="0" id="scrollbox-demo" style="border: 1px solid #444; width: 80ch;">
     <textarea class="wb-clipboard-bridge"></textarea>
@@ -116,7 +116,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     // Buttons (no border)
     const plainEl = document.getElementById('buttons-plain');
     const plainEditor = new Buffee(plainEl, {
-      initialViewportSize: 3,
+      viewportRows: 3,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
@@ -135,7 +135,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     // Buttons (with border)
     const borderEl = document.getElementById('buttons-border');
     const borderEditor = new Buffee(borderEl, {
-      initialViewportSize: 5,
+      viewportRows: 5,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
@@ -154,7 +154,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     // Prompt
     const promptEl = document.getElementById('prompt-demo');
     const promptEditor = new Buffee(promptEl, {
-      initialViewportSize: 8,
+      viewportRows: 8,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
@@ -172,7 +172,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     // ScrollBox
     const scrollEl = document.getElementById('scrollbox-demo');
     const scrollEditor = new Buffee(scrollEl, {
-      initialViewportSize: 10,
+      viewportRows: 10,
       showGutter: false,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"

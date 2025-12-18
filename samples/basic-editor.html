@@ -18,7 +18,7 @@
 
   <h1>Basic Editor</h1>
   <p>A simple editable text editor with default settings.</p>
-  <p><code>new Buffee(el, { initialViewportSize: 15 })</code></p>
+  <p><code>new Buffee(el, { viewportRows: 15 })</code></p>
 
   <blockquote class="wb no-select" tabindex="0" id="editor" style="border: 1px solid #444; width: 600px;">
     <textarea class="wb-clipboard-bridge"></textarea>
@@ -39,7 +39,7 @@
   <script>
     const el = document.getElementById('editor');
     const editor = new Buffee(el, {
-      initialViewportSize: 15,
+      viewportRows: 15,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });

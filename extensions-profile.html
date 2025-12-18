@@ -269,7 +269,7 @@
         </blockquote>
       `;
       const el = container.querySelector('#test-editor');
-      return new Buffee(el, { initialViewportSize: 20 });
+      return new Buffee(el, { viewportRows: 20 });
     }
 
     function getIterations() {

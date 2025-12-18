@@ -1,11 +1,11 @@
 /**
  * @fileoverview Buffee, the text slayer
- * @version 7.0.0-alpha.1
+ * @version 7.1.0-alpha.1
  */
 
 /**
  * @typedef {Object} BuffeeConfig
- * @property {number} [initialViewportSize=20] - Number of visible lines in the viewport
+ * @property {number} [viewportRows=20] - Number of visible lines in the viewport
  * @property {number} [lineHeight=24] - Height of each line in pixels
  * @property {number} [indentation=4] - Number of spaces per indentation level
  * @property {string} [colorPrimary="#B2B2B2"] - Primary text color
@@ -14,6 +14,7 @@
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
  * @property {boolean} [autoFitViewport=false] - Automatically size viewport to fit container height
+ * @property {number} [viewportCols] - Fixed number of text columns (auto-calculates container width including gutter)
  * @property {BuffeeAdvancedConfig} [advanced={}] - Advanced configuration options
  */
 
@@ -45,18 +46,18 @@
  * @param {BuffeeConfig} [config={}] - Configuration options
  * @example
  * const editor = new Buffee(document.getElementById('editor'), {
- *   initialViewportSize: 25,
+ *   viewportRows: 25,
  *   showGutter: true,
  *   lineHeight: 20
  * });
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.0.0-alpha.1";
+  this.version = "7.1.0-alpha.1";
 
   // Extract configuration with defaults
   const {
-    initialViewportSize = 20,
+    viewportRows = 20,
     lineHeight = 24,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
@@ -66,6 +67,7 @@ function Buffee(node, config = {}) {
     showGutter = true,
     showStatusLine = true,
     autoFitViewport = false,
+    viewportCols,
     advanced = {}
   } = config;
 
@@ -167,6 +169,14 @@ function Buffee(node, config = {}) {
     width: gutterSize+gutterPadding+'ch',
     display: showGutter ? '' : 'none'
   });
+
+  // Set container width if viewportCols specified
+  if (viewportCols) {
+    const gutterWidthCH = showGutter ? (gutterSize + gutterPadding) : 0;
+    // Gutter has paddingRight: editorPaddingPX*2, lines has margin: editorPaddingPX (left+right)
+    const extraPX = showGutter ? editorPaddingPX * 4 : editorPaddingPX * 2;
+    node.style.width = `calc(${gutterWidthCH + viewportCols}ch + ${extraPX}px)`;
+  }
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
   let lastDisplayLines = 0; // Track display lines for delta-based updates
@@ -1007,7 +1017,7 @@ function Buffee(node, config = {}) {
     /** @type {number} Index of the first visible line (0-indexed) */
     start: 0,
     /** @type {number} Number of visible lines */
-    size: autoFitViewport ? 0 : initialViewportSize,
+    size: autoFitViewport ? 0 : viewportRows,
 
     /**
      * Index of the last visible line.

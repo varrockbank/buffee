@@ -119,6 +119,19 @@ new Buffee(el, { autoFitViewport: true });
 
 The container must have a defined height. The editor will resize automatically when the container changes.
 
+**CSS requirement with status bar:** When using `autoFitViewport: true` with a visible status bar, the editor container needs flex layout:
+
+```css
+.wb {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+```
+
+Without status bar, only `height: 100%; width: 100%;` is needed.
+
 ### Model-view-controller API
 
 **Model** `instance.Model.lines` is the text buffer

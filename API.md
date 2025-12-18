@@ -60,7 +60,7 @@ Layout the HTML for the editor.
 
 ## Sizing the Editor
 
-Height is controlled by `initialViewportSize` (number of lines). Width is set via CSS.
+Height is controlled by `viewportRows` (number of lines). Width is set via CSS.
 
 ### Width Gotchas
 
@@ -117,7 +117,7 @@ For `ch` units to work correctly, the container's `font-size` must match `lineHe
 
 ### Dimensions
 
-- Height = `initialViewportSize` × `lineHeight` pixels
+- Height = `viewportRows` × `lineHeight` pixels
 - Width = specified width minus gutter, padding, and border
 
 ### Auto-fit Viewport
@@ -145,7 +145,7 @@ The editor will:
 </div>
 ```
 
-**Note:** When `autoFitViewport` is enabled, `initialViewportSize` is ignored.
+**Note:** When `autoFitViewport` is enabled, `viewportRows` is ignored.
 
 ## Initialize
 
@@ -153,7 +153,7 @@ The editor will:
 const editor = new Buffee(document.getElementById('editor'), {
   colorPrimary: "#B2B2B2",
   colorSecondary: "#212026",
-  initialViewportSize: 20,
+  viewportRows: 20,
   lineHeight: 24,
   indentation: 4,
   showGutter: true,
@@ -167,7 +167,7 @@ const editor = new Buffee(document.getElementById('editor'), {
 |--------|------|---------|-------------|
 | `colorPrimary` | string | `"#B2B2B2"` | Text and status bar color |
 | `colorSecondary` | string | `"#212026"` | Gutter and status background |
-| `initialViewportSize` | number | `20` | Visible lines |
+| `viewportRows` | number | `20` | Visible lines |
 | `lineHeight` | number | `24` | Line height in pixels |
 | `indentation` | number | `4` | Spaces for indent/unindent |
 | `expandtab` | number | `4` | Tab width (0 = hard tabs) |

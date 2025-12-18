@@ -21,7 +21,7 @@
   <p>Two options for read-only editors. Try typing - editing is disabled, but arrow keys work.</p>
 
   <h2>Option 1: TUI Mode (simpler)</h2>
-  <pre>new Buffee(el, { initialViewportSize: 10 })
+  <pre>new Buffee(el, { viewportRows: 10 })
 TUI.enabled = true</pre>
   <blockquote class="wb no-select" tabindex="0" id="editor-tui" style="border: 1px solid #444; width: 600px;">
     <textarea class="wb-clipboard-bridge"></textarea>
@@ -73,7 +73,7 @@ example();`;
 
     // Option 1: TUI mode
     const edTui = new Buffee(document.getElementById('editor-tui'), {
-      initialViewportSize: 10,
+      viewportRows: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
@@ -82,7 +82,7 @@ example();`;
 
     // Option 2: Chunked mode (for large files)
     const edChunked = new Buffee(document.getElementById('editor-chunked'), {
-      initialViewportSize: 10,
+      viewportRows: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });

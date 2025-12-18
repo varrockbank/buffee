@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 7.1.0-alpha.1 [2025-12-18]
+*** refactor 
+- normalize name of viewport row/col config. initialViewportSize->viewportRow, columns->viewportCols
+
 ** 7.0.0-alpha.1 [2025-12-18]
 *** refactor 
 - move some config options to advanced

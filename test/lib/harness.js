@@ -78,7 +78,7 @@ function createEditorNode() {
 class EditorTestHarness {
   constructor(node, size = 10) {
     this.node = node;
-    this.wb = new Buffee(node, { initialViewportSize: size });
+    this.wb = new Buffee(node, { viewportRows: size });
     this.walkthrough = new Walkthrough();
 
     // Store reference for test framework
