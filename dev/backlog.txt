@@ -1,5 +1,4 @@
 2. dom specified by user template doesn't match final. cause UI re-orders stuff 
-3. layout shift caused by loading the top nav 
 9. add themes.css which appends a bunch of files in themes/ directory 
 13. integration testing 
 14. status line is broken 
