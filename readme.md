@@ -25,11 +25,25 @@ This trifecta uniquely positions buffee as a building block for rich editing exp
 
 See [comparison](https://varrockbank.github.io/buffee/comparison.html) and [performance](https://varrockbank.github.io/buffee/performance.html) for more on Buffee's niche.
 
+## The Magic Trick
+
+Key insights and performance levers are (1) small DOM footprint and (2) surgical DOM updates against viewport-restricted rendering. 
+
+The zeitgeist of webdev is VDOM. This abstraction is not free at runtime. VDOM libraries are bulkier than Buffee in its entirety. Buffee gets away by dealing with 
+a constrained UI surface space and not need diffs of arbitrary trees.
+
+The fixed-width grid layout limitation help reduce complexity. 
+
+Finally, V8 arrays, not being real arrays, prove miraculuously viable as a buffer data structure. VScode's Piecetree datastructure along is 10x the size of Buffee's entire source.
+
 ## Usage
 
 ### Font Requirements
 
-Buffee assumes monospace fonts with accurate CSS `ch` values. When this assumption breaks, the cursor drifts from expected position over long lines.
+Buffee assumes monospace fonts with accurate CSS `ch` values. If this assumption breaks, cursor 
+will be visually misaligned from true position. This is more evident with variable-width 
+text but some monospace fonts can cause "drift", fractions of a pixel per character, and 
+these numeric errors accumulating.
 
 - **Good:** Menlo, Consolas, `monospace` (generic)
 - **Bad:** Monaco
@@ -38,10 +52,10 @@ To test: type "A" 100+ times and move cursor to end. If misaligned, try a differ
 
 ### CSS 
 
-Use `style.css` which contains all structural styles. Then define colors for your instance:
+[style.css](style.css) contains structural styles. Bring-your-own cursor and selection color.
 
 ```css
-.wb { background-color: #282C34; color: #B2B2B2 }
+.wb { background-color: #282C34; color: #B2B2B2 } /* optional */
 .wb .wb-selection { background-color: #EDAD10 }
 .wb .wb-cursor { background-color: #FF6B6B }
 ```
@@ -53,7 +67,7 @@ see [themes](https://varrockbank.github.io/buffee/themes.html) for inspiration.
 Editor instances bind to DOM node with this structure:
 
 ```html
-<blockquote class="wb no-select" tabindex="0" id="editor">
+<blockquote class="wb no-select" tabindex="0" id="editor" style="">
   <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
   <div class="wb-content">
     <div class="wb-gutter"></div>
@@ -78,9 +92,7 @@ Editor instances bind to DOM node with this structure:
 const editor = new Buffee(document.getElementById("editor"), {});
 ```
 
-#### Auto-fit Viewport
-
-By default, the editor auto-fits to its container. For fixed dimensions, specify:
+Editor auto-fits to its container size. For fixed dimensions:
 
 ```javascript
 new Buffee(el, { viewportRows: 20 });      // Fixed row count
@@ -88,7 +100,7 @@ new Buffee(el, { viewportCols: 80 });      // Fixed column width
 new Buffee(el, { viewportRows: 20, viewportCols: 80 }); // Both fixed
 ```
 
-For auto-fit to work, the editor must have a defined height (either `height: 100%` of parent, or explicit pixel height).
+Container should have explicit height inherit some percentage from parent. 
 
 ### Model-view-controller API
 
@@ -97,6 +109,8 @@ For auto-fit to work, the editor must have a defined height (either `height: 100
 **View** `instance.Viewport` subset of indices of text buffer to be rendered
 
 **Controller** `instance.Selection` text editor operations are relative to the text Selection. Cursor are just a special case of Selection. Historically, indexing was Viewport relative but now absolute.
+
+See: [API notes](https://varrockbank.github.io/buffee/API.html)
 
 ## Extensibility
 
@@ -109,21 +123,4 @@ Historically, extensibility was only via the MVC APIs. However, extensions can a
 
 iOS support is currently provided as an extension which maps iOS events to keyboard events. see: index.html for example.
 
-## Distributable
-
-There is no build process needed to vendor `Buffee` global function nor is there to work on the code. However, the minified distributable is created with globally installed `Terser`. This is done by a pre-commit hook ensuring `dist/buffee.min.js` is updated in sync. 
-`scripts/setup-hooks.sh` symlinks:
-
-```sh
-ln -s ../../hooks/pre-commit .git/hooks/pre-commit
-```
-
-## Footnotes
-
-Key performance insight is maintaining small footprint in the DOM and 
-then performing surgical DOM updates. Furthermore, the fixed-width character grid
-simplifies some rendering challenges.
-
-The zeitgeist of webdev is VDOM and efficient incrementality but this abstraction does not come free. Furthermore, the smallest VDOM diffing libraries are larger than buffee's entire footprint.
-
-Buffers are the darkhorses of text editor implementations. They map 1:1 with the problem domain but are infeasible in practice as text editing operations constantly involve line reindexing. The pantheon of native text editors use a combination of complex data structures. VSCode, whle running in Electron, uses a [Piecetree](https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation). TThe piecetree library alone is 10x+ buffee's entire footprint. Buffee owes its compactness to V8 arrays not being real arrays and hyperoptimized by V8 magic. We can program against an intuitive model and remain compact while getting O(1) cursor/line-wise editor operations 
+See: [Extensions](https://varrockbank.github.io/buffee/extensions.html)

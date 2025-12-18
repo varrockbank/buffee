@@ -10,19 +10,6 @@
 <script src="buffee.js"></script>
 <script src="extensions/highlights.js"></script>
 <script src="extensions/tui-legacy.js"></script>
-<style>
-  /* Syntax highlighting colors */
-  .wb .wb-lines pre .highlight-function {
-    color: orange;
-  }
-  .wb .wb-lines pre .highlight-function-name {
-    color: cadetblue;
-  }
-  .wb .wb-lines pre .highlight-string {
-    color: green;
-  }
-
-</style>
 </head>
 
 <body>
@@ -32,7 +19,7 @@
       .then(r => r.text())
       .then(html => document.getElementById('nav').innerHTML = html);
   </script>
-  <p><strong>Buffee, the text slayer</strong> (<span id="vbuf-version"></span>) — embeddable terminal-style text editor for netizens — compact, fast, unbounded</p>
+  <p><strong>Buffee, the text slayer</strong> <span id="vbuf-version"></span> — embeddable terminal-style text editor for netizens — compact, fast, unbounded</p>
 
   <!-- Features Section -->
   <div style="padding: 12px 0;">
@@ -209,7 +196,7 @@
     window.primary = primary;
 
     // Set version from vbuf instance
-    document.getElementById('vbuf-version').textContent = 'v' + primary.version;
+    document.getElementById('vbuf-version').textContent = '( v' + primary.version + ' )';
 
     const hackerNewsElement = document.getElementById('hackernews');
     const hackernews = new Buffee(hackerNewsElement, {

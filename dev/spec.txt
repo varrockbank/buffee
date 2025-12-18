@@ -129,3 +129,11 @@ This works because:
 ## Selection Rendering
 
 Selections use the same `ch` unit positioning as the cursor. Each viewport line has a pre-allocated selection div that gets shown/hidden and resized based on the selection range.
+
+## Buffer as a data structure
+
+Buffers are the darkhorses of text editor implementations. They map 1:1 with the problem domain but are infeasible in practice as text editing operations constantly involve line reindexing. The pantheon of native text editors use a combination of complex data structures. VSCode, whle running in Electron, uses a [Piecetree](https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation). TThe piecetree library alone is 10x+ buffee's entire footprint. Buffee owes its compactness to V8 arrays not being real arrays and hyperoptimized by V8 magic. We can program against an intuitive model and remain compact while getting O(1) cursor/line-wise editor operations 
+
+# VDOM vs DOM
+
+The zeitgeist of webdev is VDOM and efficient incrementality but this abstraction does not come free. Furthermore, the smallest VDOM diffing libraries are larger than buffee's entire footprint.
