@@ -1,6 +1,6 @@
 /**
  * @fileoverview Buffee, the text slayer
- * @version 7.3.0-alpha.1
+ * @version 7.4.0-alpha.1
  */
 
 /**
@@ -53,7 +53,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.3.0-alpha.1";
+  this.version = "7.4.0-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -760,16 +760,6 @@ function Buffee(node, config = {}) {
     delete(i) {
       this.lines.splice(i, 1);
     },
-
-    /**
-     * Appends lines to the end of the document.
-     * @param {string[]} newLines - Lines to append
-     * @param {boolean} [skipRender=false] - Whether to skip re-rendering
-     */
-    appendLines(newLines, skipRender = false) {
-      this.lines.push(...newLines.map(expandTabs));
-      if (!skipRender) render();
-    },
   }
 
   /**
@@ -1374,12 +1364,16 @@ function Buffee(node, config = {}) {
     $elementLayer,
     render,
     renderHooks,
-    zIndex: { selection: zIndexSelection, text: zIndexText, cursor: zIndexCursor, elements: zIndexElements }
+    zIndex: { selection: zIndexSelection, text: zIndexText, cursor: zIndexCursor, elements: zIndexElements },
+    appendLines(newLines, skipRender = false) {
+      Model.lines.push(...newLines.map(expandTabs));
+      if (!skipRender) render(true);
+    }
   };
 
   /**
    * Appends a line at the end of the document and scrolls to show it.
-   * @deprecated Use Model.appendLines instead
+   * @deprecated Use _internals.appendLines instead
    * @param {string} s - Line to append
    */
   this.appendLineAtEnd = (s) => {

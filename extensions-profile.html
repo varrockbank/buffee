@@ -8,7 +8,7 @@
   <script src="extensions/syntax.js"></script>
   <script src="extensions/elementals.js"></script>
   <script src="extensions/tui-legacy.js"></script>
-  <script src="extensions/chunkloader.js"></script>
+  <script src="extensions/ultrahighcapacity.js"></script>
   <style>
     .wb {
       background-color: #282C34;
@@ -168,16 +168,16 @@
       </div>
     </div>
 
-    <!-- ChunkLoader Extension Profile -->
+    <!-- UltraHighCapacity Extension Profile -->
     <div class="profile-card">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-white text-lg">ChunkLoader</h2>
-        <button class="profile-btn bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded text-sm" data-ext="chunkloader">
+        <h2 class="text-white text-lg">UltraHighCapacity</h2>
+        <button class="profile-btn bg-neutral-700 hover:bg-neutral-600 text-white px-3 py-1 rounded text-sm" data-ext="ultrahighcapacity">
           Run Profile
         </button>
       </div>
       <p class="text-neutral-500 text-sm mb-4">Compressed chunked storage for large files</p>
-      <div id="chunkloader-results">
+      <div id="ultrahighcapacity-results">
         <div class="metric">
           <span class="metric-label">activate()</span>
           <span class="metric-value" id="chunk-activate">--</span>
@@ -407,13 +407,13 @@
       setMetric('tui-clear', performance.now() - start, { fast: 1, medium: 5 });
     }
 
-    async function profileChunkLoader() {
+    async function profileUltraHighCapacity() {
       const editor = createFreshEditor();
-      BuffeeChunkLoader(editor);
+      BuffeeUltraHighCapacity(editor);
 
       // Profile activate
       let start = performance.now();
-      editor.ChunkLoader.activate(1000);
+      editor.UltraHighCapacity.activate(1000);
       setMetric('chunk-activate', performance.now() - start, { fast: 1, medium: 5 });
 
       // Generate test lines
@@ -429,26 +429,26 @@
 
       // Profile appendLines 1k
       start = performance.now();
-      await editor.ChunkLoader.appendLines(lines1k, true);
+      await editor.UltraHighCapacity.appendLines(lines1k, true);
       setMetric('chunk-append-1k', performance.now() - start, { fast: 50, medium: 200 });
 
       // Profile appendLines 10k
-      editor.ChunkLoader.clear();
+      editor.UltraHighCapacity.clear();
       start = performance.now();
-      await editor.ChunkLoader.appendLines(lines10k, true);
+      await editor.UltraHighCapacity.appendLines(lines10k, true);
       const append10kTime = performance.now() - start;
       setMetric('chunk-append-10k', append10kTime, { fast: 200, medium: 1000 });
 
       // Calculate compression ratio
       const uncompressedSize = lines10k.join('\n').length;
-      const compressedSize = editor.ChunkLoader.compressedSize;
+      const compressedSize = editor.UltraHighCapacity.compressedSize;
       const ratio = ((1 - compressedSize / uncompressedSize) * 100).toFixed(1);
       document.getElementById('chunk-ratio').textContent = `${ratio}% smaller`;
       document.getElementById('chunk-ratio').className = 'metric-value';
 
       // Profile clear
       start = performance.now();
-      editor.ChunkLoader.clear();
+      editor.UltraHighCapacity.clear();
       setMetric('chunk-clear', performance.now() - start, { fast: 0.1, medium: 1 });
     }
 
@@ -465,7 +465,7 @@
           if (ext === 'syntax') await profileSyntax();
           else if (ext === 'elementals') await profileElementals();
           else if (ext === 'tui') await profileTUI();
-          else if (ext === 'chunkloader') await profileChunkLoader();
+          else if (ext === 'ultrahighcapacity') await profileUltraHighCapacity();
         } catch (e) {
           console.error(e);
         }
@@ -486,7 +486,7 @@
         await profileSyntax();
         await profileElementals();
         await profileTUI();
-        await profileChunkLoader();
+        await profileUltraHighCapacity();
       } catch (e) {
         console.error(e);
       }

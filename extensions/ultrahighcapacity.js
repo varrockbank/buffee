@@ -1,30 +1,29 @@
 /**
- * @fileoverview BuffeeChunkLoader - Chunked file loading extension for Buffee.
- * Enables loading and viewing very large files using gzip compression and chunked storage.
+ * @fileoverview BuffeeUltraHighCapacity - Ultra-high-capacity file loading extension for Buffee.
+ * Enables loading and viewing very large files (1B+ lines) using gzip compression and chunked storage.
  * @version 1.0.0
  */
 
 /**
- * Initializes chunked file loading for a Buffee instance.
+ * Initializes ultra-high-capacity mode for a Buffee instance.
  * When activated, the editor enters navigate mode (can scroll, no editing) and handles large files efficiently
  * by compressing lines into chunks and decompressing on-demand.
  *
  * @param {Buffee} vbuf - The Buffee instance to extend
- * @returns {Object} The ChunkLoader API object
+ * @returns {Object} The UltraHighCapacity API object
  * @example
  * const editor = new Buffee(document.getElementById('editor'));
- * const ChunkLoader = BuffeeChunkLoader(editor);
- * ChunkLoader.activate();
- * await ChunkLoader.appendLines(largeArrayOfLines);
+ * BuffeeUltraHighCapacity(editor);
+ * editor.UltraHighCapacity.activate();
+ * await editor.UltraHighCapacity.appendLines(largeArrayOfLines);
  */
-function BuffeeChunkLoader(vbuf) {
-  const { $e, render, renderHooks } = vbuf._internals;
+function BuffeeUltraHighCapacity(vbuf) {
+  const { $e, render, renderHooks, appendLines } = vbuf._internals;
   const { Viewport, Model } = vbuf;
 
   // Store original methods/getters
   const originalLastIndexGetter = Object.getOwnPropertyDescriptor(Model, 'lastIndex').get;
-  const originalLinesGetter = Object.getOwnPropertyDescriptor(Viewport, 'lines').get;
-  const originalAppendLines = Model.appendLines.bind(Model);
+  const originalAppendLines = appendLines;
 
   // Chunk state
   let enabled = false;
@@ -113,10 +112,10 @@ function BuffeeChunkLoader(vbuf) {
   }
 
   /**
-   * Gets viewport lines from chunked storage.
+   * Loads chunks around the viewport and updates Model.lines.
    * @private
    */
-  function getChunkedLines() {
+  function loadChunksForViewport() {
     const startChunkIndex = Math.floor(Viewport.start / chunkSize);
 
     // Check if we need to load new chunks
@@ -127,8 +126,12 @@ function BuffeeChunkLoader(vbuf) {
 
         currentChunkIndex = startChunkIndex;
 
-        // Load current chunk
-        buffer = await decompressChunk(startChunkIndex);
+        // Load current chunk (if it exists)
+        if (startChunkIndex < chunks.length) {
+          buffer = await decompressChunk(startChunkIndex);
+        } else {
+          buffer = [];
+        }
 
         // Load previous chunk if it exists
         if (prevChunkIndex >= 0 && prevChunkIndex < chunks.length) {
@@ -148,26 +151,46 @@ function BuffeeChunkLoader(vbuf) {
       };
 
       loadChunks();
-      return Array(Viewport.size).fill("...");
     }
+  }
 
-    // Build result from available chunks
-    const result = [];
-    for (let i = Viewport.start; i <= Viewport.end; i++) {
-      const chunkIdx = Math.floor(i / chunkSize);
-      const lineInChunk = i % chunkSize;
+  /**
+   * Gets a line from chunked storage by absolute index.
+   * @private
+   */
+  function getChunkedLine(lineIndex) {
+    const chunkIdx = Math.floor(lineIndex / chunkSize);
+    const lineInChunk = lineIndex % chunkSize;
+    const startChunkIndex = currentChunkIndex;
 
-      if (chunkIdx === startChunkIndex - 1 && prevBuffer.length > 0) {
-        result.push(prevBuffer[lineInChunk] || '');
-      } else if (chunkIdx === startChunkIndex) {
-        result.push(buffer[lineInChunk] || '');
-      } else if (chunkIdx === startChunkIndex + 1 && nextBuffer.length > 0) {
-        result.push(nextBuffer[lineInChunk] || '');
-      } else {
-        result.push('');
+    if (chunkIdx === startChunkIndex - 1 && prevBuffer.length > 0) {
+      return prevBuffer[lineInChunk] || '';
+    } else if (chunkIdx === startChunkIndex) {
+      return buffer[lineInChunk] || '';
+    } else if (chunkIdx === startChunkIndex + 1 && nextBuffer.length > 0) {
+      return nextBuffer[lineInChunk] || '';
+    } else {
+      return '...';
+    }
+  }
+
+  /**
+   * Creates a Proxy for Model.lines that returns chunked content.
+   * @private
+   */
+  function createLinesProxy() {
+    return new Proxy([], {
+      get(target, prop) {
+        if (prop === 'length') {
+          return totalLines;
+        }
+        if (typeof prop === 'string' && /^\d+$/.test(prop)) {
+          loadChunksForViewport();
+          return getChunkedLine(parseInt(prop, 10));
+        }
+        return target[prop];
       }
-    }
-    return result;
+    });
   }
 
   /**
@@ -227,10 +250,10 @@ function BuffeeChunkLoader(vbuf) {
   }
 
   /**
-   * ChunkLoader API.
-   * @namespace ChunkLoader
+   * UltraHighCapacity API.
+   * @namespace UltraHighCapacity
    */
-  const ChunkLoader = {
+  const UltraHighCapacity = {
     /**
      * Whether chunked mode is currently active.
      * @type {boolean}
@@ -276,7 +299,9 @@ function BuffeeChunkLoader(vbuf) {
       currentChunkIndex = -1;
       prevBuffer = [];
       nextBuffer = [];
-      Model.lines = [];
+
+      // Replace Model.lines with a Proxy that returns chunked content
+      Model.lines = createLinesProxy();
 
       // Set navigate mode (can scroll, no editing)
       vbuf.editMode = 'navigate';
@@ -287,14 +312,8 @@ function BuffeeChunkLoader(vbuf) {
         configurable: true
       });
 
-      // Override Viewport.lines
-      Object.defineProperty(Viewport, 'lines', {
-        get: getChunkedLines,
-        configurable: true
-      });
-
-      // Override Model.appendLines
-      Model.appendLines = appendChunkedLines;
+      // Override _internals.appendLines
+      vbuf._internals.appendLines = appendChunkedLines;
 
       render(true);
     },
@@ -305,19 +324,17 @@ function BuffeeChunkLoader(vbuf) {
     deactivate() {
       enabled = false;
 
-      // Restore original getters
+      // Restore original lastIndex getter
       Object.defineProperty(Model, 'lastIndex', {
         get: originalLastIndexGetter,
         configurable: true
       });
 
-      Object.defineProperty(Viewport, 'lines', {
-        get: originalLinesGetter,
-        configurable: true
-      });
+      // Restore Model.lines to a regular array
+      Model.lines = [];
 
       // Restore original appendLines
-      Model.appendLines = originalAppendLines;
+      vbuf._internals.appendLines = originalAppendLines;
 
       // Restore write mode
       vbuf.editMode = 'write';
@@ -341,7 +358,7 @@ function BuffeeChunkLoader(vbuf) {
      */
     async appendLines(lines, skipRender = false) {
       if (!enabled) {
-        throw new Error('ChunkLoader is not activated. Call activate() first.');
+        throw new Error('UltraHighCapacity is not activated. Call activate() first.');
       }
       await appendChunkedLines(lines, skipRender);
     },
@@ -361,7 +378,7 @@ function BuffeeChunkLoader(vbuf) {
   };
 
   // Attach to vbuf instance
-  vbuf.ChunkLoader = ChunkLoader;
+  vbuf.UltraHighCapacity = UltraHighCapacity;
 
-  return ChunkLoader;
+  return UltraHighCapacity;
 }

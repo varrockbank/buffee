@@ -1260,7 +1260,7 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
     <script src="../extensions/syntax.js"></script>
     <script src="../extensions/elementals.js"></script>
     <script src="../extensions/tui-legacy.js"></script>
-    <script src="../extensions/chunkloader.js"></script>
+    <script src="../extensions/ultrahighcapacity.js"></script>
     <script src="lib/test-framework.js"></script>
     <script src="lib/walkthrough.js"></script>
     <script src="lib/harness.js"></script>
@@ -2335,13 +2335,13 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
             });
 
             // ===== CHUNKLOADER TESTS =====
-            extRunner.describe('ChunkLoader', () => {
-                extRunner.it('initializes ChunkLoader extension', () => {
+            extRunner.describe('UltraHighCapacity', () => {
+                extRunner.it('initializes UltraHighCapacity extension', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        BuffeeChunkLoader(editor);
-                        assertTrue(!!editor.ChunkLoader, 'ChunkLoader should be attached to editor');
-                        assertFalse(editor.ChunkLoader.enabled, 'Should be disabled by default');
+                        BuffeeUltraHighCapacity(editor);
+                        assertTrue(!!editor.UltraHighCapacity, 'UltraHighCapacity should be attached to editor');
+                        assertFalse(editor.UltraHighCapacity.enabled, 'Should be disabled by default');
                     } finally {
                         cleanup();
                     }
@@ -2350,10 +2350,10 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('activates chunked mode', () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        BuffeeChunkLoader(editor);
-                        editor.ChunkLoader.activate(1000);
-                        assertTrue(editor.ChunkLoader.enabled, 'Should be enabled after activate');
-                        assertEqual(editor.ChunkLoader.totalLines, 0, 'Should start with 0 lines');
+                        BuffeeUltraHighCapacity(editor);
+                        editor.UltraHighCapacity.activate(1000);
+                        assertTrue(editor.UltraHighCapacity.enabled, 'Should be enabled after activate');
+                        assertEqual(editor.UltraHighCapacity.totalLines, 0, 'Should start with 0 lines');
                     } finally {
                         cleanup();
                     }
@@ -2362,12 +2362,12 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('tracks total lines after append', async () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        BuffeeChunkLoader(editor);
-                        editor.ChunkLoader.activate(1000);
+                        BuffeeUltraHighCapacity(editor);
+                        editor.UltraHighCapacity.activate(1000);
 
                         // Append some lines
-                        await editor.ChunkLoader.appendLines(['line1', 'line2', 'line3']);
-                        assertEqual(editor.ChunkLoader.totalLines, 3, 'Should have 3 total lines');
+                        await editor.UltraHighCapacity.appendLines(['line1', 'line2', 'line3']);
+                        assertEqual(editor.UltraHighCapacity.totalLines, 3, 'Should have 3 total lines');
                     } finally {
                         cleanup();
                     }
@@ -2376,13 +2376,13 @@ expect(3+5).toBe(8);            <span style="color: #4CAF50;">→</span>  expect
                 extRunner.it('clears chunk data', async () => {
                     const { editor, cleanup } = createTestEditor();
                     try {
-                        BuffeeChunkLoader(editor);
-                        editor.ChunkLoader.activate(1000);
-                        await editor.ChunkLoader.appendLines(['line1', 'line2']);
-                        assertEqual(editor.ChunkLoader.totalLines, 2, 'Should have 2 lines');
+                        BuffeeUltraHighCapacity(editor);
+                        editor.UltraHighCapacity.activate(1000);
+                        await editor.UltraHighCapacity.appendLines(['line1', 'line2']);
+                        assertEqual(editor.UltraHighCapacity.totalLines, 2, 'Should have 2 lines');
 
-                        editor.ChunkLoader.clear();
-                        assertEqual(editor.ChunkLoader.totalLines, 0, 'Should have 0 lines after clear');
+                        editor.UltraHighCapacity.clear();
+                        assertEqual(editor.UltraHighCapacity.totalLines, 0, 'Should have 0 lines after clear');
                     } finally {
                         cleanup();
                     }

@@ -41,13 +41,25 @@ editor.TUI.addButton({ row: 1, col: 2, label: 'OK', border: true })
 editor.TUI.enabled = true</pre>
   <p><a href="samples/tui-legacy.html">Demo →</a></p>
 
-  <h2>ChunkLoader</h2>
-  <p><code>chunkloader.js</code></p>
-  <p>Gzip-compressed chunked storage for massive files. Decompress on scroll.</p>
-  <pre>editor.use(BuffeeChunkLoader)
-editor.ChunkLoader.activate(50000)
-await editor.ChunkLoader.appendLines(lines)</pre>
-  <p><a href="samples/read-only.html">Demo →</a></p>
+  <h2>FileLoader</h2>
+  <p><code>fileloader.js</code></p>
+  <p>Multiple file loading strategies optimized for different file sizes. Choose the right loader based on your file size and memory constraints.</p>
+  <pre>BuffeeFileLoader(editor)
+await editor.FileLoader.naiveLoad(file)           // &lt;10M lines
+await editor.FileLoader.chunkedBlobLoad(file)     // &lt;70M lines
+await editor.FileLoader.chunkedFileReaderLoad(file)
+await editor.FileLoader.streamLoad(file)
+await editor.FileLoader.streamMaterializedLoad(file) // &lt;75M lines
+await editor.FileLoader.streamGcHintsLoad(file)   // &lt;90M lines</pre>
+  <p><a href="samples/ultra-high-capacity.html">Demo →</a></p>
+
+  <h2>UltraHighCapacity</h2>
+  <p><code>ultrahighcapacity.js</code></p>
+  <p>Gzip-compressed chunked storage for massive files (1B+ lines). Decompress on scroll. Forces editor into navigation-only mode.</p>
+  <pre>BuffeeUltraHighCapacity(editor)
+editor.UltraHighCapacity.activate(50000)
+await editor.UltraHighCapacity.appendLines(lines)</pre>
+  <p><a href="samples/ultra-high-capacity.html">Demo →</a></p>
 
   <h2>iOS</h2>
   <p><code>ios.js</code></p>

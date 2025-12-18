@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 7.4.0-alpha.1 [2025-12-18]
+*** refactor 
+- privatize #appendLines API. Refactor File Loader extensions. Fixed read-only.html sample.
+
 ** 7.3.0-alpha.1 [2025-12-18]
 *** refactor 
 - include necessary flexbox styles in style.css so user doesn't have to specify

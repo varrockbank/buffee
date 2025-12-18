@@ -181,7 +181,6 @@ editor.Model.lines;        // ["Hello", "World"]
 editor.Model.lastIndex;    // 1
 
 // Modify
-editor.Model.appendLines(["Line 3", "Line 4"]);
 editor.Model.splice(1, ["inserted"], 0);
 editor.Model.delete(1);
 ```
@@ -388,11 +387,11 @@ editor.Model.text = "Your content here";
 editor.TUI.enabled = true;  // Sets editMode to 'read' automatically
 ```
 
-**ChunkLoader** (for very large files):
+**UltraHighCapacity** (for very large files):
 ```javascript
-BuffeeChunkLoader(editor);
-editor.ChunkLoader.activate();  // Sets editMode to 'navigate' automatically
-await editor.ChunkLoader.appendLines(["Line 1", "Line 2", ...]);
+BuffeeUltraHighCapacity(editor);
+editor.UltraHighCapacity.activate();  // Sets editMode to 'navigate' automatically
+await editor.UltraHighCapacity.appendLines(["Line 1", "Line 2", ...]);
 ```
 
 ---
@@ -450,35 +449,35 @@ Tree-sitter rendering is capped at 60fps using a dirty flag pattern. Call `markD
 
 ---
 
-## ChunkLoader Extension (`editor.ChunkLoader`)
+## UltraHighCapacity Extension (`editor.UltraHighCapacity`)
 
-ChunkLoader is an optional extension for loading and viewing very large files. It compresses lines into gzip chunks and decompresses on-demand for efficient memory usage.
+UltraHighCapacity is an optional extension for loading and viewing very large files (1B+ lines). It compresses lines into gzip chunks and decompresses on-demand for efficient memory usage.
 
 ```html
 <script src="buffee.js"></script>
-<script src="extensions/chunkloader.js"></script>
+<script src="extensions/ultrahighcapacity.js"></script>
 ```
 
 ```javascript
 const editor = new Buffee(document.getElementById('editor'), options);
-BuffeeChunkLoader(editor);
+BuffeeUltraHighCapacity(editor);
 
-// Activate chunked mode (disables editing)
-editor.ChunkLoader.activate(50000);  // 50k lines per chunk
+// Activate ultra-high-capacity mode (disables editing)
+editor.UltraHighCapacity.activate(50000);  // 50k lines per chunk
 
 // Append lines (must use this, not Model.text)
-await editor.ChunkLoader.appendLines(largeArrayOfLines);
+await editor.UltraHighCapacity.appendLines(largeArrayOfLines);
 
 // Check status
-editor.ChunkLoader.enabled;     // true
-editor.ChunkLoader.totalLines;  // total line count
-editor.ChunkLoader.chunkCount;  // number of compressed chunks
+editor.UltraHighCapacity.enabled;     // true
+editor.UltraHighCapacity.totalLines;  // total line count
+editor.UltraHighCapacity.chunkCount;  // number of compressed chunks
 
 // Clear all data
-editor.ChunkLoader.clear();
+editor.UltraHighCapacity.clear();
 
 // Deactivate and restore normal mode
-editor.ChunkLoader.deactivate();
+editor.UltraHighCapacity.deactivate();
 ```
 
 ### Important Notes

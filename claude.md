@@ -35,7 +35,8 @@ Located in `extensions/`, tested in "Extensions" tab of `test/index.html`.
 | Syntax | `syntax.js` | Regex-based syntax highlighting |
 | Elementals | `elementals.js` | DOM-based UI elements in overlay layer |
 | TUI Legacy | `tui-legacy.js` | Text-based UI via text manipulation |
-| ChunkLoader | `chunkloader.js` | Lazy loading for large files |
+| FileLoader | `fileloader.js` | Multiple file loading strategies for different sizes |
+| UltraHighCapacity | `ultrahighcapacity.js` | Ultra-high-capacity mode for 1B+ lines |
 
 ## Generating Sample Pages
 

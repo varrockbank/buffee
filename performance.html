@@ -75,13 +75,13 @@ Took 4.60 millis to delete line with 10000001 lines. That's 217.39 FPS.</pre>
   <h2>Chunked File Loading</h2>
 
   <h3>No improvement: Sequentially adding lines</h3>
-  <p>We add an <code>appendLines</code> method to model and send in 100k lines at a time.</p>
+  <p>We add an <code>appendLines</code> method to _internals and send in 100k lines at a time.</p>
   <pre>const fileLines = fileSourceTextString.split('\n');
 primary.Model.lines = [];
 const BATCH_SIZE = 100_000;
 for (let i = 0; i &lt; fileLines.length; i += BATCH_SIZE) {
   const batch = fileLines.slice(i, i + BATCH_SIZE);
-  editor.Model.appendLines(batch);
+  editor._internals.appendLines(batch);
 }</pre>
   <p>This doesn't work and still fails on 20 million line files. The bottleneck seems to be on the source file being in memory.</p>
 
@@ -111,7 +111,7 @@ for (let i = 0; i &lt; fileLines.length; i += BATCH_SIZE) {
   <p>At 70 million lines, consumed 3660MB of heap space, near Chrome's 4GB tab limit. Running Chrome with <code>--js-flags="--max-old-space-size=8192"</code> does not seem to increase the tab limit.</p>
 
   <h3>Chunk Size Experiments</h3>
-  <p>Larger chunk sizes are more performant but risk stack overflow when calling appendLines. 1MB is the sweet spot.</p>
+  <p>Larger chunk sizes are more performant but risk stack overflow when calling _internals.appendLines. 1MB is the sweet spot.</p>
   <table>
     <tr><th>Lines</th><th>256KB</th><th>512KB</th><th>1MB</th><th>2MB</th></tr>
     <tr><td>10M</td><td>872.80ms</td><td>685.40ms</td><td>678.70ms</td><td>640.30ms</td></tr>
@@ -131,12 +131,12 @@ for (let i = 0; i &lt; fileLines.length; i += BATCH_SIZE) {
   <h3>Materializing Sliced Strings</h3>
   <p>After inspecting heap, [sliced strings] accounted for ~100MB redundancy. Materializing strings gives 5-10% capacity improvement:</p>
   <pre>// Before
-primary.Model.appendLines(slicedLines, true);
+primary._internals.appendLines(slicedLines, true);
 // Heap: 3650MB
 
 // After - force materialization
 const materializedLines = slicedLines.map(line =&gt; Array.from(line).join(''));
-primary.Model.appendLines(materializedLines, true);
+primary._internals.appendLines(materializedLines, true);
 // Heap peak: 3300MB, after: 3150MB</pre>
 
   <h3>Force GC</h3>

@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <title>buffee - Ultra High Capacity</title>
   <script src="../buffee.js"></script>
-  <script src="../extensions/chunkloader.js"></script>
+  <script src="../extensions/fileloader.js"></script>
+  <script src="../extensions/ultrahighcapacity.js"></script>
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
   <style>
@@ -143,7 +144,8 @@
       viewportRows: 15,
       logger: log
     });
-    BuffeeChunkLoader(editor);
+    BuffeeFileLoader(editor);
+    BuffeeUltraHighCapacity(editor);
 
     editor.Model.text = 'Select a file to load...';
     editorEl.focus();
@@ -173,18 +175,9 @@
       const f = document.getElementById("file-input").files[0];
       if (!f) { alert("No file selected"); return; }
 
-      const t0 = performance.now();
-      const text = await f.text();
-      const t1 = performance.now();
-      log(`[Naive] Read file to text: ${(t1 - t0).toFixed(2)}ms`);
-
-      const t2 = performance.now();
-      editor.Model.text = text;
-      const t3 = performance.now();
-      const lineCount = editor.Model.lines.length;
+      const result = await editor.FileLoader.naiveLoad(f);
       const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-      log(`[Naive] Set Model.text (split + render): ${(t3 - t2).toFixed(2)}ms`);
-      log(`[Naive] Loaded ${lineCount.toLocaleString()} lines in ${(t3 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+      log(`[Naive] Loaded ${result.lines.toLocaleString()} lines in ${result.timeMs.toFixed(2)}ms // ${fileSizeMiB} MiB`);
     });
 
     // Chunked (File.slice)
@@ -192,40 +185,9 @@
       const f = document.getElementById("file-input").files[0];
       if (!f) { alert("No file selected"); return; }
 
-      const t0 = performance.now();
-      editor.Model.lines = [];
-
-      const CHUNK_SIZE = 1 * 1024 * 1024;
-      let offset = 0;
-      let remainder = '';
-      let totalLines = 0;
-
-      while (offset < f.size) {
-        const blob = f.slice(offset, offset + CHUNK_SIZE);
-        const text = await blob.text();
-        const fullText = remainder + text;
-        const lastNewlineIndex = fullText.lastIndexOf('\n');
-
-        if (lastNewlineIndex !== -1) {
-          const completeText = fullText.substring(0, lastNewlineIndex);
-          const lines = completeText.split('\n');
-          editor.Model.appendLines(lines);
-          totalLines += lines.length;
-          remainder = fullText.substring(lastNewlineIndex + 1);
-        } else {
-          remainder = fullText;
-        }
-        offset += CHUNK_SIZE;
-      }
-
-      if (remainder.length > 0) {
-        editor.Model.appendLines([remainder]);
-        totalLines++;
-      }
-
-      const t1 = performance.now();
+      const result = await editor.FileLoader.chunkedBlobLoad(f);
       const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-      log(`[Chunked] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+      log(`[Chunked] Loaded ${result.lines.toLocaleString()} lines in ${result.timeMs.toFixed(2)}ms // ${fileSizeMiB} MiB`);
     });
 
     // Chunked (FileReader)
@@ -233,49 +195,9 @@
       const f = document.getElementById("file-input").files[0];
       if (!f) { alert("No file selected"); return; }
 
-      const t0 = performance.now();
-      editor.Model.lines = [];
-
-      const CHUNK_SIZE = 1 * 1024 * 1024;
-      let offset = 0;
-      let remainder = '';
-      let totalLines = 0;
-
-      function readBlobAsText(blob) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.onerror = (e) => reject(e);
-          reader.readAsText(blob);
-        });
-      }
-
-      while (offset < f.size) {
-        const blob = f.slice(offset, offset + CHUNK_SIZE);
-        const text = await readBlobAsText(blob);
-        const fullText = remainder + text;
-        const lastNewlineIndex = fullText.lastIndexOf('\n');
-
-        if (lastNewlineIndex !== -1) {
-          const completeText = fullText.substring(0, lastNewlineIndex);
-          const lines = completeText.split('\n');
-          editor.Model.appendLines(lines);
-          totalLines += lines.length;
-          remainder = fullText.substring(lastNewlineIndex + 1);
-        } else {
-          remainder = fullText;
-        }
-        offset += CHUNK_SIZE;
-      }
-
-      if (remainder.length > 0) {
-        editor.Model.appendLines([remainder]);
-        totalLines++;
-      }
-
-      const t1 = performance.now();
+      const result = await editor.FileLoader.chunkedFileReaderLoad(f);
       const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-      log(`[FileReader] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
+      log(`[FileReader] Loaded ${result.lines.toLocaleString()} lines in ${result.timeMs.toFixed(2)}ms // ${fileSizeMiB} MiB`);
     });
 
     // Streaming (ReadableStream)
@@ -283,52 +205,9 @@
       const f = document.getElementById("file-input").files[0];
       if (!f) { alert("No file selected"); return; }
 
-      const t0 = performance.now();
-      editor.Model.lines = [];
-
-      let remainder = '';
-      let totalLines = 0;
-      const decoder = new TextDecoder('utf-8');
-      const stream = f.stream();
-      const reader = stream.getReader();
-      let chunkCount = 0;
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          const fullText = remainder + text;
-          const lastNewlineIndex = fullText.lastIndexOf('\n');
-
-          if (lastNewlineIndex !== -1) {
-            const completeText = fullText.substring(0, lastNewlineIndex);
-            const lines = completeText.split('\n');
-            editor.Model.appendLines(lines);
-            totalLines += lines.length;
-            remainder = fullText.substring(lastNewlineIndex + 1);
-          } else {
-            remainder = fullText;
-          }
-
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        if (remainder.length > 0) {
-          editor.Model.appendLines([remainder]);
-          totalLines++;
-        }
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        log(`[Stream] Loaded ${totalLines.toLocaleString()} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
-      } finally {
-        reader.releaseLock();
-      }
+      const result = await editor.FileLoader.streamLoad(f);
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      log(`[Stream] Loaded ${result.lines.toLocaleString()} lines in ${result.timeMs.toFixed(2)}ms // ${fileSizeMiB} MiB`);
     });
 
     // Streaming + Materialization
@@ -336,48 +215,9 @@
       const f = document.getElementById("file-input").files[0];
       if (!f) { alert("No file selected"); return; }
 
-      const reader = f.stream().getReader();
-      try {
-        editor.Model.lines = [];
-        const decoder = new TextDecoder('utf-8');
-        let chunkCount = 0;
-        const t0 = performance.now();
-        let remainder = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          const lastNewlineIndex = text.lastIndexOf('\n');
-
-          if (lastNewlineIndex !== -1) {
-            const allLines = text.split('\n');
-            const slicedLines = allLines.slice(0, -1);
-            slicedLines[0] = remainder + slicedLines[0];
-            remainder = allLines[allLines.length - 1];
-
-            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
-            editor.Model.appendLines(materializedLines, true);
-          } else {
-            remainder += text;
-          }
-
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            editor.Model.appendLines([], false);
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        editor.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        log(`[Stream+Mat] Loaded ${editor.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
-      } finally {
-        reader.releaseLock();
-      }
+      const result = await editor.FileLoader.streamMaterializedLoad(f);
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      log(`[Stream+Mat] Loaded ${result.lines.toLocaleString()} lines in ${result.timeMs.toFixed(2)}ms // ${fileSizeMiB} MiB`);
     });
 
     // Streaming + GC Hints
@@ -385,48 +225,9 @@
       const f = document.getElementById("file-input").files[0];
       if (!f) { alert("No file selected"); return; }
 
-      const reader = f.stream().getReader();
-      try {
-        editor.Model.lines = [];
-        const decoder = new TextDecoder('utf-8');
-        let chunkCount = 0;
-        const t0 = performance.now();
-        let remainder = '';
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const text = decoder.decode(value, { stream: true });
-          const lastNewlineIndex = text.lastIndexOf('\n');
-
-          if (lastNewlineIndex !== -1) {
-            const allLines = text.split('\n');
-            const slicedLines = allLines.slice(0, -1);
-            slicedLines[0] = remainder + slicedLines[0];
-            remainder = allLines[allLines.length - 1];
-
-            const materializedLines = slicedLines.map(line => Array.from(line).join(''));
-            editor.Model.appendLines(materializedLines, chunkCount % 10 == 5 ? false : true);
-          } else {
-            remainder += text;
-          }
-
-          chunkCount++;
-          if (chunkCount % 10 === 0) {
-            const _ = new Array(100000);
-            await new Promise(resolve => setTimeout(resolve, 0));
-          }
-        }
-
-        editor.Model.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
-
-        const t1 = performance.now();
-        const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
-        log(`[Stream+GC] Loaded ${editor.Model.lines.length} lines in ${(t1 - t0).toFixed(2)}ms // ${fileSizeMiB} MiB`);
-      } finally {
-        reader.releaseLock();
-      }
+      const result = await editor.FileLoader.streamGcHintsLoad(f);
+      const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
+      log(`[Stream+GC] Loaded ${result.lines.toLocaleString()} lines in ${result.timeMs.toFixed(2)}ms // ${fileSizeMiB} MiB`);
     });
 
     // Ultra-High-Capacity Mode (Chunked + Compressed)
@@ -436,7 +237,7 @@
 
       const reader = f.stream().getReader();
       try {
-        editor.ChunkLoader.activate();
+        editor.UltraHighCapacity.activate();
         document.getElementById('read-only-indicator').classList.remove('hidden');
 
         const decoder = new TextDecoder('utf-8');
@@ -460,33 +261,33 @@
 
             const materializedLines = slicedLines.map(line => Array.from(line).join(''));
             originalSize += materializedLines.join('\n').length;
-            await editor.Model.appendLines(materializedLines, true);
+            await editor._internals.appendLines(materializedLines, true);
           } else {
             remainder += text;
           }
 
           chunkCount++;
           if (chunkCount % 10 === 0) {
-            await editor.Model.appendLines([], false);
+            await editor._internals.appendLines([], false);
             await new Promise(resolve => setTimeout(resolve, 0));
           }
         }
 
         if (remainder.length > 0) {
-          await editor.Model.appendLines([remainder], false);
+          await editor._internals.appendLines([remainder], false);
         }
 
-        const compressedSize = editor.ChunkLoader.compressedSize;
+        const compressedSize = editor.UltraHighCapacity.compressedSize;
         const t1 = performance.now();
         const fileSizeMiB = (f.size / (1024 * 1024)).toFixed(3);
         const compressionRatio = ((1 - compressedSize / originalSize) * 100).toFixed(1);
 
-        log(`[Chunked+Compressed] Stored ${editor.ChunkLoader.totalLines.toLocaleString()} lines in ${editor.ChunkLoader.chunkCount} gzipped chunks`);
+        log(`[Chunked+Compressed] Stored ${editor.UltraHighCapacity.totalLines.toLocaleString()} lines in ${editor.UltraHighCapacity.chunkCount} gzipped chunks`);
         log(`  Time: ${(t1 - t0).toFixed(2)}ms // File: ${fileSizeMiB} MiB (${f.size} bytes)`);
         log(`  Original size: ${(originalSize / 1024 / 1024).toFixed(2)} MiB`);
         log(`  Compressed size: ${(compressedSize / 1024 / 1024).toFixed(2)} MiB`);
         log(`  Compression ratio: ${compressionRatio}% savings`);
-        log(`  Memory savings: ${editor.ChunkLoader.chunkCount} chunks vs ${editor.ChunkLoader.totalLines.toLocaleString()} array elements = ${(editor.ChunkLoader.totalLines / editor.ChunkLoader.chunkCount).toFixed(0)}x reduction`);
+        log(`  Memory savings: ${editor.UltraHighCapacity.chunkCount} chunks vs ${editor.UltraHighCapacity.totalLines.toLocaleString()} array elements = ${(editor.UltraHighCapacity.totalLines / editor.UltraHighCapacity.chunkCount).toFixed(0)}x reduction`);
       } finally {
         reader.releaseLock();
       }
