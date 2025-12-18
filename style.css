@@ -76,6 +76,11 @@
 }
 
 /* Status bar */
+.wb .wb-status {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+}
 .wb .wb-status span {
   padding-right: 4px;
 }
