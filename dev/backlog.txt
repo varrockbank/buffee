@@ -8,3 +8,6 @@
     .wb .wb-cursor { background-color: #FF6B6B }
 19. make buffee smart about status-line. if html present, render, no otherwise
 20. make buffee smart about gutter if html present, render, no otherwise
+21. file loading indicator.
+22. show selection coordinates, not just cursor 
+23. accept a lambda to map to coordinates

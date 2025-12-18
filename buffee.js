@@ -1,6 +1,6 @@
 /**
  * @fileoverview Buffee, the text slayer
- * @version 7.5.0-alpha.1
+ * @version 7.6.0-alpha.1
  */
 
 /**
@@ -53,7 +53,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.5.0-alpha.1";
+  this.version = "7.6.0-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -98,11 +98,9 @@ function Buffee(node, config = {}) {
   });
 
   // Layer z-indexes (from bottom to top):
-  // - Selection: 100 (background highlights)
   // - Text: 200 (actual content)
   // - Cursor: 300 (visible above text)
   // - Elements: 400 (UI elements like buttons, prompts)
-  const zIndexSelection = 100;
   const zIndexText = 200;
   const zIndexCursor = 300;
   const zIndexElements = 400;
@@ -419,9 +417,8 @@ function Buffee(node, config = {}) {
      */
     insert(s, skipRender = false) {
       s = expandTabs(s);
-      const t0 = performance.now();
       if (this.isSelection) {
-        const [first, second] = this.ordered;
+        const [first, _] = this.ordered;
 
         // Get selected text before deleting
         const selectedText = this.lines.join('\n');
@@ -455,20 +452,13 @@ function Buffee(node, config = {}) {
         }
       }
       if (!skipRender) render(true);
-      const t1 = performance.now();
-      const millis = parseFloat(t1 - t0);
-      logger.log(`Took ${millis.toFixed(2)} millis to insert with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
 
     /**
      * Deletes the character before cursor or the current selection.
      */
     delete() {
-      if (this.isSelection) {
-        return this.insert('');
-      }
-
-      const t0 = performance.now();
+      if (this.isSelection) return this.insert('');
 
       if (tail.col > 0) {
         // Delete character before cursor
@@ -488,10 +478,6 @@ function Buffee(node, config = {}) {
       }
 
       render(true);
-
-      const t1 = performance.now();
-      const millis = parseFloat(t1 - t0);
-      logger.log(`Took ${millis.toFixed(2)} millis to delete with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
 
     /**
@@ -500,24 +486,13 @@ function Buffee(node, config = {}) {
     newLine() {
       if (this.isSelection) Selection.insert('', true); // skipRender - we render below
 
-      const t0 = performance.now();
-
       // Insert newline character
       History._insert(tail.row, tail.col, '\n');
 
-      // Move cursor to start of new line
-      head.col = 0;
-      head.row++;
-
-      // Scroll viewport if cursor went below visible area
-      if (head.row > Viewport.end) {
-        Viewport.start = head.row - Viewport.size + 1;
-      }
+      head.col = 0, head.row++;
+      if (head.row > Viewport.end) Viewport.start = head.row - Viewport.size + 1;
 
       render(true);
-      const t1 = performance.now();
-      const millis = parseFloat(t1 - t0);
-      logger.log(`Took ${millis.toFixed(2)} millis to insert new line with ${Model.lines.length} lines. That's ${1000/millis} FPS.`);
     },
 
     /**

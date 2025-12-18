@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 7.6.0-alpha.1 [2025-12-18]
+*** refactor 
+- prune performance profiling code
+
 ** 7.5.0-alpha.1 [2025-12-18]
 *** config 
 - new `interactivity` flag: -1 read-only, 0 navigation, 1 normal
