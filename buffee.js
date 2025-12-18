@@ -1,6 +1,6 @@
 /**
  * @fileoverview Buffee, the text slayer
- * @version 7.6.1-alpha.1
+ * @version 7.6.2-alpha.1
  */
 
 /**
@@ -53,7 +53,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.6.1-alpha.1";
+  this.version = "7.6.2-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -78,7 +78,10 @@ function Buffee(node, config = {}) {
     editorPaddingPX = 4,
     gutterPadding = 1,
     logger = console,
-    rightScrollBuffer = '2ch'  // Extra space after line end for horizontal scrolling
+    rightScrollBuffer = '2ch',  // Extra space after line end for horizontal scrolling
+    zIndexText = 200,
+    zIndexCursor = 300,
+    zIndexElements = 400
   } = advanced;
 
   let gutterSize = initialGutterSize;
@@ -96,14 +99,6 @@ function Buffee(node, config = {}) {
     margin: editorPaddingPX+'px',
     tabSize: expandtab || 4
   });
-
-  // Layer z-indexes (from bottom to top):
-  // - Text: 200 (actual content)
-  // - Cursor: 300 (visible above text)
-  // - Elements: 400 (UI elements like buttons, prompts)
-  const zIndexText = 200;
-  const zIndexCursor = 300;
-  const zIndexElements = 400;
 
   // Text layer - contains all pre elements for line content
   const $textLayer = document.createElement("div");

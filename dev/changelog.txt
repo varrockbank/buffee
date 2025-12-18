@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 7.6.2-alpha.1 [2025-12-18]
+*** config
+- make zIndexText, zIndexCursor, zIndexElements options under config.advanced 
+
 ** 7.6.1-alpha.1 [2025-12-18]
 *** golf
 - const Viewport = ... ; this.Viewport = Viewport, can be done in 1 line
