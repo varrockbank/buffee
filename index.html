@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" href="reset.css">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="themes/buffee.css">
+<link rel="stylesheet" href="themes/Buffee.css">
 <link rel="stylesheet" href="themes/hn.css">
 <link rel="stylesheet" href="themes/kai.css">
-<script src="buffee.js"></script>
+<script src="Buffee.js"></script>
 <script src="extensions/highlights.js"></script>
 <script src="extensions/tui-legacy.js"></script>
 <style>
@@ -32,14 +32,14 @@
       .then(r => r.text())
       .then(html => document.getElementById('nav').innerHTML = html);
   </script>
-  <p><strong>buffee, the text slayer</strong> (<span id="vbuf-version"></span>) — an embeddable text editor for the web — compact, fast, unbounded</p>
+  <p><strong>Buffee, the text slayer</strong> (<span id="vbuf-version"></span>) — embeddable terminal-style text editor for netizens — compact, fast, unbounded</p>
 
   <!-- Features Section -->
   <div style="padding: 12px 0;">
     <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 32px;">
       <div style="text-align: left;">
         <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">0.01MB</h3>
-        <p style="margin: 0; font-size: 14px;"><a href="dist/buffee.min.js">distributable</a> (gz+min)</p>
+        <p style="margin: 0; font-size: 14px;"><a href="dist/Buffee.min.js">distributable</a> (gz+min)</p>
       </div>
       <div style="text-align: left;">
         <h3 style="font-size: 32px; margin: 0 0 8px 0; font-weight: 700;">0</h3>
@@ -66,7 +66,7 @@
 
     <!-- Main Playground -->
     <section>
-      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select buffee-themepack1 buffee" tabindex="0" id="playground">
+      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select Buffee-themepack1 Buffee" tabindex="0" id="playground">
         <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
           <div class="💪 wb-content">
@@ -88,27 +88,29 @@
 
     <!-- About -->
     <section>
-      <h3>Text slayer, editor, UI</h3>
-      <p>Essentially this a rendering engine for fixed-width cells in grid-layout.
-        The grid as viewport into an arbitrarily large buffer of text lines.
+      <h3>Inspired by the terminal</h3>
+      <p>
+        This microlibrary is inspired by the spartan performance and minimalism of terminal interfaces and Vim.
       </p>
-      <p>The core implementation tightly couples rendering and editing capabilities.
-        The original prototype served to view large distributed server logs. 
-        It turns out that making performance headway in this area translates to being a performant text editor.
+      <p>Buffee is efficient as a rendering engine for monospace plaintext in grid-layout.
+        The grid being viewport into an arbitrarily large buffer of text lines.
+      </p>
+      <p>To maximize performance, the core implementation tighly couples text editing operations with rendering.
+        The project originated as a way to inspect massive, distributed server log files directly in the browser.
+        Breakthroughs in this problem space were distilled down to Buffee. 
         The key optimization is sidestepping DOM bottlenecks and avoiding JavaScript fatigue. 
       </p>
       <p>
-        TUI capabilities ship as an extension. The goal is to liberate OrgMode from the Emacs text-based UI, err operating system. 
-        The advent of AI coding has also ignited interest in TUIs, particularly 
-        terminal-based agentic prompts. Buffee completes the circle:
-        where <a href="https://github.com/dankamongmen/notcurses">notcurses</a> brings browser bling to the terminal, buffee brings 20th century drab 
-        to the modern web.  
+        TUI capabilities ship as an extension. One day we will liberate OrgMode from the text-based-UI, err operating system, that is Emacs. 
+        Terminal-based agentic coding tools have also ignited interest in TUIs. 
+        Where <a href="https://github.com/dankamongmen/notcurses">notcurses</a> brings browser bling to the terminal, Buffee completes the circle 
+        by ushering in 20th century paradigms to the modern web.  
       </p>
       </p>
       <p>
-        We'd like to thank the wizards of V8. Compactness is possible because V8 arrays proved instaneously fast. Compare with complex 
+        Much is owed to the wizards of V8. Compactness was made possible because V8 arrays proved instaneously fast. Compare with complex 
         structures, plural, needed by native editors, e.g. <a href="https://code.visualstudio.com/blogs/2018/03/23/text-buffer-reimplementation">piecetable</a>. 
-        Content/syntax-aware considerations aside, buffee rivals or outperforms titans of the text editor industry. 
+        Content/syntax-aware considerations aside, Buffee rivals titans of the text editor industry. 
       </p>
     </section>
 
@@ -130,7 +132,7 @@
         <input type="text" id="tui-content" value="Foobar" style="width: 120px;">
         <button id="tui-add-btn">Add Element</button>
       </div>
-      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select buffee-themepack1 kai" tabindex="0" id="tui-demo">
+      <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select Buffee-themepack1 kai" tabindex="0" id="tui-demo">
         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
         <div class="💪 wb-content">
           <div class="wb-gutter"></div>
@@ -153,7 +155,7 @@
     <section>
       <h3>HackerNews Front Page</h3>
       <p>Example of loading data from APIs.</p>
-    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select buffee-themepack1 hn" tabindex="0" id="hackernews">
+    <blockquote cite="" class="💪 🍜 🥷 🌕 🪜 wb no-select Buffee-themepack1 hn" tabindex="0" id="hackernews">
       <!-- Hidden clipboard bridge lives inside the editor so copy bubbles through it -->
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="💪 wb-content">
