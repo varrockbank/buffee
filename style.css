@@ -1,0 +1,68 @@
+/**
+ * Buffee Editor - Required Styles
+ *
+ * This stylesheet contains the essential structural CSS for Buffee.
+ * Colors are intentionally omitted - define them at point of usage.
+ *
+ * Required color properties to define:
+ *   .wb { background-color, color }
+ *   .wb .wb-selection { background-color }
+ *   .wb .wb-cursor { background-color }
+ *   .wb .wb-status { background-color, color } (optional)
+ */
+
+/* Main container */
+.wb {
+  position: relative;
+  outline: none;
+  font-family: 'Menlo', 'Consolas', monospace;
+}
+
+/* Prevent text selection on editor chrome */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Hidden clipboard bridge - must be selectable but invisible */
+.wb-clipboard-bridge {
+  position: fixed;
+  left: 0;
+  top: 1px;
+  width: 0;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Lines container - overflow handled by buffee.js */
+
+/* Line elements */
+.wb .wb-lines pre::before {
+  content: "\200B";
+}
+.wb .wb-lines pre {
+  margin: 0;
+  overflow: visible;
+  white-space: pre;
+}
+
+/* Selection overlay */
+.wb .wb-selection {
+  left: 0ch;
+  top: 0ch;
+  position: absolute;
+  mix-blend-mode: difference;
+}
+
+/* Cursor overlay */
+.wb .wb-cursor {
+  mix-blend-mode: exclusion;
+}
+
+/* Status bar */
+.wb .wb-status span {
+  padding-right: 4px;
+}
