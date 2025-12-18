@@ -17,26 +17,43 @@
   <h1>Getting Started</h1>
 
   <h2>1. Required CSS</h2>
+  <p>Include <code>style.css</code> for structural styles, then define your colors:</p>
+  <pre>&lt;link rel="stylesheet" href="style.css"&gt;
+&lt;style&gt;
+.wb {
+  background-color: #282C34;
+  color: #B2B2B2;
+}
+.wb .wb-selection {
+  background-color: #EDAD10;
+}
+.wb .wb-cursor {
+  background-color: #FF6B6B;
+}
+&lt;/style&gt;</pre>
+
+  <p>Or include everything inline:</p>
   <pre>.wb {
   background-color: #282C34;
   color: #B2B2B2;
   position: relative;
   outline: none;
-  font-family: monospace;
+  font-family: 'Menlo', 'Consolas', monospace;
 }
 .no-select { user-select: none; }
 .wb-clipboard-bridge {
   position: fixed; left: 0; top: 1px;
   width: 0; height: 1px; opacity: 0; pointer-events: none;
 }
+.wb .wb-lines { overflow-x: hidden; }
 .wb .wb-lines pre::before { content: "\200B"; }
-.wb .wb-lines pre { margin: 0; overflow: hidden; }
+.wb .wb-lines pre { margin: 0; overflow: visible; white-space: pre; }
 .wb .wb-selection {
   background-color: #EDAD10;
   position: absolute;
   mix-blend-mode: difference;
 }
-.wb .wb-cursor { background-color: #FF6B6B; }
+.wb .wb-cursor { background-color: #FF6B6B; mix-blend-mode: exclusion; }
 .wb .wb-status span { padding-right: 4px; }</pre>
 
   <h2>2. Required HTML Structure</h2>
@@ -45,7 +62,7 @@
   &lt;textarea class="wb-clipboard-bridge" aria-hidden="true"&gt;&lt;/textarea&gt;
   &lt;div style="display: flex"&gt;
     &lt;div class="wb-gutter"&gt;&lt;/div&gt;
-    &lt;div class="wb-lines" style="flex: 1; overflow: hidden;"&gt;&lt;/div&gt;
+    &lt;div class="wb-lines" style="flex: 1;"&gt;&lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="wb-status" style="display: flex; justify-content: space-between;"&gt;
     &lt;div class="wb-status-left"&gt;&lt;span class="wb-linecount"&gt;&lt;/span&gt;&lt;/div&gt;

@@ -1,7 +1,7 @@
 /**
  * @fileoverview Buffee - A high-performance virtual buffer text editor for the browser.
  * Renders fixed-width character cells in a grid layout with virtual scrolling.
- * @version 6.1.1-alpha.1
+ * @version 6.1.2-alpha.1
  */
 
 /**
@@ -47,7 +47,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "6.1.1-alpha.1";
+  this.version = "6.1.2-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -79,8 +79,7 @@ function Buffee(node, config = {}) {
     fontSize: lineHeight+'px',
     position: 'relative',
     margin: editorPaddingPX+'px',
-    tabSize: expandtab || 4,
-    overflowX: 'hidden'
+    tabSize: expandtab || 4
   });
 
   // Layer z-indexes (from bottom to top):

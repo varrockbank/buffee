@@ -37,7 +37,10 @@
   pointer-events: none;
 }
 
-/* Lines container - overflow handled by buffee.js */
+/* Lines container */
+.wb .wb-lines {
+  overflow-x: hidden;
+}
 
 /* Line elements */
 .wb .wb-lines pre::before {

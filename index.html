@@ -3,77 +3,44 @@
 <title>Buffee, the text slayer</title>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="reset.css">
+<link rel="stylesheet" href="style.css">
 <script src="buffee.js"></script>
 <script src="extensions/tui-legacy.js"></script>
 <style>
-  /*** Classes for Buffee ***/
+  /* Colors - define per instance */
   .wb {
-      background-color: #282C34;
-      color: #B2B2B2;
-      position: relative;
-      outline: none;
-      font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
-      border: 1px solid black;
-  }
-  .no-select {
-      user-select: none;       /* Standard */
-      -webkit-user-select: none; /* Safari */
-      -moz-user-select: none;    /* Firefox */
-      -ms-user-select: none;     /* IE/Edge (old) */
-  }
-  /* Bridge must be selectable but invisible & offscreen */
-  .wb-clipboard-bridge {
-      position: fixed;      /* out of normal flow so it won't jump layout */
-      left: 0;
-      top: 1px;
-      width: 0;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none; /* avoid clicks */
-  }
-
-  .wb .wb-lines pre::before {
-      content: "\200B";
-  }
-  .wb .wb-lines pre {
-      margin: 0;
-      overflow: hidden;
+    background-color: #282C34;
+    color: #B2B2B2;
+    border: 1px solid black;
   }
   .wb .wb-selection {
-      left: 0ch;
-      top: 0ch;
-      background-color: #EDAD10;
-      position: absolute;
-      mix-blend-mode: difference;        /* inverts underlying pixels */
+    background-color: #EDAD10;
   }
   .wb .wb-cursor {
-      background-color: #FF6B6B;
-      mix-blend-mode: exclusion;
+    background-color: #FF6B6B;
   }
-  .wb .wb-status {
-      padding: 6px;
-  }
-  .wb .wb-status span {
-      padding-right: 4px;
-  }
+
+  /* Syntax highlighting colors */
   .wb .wb-lines pre .highlight-function {
-      color: orange;
+    color: orange;
   }
   .wb .wb-lines pre .highlight-function-name {
-      color: cadetblue ;
+    color: cadetblue;
   }
   .wb .wb-lines pre .highlight-string {
-      color: green;
+    color: green;
   }
 
+  /* HackerNews instance colors */
   #hackernews.wb {
-      background-color: #F6F6EF;
-      color: black;
+    background-color: #F6F6EF;
+    color: black;
   }
   #hackernews.wb .wb-selection {
-      background-color: #DCDCDA;
+    background-color: #DCDCDA;
   }
 
+  /* Playground instance colors */
   #playground.wb {
     background-color: #201430;
     color: #E1D6F8;
@@ -82,7 +49,7 @@
     background-color: #F9AD40;
   }
 
-  /* TUI Mode demo styling */
+  /* TUI demo instance colors */
   #tui-demo.wb {
     background-color: #1a1a2e;
     color: #eaeaea;

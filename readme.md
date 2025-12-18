@@ -37,6 +37,24 @@ To test: type "A" 100+ times and move cursor to end. If misaligned, try a differ
 
 ### Required CSS
 
+Use `style.css` which contains all structural styles. Then define colors for your instance:
+
+```css
+/* Your colors */
+.wb {
+  background-color: #282C34;
+  color: #B2B2B2;
+}
+.wb .wb-selection {
+  background-color: #EDAD10;
+}
+.wb .wb-cursor {
+  background-color: #FF6B6B;
+}
+```
+
+Or include everything inline (structural + colors):
+
 ```css
 .wb {
   background-color: #282C34;
@@ -50,14 +68,15 @@ To test: type "A" 100+ times and move cursor to end. If misaligned, try a differ
   position: fixed; left: 0; top: 1px;
   width: 0; height: 1px; opacity: 0; pointer-events: none;
 }
+.wb .wb-lines { overflow-x: hidden; }
 .wb .wb-lines pre::before { content: "\200B"; }
-.wb .wb-lines pre { margin: 0; overflow: hidden; }
+.wb .wb-lines pre { margin: 0; overflow: visible; white-space: pre; }
 .wb .wb-selection {
   background-color: #EDAD10;
   position: absolute;
   mix-blend-mode: difference;
 }
-.wb .wb-cursor { background-color: #FF6B6B; }
+.wb .wb-cursor { background-color: #FF6B6B; mix-blend-mode: exclusion; }
 .wb .wb-status span { padding-right: 4px; }
 ```
 

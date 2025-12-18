@@ -1,5 +1,10 @@
 * Project Devlog
 
+** 6.1.2-alpha.1 [2025-12-18]
+*** refactor
+- Extract structural CSS to style.css (colors defined by user)
+- Remove redundant overflowX from buffee.js (now in style.css)
+
 ** 6.1.1-alpha.1 [2025-12-18]
 *** fix
 - Keep grid fixed, snapping to left edge of viewport, rather than relative to cursor which may advance less than 1ch
