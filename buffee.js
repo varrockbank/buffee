@@ -47,17 +47,17 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.2-alpha.1";
+  this.version = "7.7.3-alpha.1";
 
   // Extract configuration with defaults
   const {
     viewportRows = 0,
+    viewportCols,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
     gutterSize: initialGutterSize = 2,
     showGutter = true,
     showStatusLine = true,
-    viewportCols,
     advanced = {}
   } = config;
 
@@ -972,9 +972,6 @@ function Buffee(node, config = {}) {
       sel.className = "wb-selection";
       // TODO: move to style.css
       Object.assign(sel.style, {
-        display: 'block',
-        visibility: 'hidden',
-        width: '1ch',
         top: i * lineHeight+'px'
       });
       $selections[i] = fragmentSelections.appendChild(sel);

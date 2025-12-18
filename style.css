@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 7.7.1-alpha.1
+ * @version 7.7.3-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -74,6 +74,9 @@
   top: 0ch;
   position: absolute;
   mix-blend-mode: difference;
+  display: block;
+  visibility: hidden;
+  width: '1ch';
 }
 
 /* Cursor overlay */
