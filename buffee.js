@@ -49,7 +49,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.6.7-alpha.1";
+  this.version = "7.6.8-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -72,9 +72,6 @@ function Buffee(node, config = {}) {
     editorPaddingPX = 4,
     gutterPadding = 1,
     logger = console,
-    zIndexText = 200,
-    zIndexCursor = 300,
-    zIndexElements = 400
   } = advanced;
 
   let gutterSize = initialGutterSize;
@@ -94,22 +91,15 @@ function Buffee(node, config = {}) {
 
   // Text layer - contains all pre elements for line content
   const $textLayer = node.querySelector(".wb-layer-text");
-  Object.assign($textLayer.style, {
-    zIndex: zIndexText,
-  });
 
   // Element layer - for UI elements (buttons, prompts, etc.) added by extensions
   const $elementLayer = node.querySelector(".wb-layer-elements");
-  Object.assign($elementLayer.style, {
-    zIndex: zIndexElements,
-  });
 
   // Cursor layer - shows head position distinctly within a selection
   const $cursor = node.querySelector(".wb-cursor");
   Object.assign($cursor.style, {
     height: lineHeight+'px',
     fontSize: lineHeight+'px',
-    zIndex: zIndexCursor
   });
 
   const $status = node.querySelector('.wb-status');

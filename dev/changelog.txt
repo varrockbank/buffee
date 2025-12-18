@@ -1,5 +1,9 @@
 * Project Devlog 
 
+** 7.6.8-alpha.1 [2025-12-18]  gz+min: 4.77 KB (-0.04), min: 14.02 KB (-0.14)
+*** refactor
+- carve z-index out of buffee and delegate to client HTML
+
 ** 7.6.7-alpha.1 [2025-12-18]  gz+min: 4.82 KB (-0.02), min: 14.17 KB (-0.12)
 *** refactor
 - delegate restructuring layers DOM to HTML templating
