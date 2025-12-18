@@ -146,16 +146,12 @@
 
     // 1. Auto-rows and auto-cols (default behavior)
     const edAutoBoth = new Buffee(document.getElementById('editor-auto-both'), {
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     edAutoBoth.Model.text = ruler(120) + '\n// Auto-rows and auto-cols\n// Drag corner to resize\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 2. Auto-rows and auto-cols (pixel dimensions)
     const edAutoBothPx = new Buffee(document.getElementById('editor-auto-both-px'), {
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     edAutoBothPx.Model.text = ruler(120) + '\n// Auto-rows and auto-cols (pixel dimensions)\n// Dimensions on editor, not parent\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
@@ -164,16 +160,12 @@
     const edFixed = new Buffee(document.getElementById('editor-fixed'), {
       viewportRows: 10,
       viewportCols: 50,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     edFixed.Model.text = ruler(40) + '\n' + Array.from({length: 15}, (_, i) => `Line ${i + 2}: This line is longer than 20 chars`).join('\n');
 
     // 4. Auto-rows, fixed cols
     const edAutoRowsFixedCols = new Buffee(document.getElementById('editor-auto-rows-fixed-cols'), {
       viewportCols: 40,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     edAutoRowsFixedCols.Model.text = ruler(60) + '\n// Auto-rows, fixed 40 cols\n// Drag to resize height\n' +
       Array.from({length: 30}, (_, i) => `Line ${i + 4}`).join('\n');
@@ -181,8 +173,6 @@
     // 5. Fixed-rows, auto-cols
     const edFixedRowsAutoCols = new Buffee(document.getElementById('editor-fixed-rows-auto-cols'), {
       viewportRows: 8,
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     edFixedRowsAutoCols.Model.text = ruler(120) + '\n// Fixed 8 rows, auto-cols\nLine 3\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');

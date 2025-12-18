@@ -10,3 +10,8 @@
 .buffee-themepack1.boring .wb-cursor {
   background-color: #B2B2B2;
 }
+.buffee-themepack1.boring .wb-gutter,
+.buffee-themepack1.boring .wb-status {
+  background-color: #212026;
+  color: #B2B2B2;
+}

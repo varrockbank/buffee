@@ -342,59 +342,13 @@ for (let i = 0; i < 10; i++) {
   console.log(fibonacci(i));
 }`;
 
-    const themes = {
-      buffee: {
-        colorPrimary: '#87FF5F',
-        colorSecondary: '#38274D'
-      },
-      hn: {
-        colorPrimary: 'black',
-        colorSecondary: '#FF6602'
-      },
-      neo: {
-        colorPrimary: '#00ff41',
-        colorSecondary: '#0a2f0a'
-      },
-      star: {
-        colorPrimary: '#FFD700',
-        colorSecondary: '#000000'
-      },
-      chelsey: {
-        colorPrimary: '#000000',
-        colorSecondary: '#f0f0f0'
-      },
-      drak: {
-        colorPrimary: '#ff79c6',
-        colorSecondary: '#44475a'
-      },
-      kai: {
-        colorPrimary: '#a6e22e',
-        colorSecondary: '#3e3d32'
-      },
-      nord: {
-        colorPrimary: '#88c0d0',
-        colorSecondary: '#3b4252'
-      },
-      darkly: {
-        colorPrimary: '#cb4b16',
-        colorSecondary: '#073642'
-      },
-      gruv: {
-        colorPrimary: '#fe8019',
-        colorSecondary: '#3c3836'
-      },
-      boring: {
-        colorPrimary: '#B2B2B2',
-        colorSecondary: '#212026'
-      }
-    };
+    const themeNames = ['buffee', 'hn', 'neo', 'star', 'chelsey', 'drak', 'kai', 'nord', 'darkly', 'gruv', 'boring'];
 
-    Object.entries(themes).forEach(([name, jsOptions]) => {
+    themeNames.forEach(name => {
       const el = document.getElementById('ed-' + name);
       const editor = new Buffee(el, {
         viewportRows: 10,
-        viewportCols: 60,
-        ...jsOptions
+        viewportCols: 60
       });
       editor.Model.text = sampleCode;
 
@@ -406,10 +360,7 @@ for (let i = 0; i < 10; i++) {
         });
 
       // Show JS options
-      const jsCode = `new Buffee(element, {
-  colorPrimary: '${jsOptions.colorPrimary}',
-  colorSecondary: '${jsOptions.colorSecondary}'
-});`;
+      const jsCode = `new Buffee(element, { viewportRows: 10 });`;
       document.getElementById('js-' + name).textContent = jsCode;
     });
   </script>

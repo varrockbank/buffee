@@ -10,3 +10,8 @@
 .buffee-themepack1.kai .wb-cursor {
   background-color: #f92672;
 }
+.buffee-themepack1.kai .wb-gutter,
+.buffee-themepack1.kai .wb-status {
+  background-color: #3e3d32;
+  color: #a6e22e;
+}

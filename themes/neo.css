@@ -10,3 +10,8 @@
 .buffee-themepack1.neo .wb-cursor {
   background-color: #00ff41;
 }
+.buffee-themepack1.neo .wb-gutter,
+.buffee-themepack1.neo .wb-status {
+  background-color: #0a2f0a;
+  color: #00ff41;
+}

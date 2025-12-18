@@ -7,8 +7,6 @@
  * @property {number} [viewportRows] - Fixed number of visible lines (if omitted, auto-fits to container height)
  * @property {number} [lineHeight=24] - Height of each line in pixels
  * @property {number} [indentation=4] - Number of spaces per indentation level
- * @property {string} [colorPrimary="#B2B2B2"] - Primary text color
- * @property {string} [colorSecondary="#212026"] - Secondary/background color for gutter and status
  * @property {number} [gutterSize=2] - Initial width of line number gutter in characters
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
@@ -52,7 +50,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.6.4-alpha.1";
+  this.version = "7.6.5-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -62,8 +60,6 @@ function Buffee(node, config = {}) {
     lineHeight = 24,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
-    colorPrimary = "#B2B2B2",
-    colorSecondary = "#212026",
     gutterSize: initialGutterSize = 2,
     showGutter = true,
     showStatusLine = true,
@@ -141,8 +137,6 @@ function Buffee(node, config = {}) {
   const $status = node.querySelector('.wb-status');
   Object.assign($status.style, {
     padding: '6px',
-    background: colorSecondary,
-    color: colorPrimary,
     display: showStatusLine ? '' : 'none'
   });
   const $statusLineCoord = node.querySelector('.wb-coordinate');
@@ -158,8 +152,6 @@ function Buffee(node, config = {}) {
     textAlign: 'right',
     paddingTop: editorPaddingPX+'px',
     paddingRight: editorPaddingPX*2+'px',
-    backgroundColor: colorSecondary,
-    color: colorPrimary,
     width: gutterSize+gutterPadding+'ch',
     display: showGutter ? '' : 'none'
   });
@@ -609,6 +601,7 @@ function Buffee(node, config = {}) {
           const line = Model.lines[i];
           let maxUnindent = 0;
           for(let k = 0; k < Math.min(indentation, line.length); k++) {
+            // TODO: potential bug. should be k?
             if (line.charAt(0) === " ") {
               maxUnindent++;
             } else {

@@ -10,3 +10,8 @@
 .buffee-themepack1.eva .wb-cursor {
   background-color: #00d9e9;
 }
+.buffee-themepack1.eva .wb-gutter,
+.buffee-themepack1.eva .wb-status {
+  background-color: #38274D;
+  color: #87FF5F;
+}

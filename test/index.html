@@ -633,8 +633,6 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
         function initDSLEditor() {
             const dslEditorEl = document.getElementById('dsl-editor');
             dslEditor = new Buffee(dslEditorEl, {
-                colorPrimary: "#333",
-                colorSecondary: "#f4f4f4",
                 showGutter: true,
                 showStatusLine: false,
                 viewportRows: 20
@@ -643,8 +641,6 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
             // Initialize JS output editor (read-only, different dimensions)
             const jsOutputEl = document.getElementById('js-output');
             jsOutputEditor = new Buffee(jsOutputEl, {
-                colorPrimary: "#333",
-                colorSecondary: "#e8e8e8",
                 showGutter: true,
                 showStatusLine: false,
                 viewportRows: 20

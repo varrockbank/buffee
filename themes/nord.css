@@ -10,3 +10,8 @@
 .buffee-themepack1.nord .wb-cursor {
   background-color: #88c0d0;
 }
+.buffee-themepack1.nord .wb-gutter,
+.buffee-themepack1.nord .wb-status {
+  background-color: #3b4252;
+  color: #88c0d0;
+}

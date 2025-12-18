@@ -10,3 +10,8 @@
 .buffee-themepack1.drak .wb-cursor {
   background-color: #ff79c6;
 }
+.buffee-themepack1.drak .wb-gutter,
+.buffee-themepack1.drak .wb-status {
+  background-color: #44475a;
+  color: #ff79c6;
+}

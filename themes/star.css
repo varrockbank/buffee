@@ -10,3 +10,8 @@
 .buffee-themepack1.star .wb-cursor {
   background-color: #FFD700;
 }
+.buffee-themepack1.star .wb-gutter,
+.buffee-themepack1.star .wb-status {
+  background-color: #000000;
+  color: #FFD700;
+}

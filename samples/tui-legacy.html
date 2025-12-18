@@ -107,8 +107,6 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const plainEditor = new Buffee(plainEl, {
       viewportRows: 3,
       showGutter: true,
-      colorPrimary: '#000000',
-      colorSecondary: '#f0f0f0'
     });
     BuffeeTUI(plainEditor);
     plainEditor.Model.text = '\n  Select action:';
@@ -126,8 +124,6 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const borderEditor = new Buffee(borderEl, {
       viewportRows: 5,
       showGutter: true,
-      colorPrimary: '#000000',
-      colorSecondary: '#f0f0f0'
     });
     BuffeeTUI(borderEditor);
     borderEditor.Model.text = '\n\n\n\n';
@@ -145,8 +141,6 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const promptEditor = new Buffee(promptEl, {
       viewportRows: 8,
       showGutter: true,
-      colorPrimary: '#000000',
-      colorSecondary: '#f0f0f0'
     });
     BuffeeTUI(promptEditor);
     promptEditor.Model.text = '\n\n\n\n\n\n\n';
@@ -163,8 +157,6 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const scrollEditor = new Buffee(scrollEl, {
       viewportRows: 10,
       showGutter: true,
-      colorPrimary: '#000000',
-      colorSecondary: '#f0f0f0'
     });
     BuffeeTUI(scrollEditor);
     scrollEditor.Model.text = '\n\n\n\n\n\n\n\n\n';

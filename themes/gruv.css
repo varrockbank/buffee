@@ -10,3 +10,8 @@
 .buffee-themepack1.gruv .wb-cursor {
   background-color: #fe8019;
 }
+.buffee-themepack1.gruv .wb-gutter,
+.buffee-themepack1.gruv .wb-status {
+  background-color: #3c3836;
+  color: #fe8019;
+}

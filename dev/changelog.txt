@@ -1,4 +1,8 @@
-* Project Devlog
+* Project Devlog 
+
+** 7.6.5-alpha.1 [2025-12-18]  gz+min: 4.94 KB (-0.05), min: 14.56 KB (-0.10)
+*** config
+- remove primary, secondary color param. specify in stylesheet
 
 ** 7.6.4-alpha.1 [2025-12-18]
 *** refactor

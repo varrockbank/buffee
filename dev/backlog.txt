@@ -3,11 +3,9 @@
 15. audit things in _internals that are used elsewhere 
 16. everywhere in web page should use buffee 
 17. wrappers in React, etc.
-18. move into style.css
-    .wb .wb-selection { background-color: #EDAD10 } 
-    .wb .wb-cursor { background-color: #FF6B6B }
 19. make buffee smart about status-line. if html present, render, no otherwise
 20. make buffee smart about gutter if html present, render, no otherwise
 21. file loading indicator.
 22. show selection coordinates, not just cursor 
 23. accept a lambda to map to coordinates
+24. bytecount calculation can be refactored out of buffee.js

@@ -117,8 +117,6 @@ To disable auto-fit, specify `viewportRows` or explicitly set `autoFitViewport: 
 
 ```javascript
 const editor = new Buffee(document.getElementById('editor'), {
-  colorPrimary: "#B2B2B2",
-  colorSecondary: "#212026",
   // viewportRows: 20,  // Omit to auto-fit, or specify for fixed height
   // viewportCols: 80,  // Omit to fill parent, or specify for fixed width
   lineHeight: 24,
@@ -132,8 +130,6 @@ const editor = new Buffee(document.getElementById('editor'), {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `colorPrimary` | string | `"#B2B2B2"` | Text and status bar color |
-| `colorSecondary` | string | `"#212026"` | Gutter and status background |
 | `viewportRows` | number | (auto) | Fixed visible lines (omit to auto-fit) |
 | `viewportCols` | number | (auto) | Fixed text columns (omit to fill parent) |
 | `lineHeight` | number | `24` | Line height in pixels |

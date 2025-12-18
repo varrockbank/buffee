@@ -85,8 +85,6 @@ example();`;
 
     // Option 1: TUI mode
     const edTui = new Buffee(document.getElementById('editor-tui'), {
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     BuffeeTUI(edTui);
     edTui.Model.text = content;
@@ -94,8 +92,6 @@ example();`;
 
     // Option 2: Ultra High Capacity mode (for large files)
     const edChunked = new Buffee(document.getElementById('editor-chunked'), {
-      colorPrimary: "#B2B2B2",
-      colorSecondary: "#212026"
     });
     BuffeeUltraHighCapacity(edChunked);
     edChunked.UltraHighCapacity.activate();
