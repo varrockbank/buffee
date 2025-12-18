@@ -1,5 +1,9 @@
 * Project Devlog 
 
+** 7.6.9-alpha.1 [2025-12-18]  gz+min: 4.75 KB (-0.00), min: 13.97 KB (-0.05)
+*** internals
+- omit getting layer element and delegate to extension to query
+
 ** 7.6.8-alpha.1 [2025-12-18]  gz+min: 4.77 KB (-0.04), min: 14.02 KB (-0.14)
 *** refactor
 - carve z-index out of buffee and delegate to client HTML

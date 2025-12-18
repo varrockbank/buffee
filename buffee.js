@@ -49,7 +49,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.6.8-alpha.1";
+  this.version = "7.6.9-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -89,12 +89,6 @@ function Buffee(node, config = {}) {
     tabSize: expandtab || 4
   });
 
-  // Text layer - contains all pre elements for line content
-  const $textLayer = node.querySelector(".wb-layer-text");
-
-  // Element layer - for UI elements (buttons, prompts, etc.) added by extensions
-  const $elementLayer = node.querySelector(".wb-layer-elements");
-
   // Cursor layer - shows head position distinctly within a selection
   const $cursor = node.querySelector(".wb-cursor");
   Object.assign($cursor.style, {
@@ -102,6 +96,7 @@ function Buffee(node, config = {}) {
     fontSize: lineHeight+'px',
   });
 
+  const $textLayer = node.querySelector(".wb-layer-text");
   const $status = node.querySelector('.wb-status');
   const $statusLineCoord = node.querySelector('.wb-coordinate');
   const $lineCounter = node.querySelector('.wb-linecount');
@@ -1279,7 +1274,6 @@ function Buffee(node, config = {}) {
     },    
     $e,
     $textLayer,
-    $elementLayer,
     render,
     renderHooks,
     appendLines(newLines, skipRender = false) {

@@ -13,8 +13,9 @@
  * @returns {Object} The Elementals API object
  */
 function BuffeeElementals(vbuf) {
-  const { $elementLayer, render, renderHooks } = vbuf._internals;
+  const { $e, renderHooks } = vbuf._internals;
   const { Viewport, lineHeight } = vbuf;
+  const $elementLayer = $e.querySelector('.wb-layer-elements');
 
   let enabled = false;
   let clickable = false;

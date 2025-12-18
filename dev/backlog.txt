@@ -7,3 +7,4 @@
 22. show selection coordinates, not just cursor 
 23. accept a lambda to map to coordinates
 24. bytecount calculation can be refactored out of buffee.js
+25. status bar display should be controlled by user programmatically to alter css
