@@ -95,12 +95,13 @@
   <p>This provides the <code>Buffee</code> constructor function.</p>
   <pre>&lt;script src="buffee.js"&gt;&lt;/script&gt;</pre>
   <p>Or minified:</p>
-  <pre>&lt;script src="dist.js"&gt;&lt;/script&gt;</pre>
+  <pre>&lt;script src="dist.buffee.min.js"&gt;&lt;/script&gt;</pre>
 
   <h2>4. Initialize</h2>
   <pre>const editor = new Buffee(document.getElementById('editor'))
-editor.Model.text = "Hello, World!"</pre>
-
+editor.Model.lines = ["Hello, World!"]
+editor._internals.render(true);
+</pre>
   <h2>5. Auto-fit Viewport</h2>
   <p>By default, the editor auto-fits to its container (if it has a defined height). To use fixed dimensions instead:</p>
   <pre>new Buffee(el, { viewportRows: 20 })      // Fixed row count
