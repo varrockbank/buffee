@@ -234,6 +234,7 @@
   window.addEventListener("DOMContentLoaded", () => {
     const mainElement = document.getElementById("playground");
     const primary = new Buffee(mainElement, {
+      viewportRows: 20,
       colorPrimary: "#87FF5F",
       colorSecondary: "#38274D"
     });
@@ -245,6 +246,7 @@
 
     const hackerNewsElement = document.getElementById('hackernews');
     const hackernews = new Buffee(hackerNewsElement, {
+      viewportRows: 20,
       colorPrimary: "black",
       colorSecondary: "#FF6602",
       showStatusLine: false,

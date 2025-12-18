@@ -20,15 +20,13 @@
   <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Editor Sizing</p>
 
   <h1>Editor Sizing</h1>
-  <p>The editor uses monospace font. Set width via the <code>viewportCols</code> config option or CSS on the container.</p>
-  <p>Use <code>viewportCols: N</code> for exact text columns, or CSS <code>width: 100%</code> to fill parent.</p>
-  <p>Height (number of lines) is set via the <code>viewportRows</code> option.</p>
+  <p>By default, the editor auto-fits to its container. Use <code>viewportRows</code> and <code>viewportCols</code> to fix dimensions.</p>
 
   <h2>1. Auto-rows, auto-cols</h2>
   <p>Parent CSS: <code>div { width: 960px; height: 300px; padding: 20px; overflow: hidden; }</code></p>
   <p>Editor CSS: <code>.wb { width: 100%; height: 100%; display: flex; flex-direction: column; }</code></p>
-  <p><code>new Buffee(el, { autoFitViewport: true })</code></p>
-  <p>Automatically determine rows/cols based on parent container (Drag bottom-right to resize parent).</p>
+  <p><code>new Buffee(el, {})</code></p>
+  <p>Default behavior: auto-fit rows and cols to parent container. Drag bottom-right to resize.</p>
   <div style="width: 960px; height: 300px; padding: 20px; border: 2px dashed #666; resize: both; overflow: hidden;">
     <blockquote class="wb no-select" tabindex="0" id="editor-auto-both" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
       <textarea class="wb-clipboard-bridge"></textarea>
@@ -49,7 +47,7 @@
 
   <h2>2. Fixed-rows, fixed-cols</h2>
   <p>Parent CSS: <code>div { background: #ccc; padding: 20px; }</code></p>
-  <p>Editor CSS: <code>width set by viewportCols config</code></p>
+  <p>Editor CSS: <code></code></p>
   <p><code>new Buffee(el, { viewportRows: 10, viewportCols: 50 })</code></p>
   <p>Width auto-calculated to fit exactly 50 text columns (plus gutter). Content extends beyond both dimensions.</p>
   <div style="border: 2px solid #666; padding: 20px;">
@@ -73,7 +71,7 @@
   <h2>3. Auto-rows, fixed-cols</h2>
   <p>Parent CSS: <code>div { height: 300px; overflow: hidden; }</code></p>
   <p>Editor CSS: <code>.wb { height: 100%; display: flex; flex-direction: column; }</code></p>
-  <p><code>new Buffee(el, { autoFitViewport: true, viewportCols: 40 })</code></p>
+  <p><code>new Buffee(el, { viewportCols: 40 })</code></p>
   <div style="height: 300px; border: 2px dashed #666; padding: 20px; resize: vertical; overflow: hidden;">
     <blockquote class="wb no-select" tabindex="0" id="editor-auto-rows-fixed-cols" style="height: 100%; display: flex; flex-direction: column;">
       <textarea class="wb-clipboard-bridge"></textarea>
@@ -122,9 +120,8 @@
       return s;
     }
 
-    // 1. Auto-rows and auto-cols (fills both dimensions)
+    // 1. Auto-rows and auto-cols (default behavior)
     const edAutoBoth = new Buffee(document.getElementById('editor-auto-both'), {
-      autoFitViewport: true,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
@@ -142,7 +139,6 @@
 
     // 3. Auto-rows, fixed cols
     const edAutoRowsFixedCols = new Buffee(document.getElementById('editor-auto-rows-fixed-cols'), {
-      autoFitViewport: true,
       viewportCols: 40,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"

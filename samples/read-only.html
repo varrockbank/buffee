@@ -21,43 +21,47 @@
   <p>Two options for read-only editors. Try typing - editing is disabled, but arrow keys work.</p>
 
   <h2>Option 1: TUI Mode (simpler)</h2>
-  <pre>new Buffee(el, { viewportRows: 10 })
+  <pre>new Buffee(el, {})
 TUI.enabled = true</pre>
-  <blockquote class="wb no-select" tabindex="0" id="editor-tui" style="border: 1px solid #444; width: 600px;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
+  <div style="width: 600px; height: 300px; border: 1px solid #444;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-tui" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div style="display: flex; flex: 1; overflow: hidden;">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
       </div>
-    </div>
-  </blockquote>
+      <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+        <div><span class="wb-linecount"></span></div>
+        <div style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+  </div>
 
   <h2>Option 2: Chunked Mode (for large files)</h2>
   <pre>BuffeeChunkLoader(editor)
 ChunkLoader.activate()
 await ChunkLoader.appendLines([...])</pre>
-  <blockquote class="wb no-select" tabindex="0" id="editor-chunked" style="border: 1px solid #444; width: 600px;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div style="display: flex;">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
-    </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
-        <span class="wb-coordinate"></span>
-        <span>|</span>
-        <span class="wb-indentation"></span>
+  <div style="width: 600px; height: 300px; border: 1px solid #444;">
+    <blockquote class="wb no-select" tabindex="0" id="editor-chunked" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div style="display: flex; flex: 1; overflow: hidden;">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
       </div>
-    </div>
-  </blockquote>
+      <div class="wb-status" style="display: flex; justify-content: space-between; padding: 6px; background: #212026;">
+        <div><span class="wb-linecount"></span></div>
+        <div style="display: flex;">
+          <span class="wb-coordinate"></span>
+          <span>|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+  </div>
 
   <script>
     const content = `// Read-only content
@@ -73,7 +77,6 @@ example();`;
 
     // Option 1: TUI mode
     const edTui = new Buffee(document.getElementById('editor-tui'), {
-      viewportRows: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });
@@ -82,7 +85,6 @@ example();`;
 
     // Option 2: Chunked mode (for large files)
     const edChunked = new Buffee(document.getElementById('editor-chunked'), {
-      viewportRows: 10,
       colorPrimary: "#B2B2B2",
       colorSecondary: "#212026"
     });

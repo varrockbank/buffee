@@ -1,6 +1,0 @@
-* DONE Make width/height configuration more consistent
-Height is set via `viewportRows`, width via `viewportCols`. Both are constructor options.
-
-* DONE Fix width sizing gotchas
-Added `viewportCols` constructor option that auto-calculates container width including gutter and padding.
-

@@ -60,82 +60,48 @@ Layout the HTML for the editor.
 
 ## Sizing the Editor
 
-Height is controlled by `viewportRows` (number of lines). Width is set via CSS.
+By default, the editor auto-fits to its container (both rows and columns). Use `viewportRows` and `viewportCols` to fix dimensions.
 
-### Width Gotchas
+| Dimension | Default | Fixed |
+|-----------|---------|-------|
+| Height | Auto-fits to container | `viewportRows: N` |
+| Width | Fills parent (100%) | `viewportCols: N` |
 
-Setting `width: 40ch` on the container does **not** give you 40 columns of text. The width includes:
-- Gutter (line numbers) - ~5ch with default settings
-- Internal padding - ~1.5ch
-- Border (if not using `box-sizing: border-box`)
-
-Observed results with `width: 40ch`:
-- With gutter: ~35 characters visible
-- Without gutter: ~38 characters visible
-
-### Recommendations
-
-**Option 1: Account for overhead**
-
-Add extra width to compensate for gutter and padding:
-```css
-#editor {
-  font-size: 24px; /* must match lineHeight */
-  width: 86ch;     /* ~80 usable columns */
-}
-```
-
-**Option 2: Hide gutter and minimize padding**
+### Fixed Dimensions
 
 ```javascript
-new Buffee(el, { showGutter: false, editorPaddingPX: 0 });
+// Fixed 80 columns × 25 rows
+new Buffee(el, { viewportRows: 25, viewportCols: 80 });
 ```
 
-**Option 3: Use 100% width**
+The `viewportCols` option auto-calculates container width to fit exactly N text columns plus gutter.
 
-Let the editor fill its parent and don't worry about exact column count:
-```css
-#editor { width: 100%; }
+### Auto-fit (Default)
+
+```javascript
+// Auto-fit to container (default behavior)
+new Buffee(el, {});
 ```
 
-**Option 4: Use `fit-content` on parent**
-
-Let the editor determine its own width, then wrap:
+Requires the container to have defined dimensions:
 ```css
-.container { width: fit-content; }
-```
-
-### Font-size requirement
-
-For `ch` units to work correctly, the container's `font-size` must match `lineHeight` (default 24px):
-```css
-#editor {
-  font-size: 24px; /* must match lineHeight */
-  width: 80ch;
-}
+#editor { width: 100%; height: 100%; }
 ```
 
 ### Dimensions
 
-- Height = `viewportRows` × `lineHeight` pixels
-- Width = specified width minus gutter, padding, and border
+- Height = `viewportRows` × `lineHeight` pixels (or auto-calculated from container)
+- Width = `viewportCols` + gutter in `ch` units (or 100% of parent)
 
-### Auto-fit Viewport
+### Auto-fit Details
 
-Use `autoFitViewport: true` to automatically size the viewport to fill the container's available height:
-
-```javascript
-new Buffee(el, { autoFitViewport: true });
-```
-
-The editor will:
+Auto-fit is enabled by default. The editor will:
 - Calculate how many lines fit based on container height and `lineHeight`
 - Update automatically when the container is resized (via ResizeObserver)
-- Render an extra partial line if space permits (to avoid wasted space)
 
 **Container requirements:**
 - The container must have a defined height (e.g., `height: 300px` or `height: 100%` with a sized parent)
-- Use `overflow: hidden` on the container to clip the partial line
+- Use `overflow: hidden` on the container to clip partial lines
 
 ```html
 <div style="height: 400px; overflow: hidden;">
@@ -145,7 +111,7 @@ The editor will:
 </div>
 ```
 
-**Note:** When `autoFitViewport` is enabled, `viewportRows` is ignored.
+To disable auto-fit, specify `viewportRows` or explicitly set `autoFitViewport: false`.
 
 ## Initialize
 
@@ -153,7 +119,8 @@ The editor will:
 const editor = new Buffee(document.getElementById('editor'), {
   colorPrimary: "#B2B2B2",
   colorSecondary: "#212026",
-  viewportRows: 20,
+  // viewportRows: 20,  // Omit to auto-fit, or specify for fixed height
+  // viewportCols: 80,  // Omit to fill parent, or specify for fixed width
   lineHeight: 24,
   indentation: 4,
   showGutter: true,
@@ -167,13 +134,14 @@ const editor = new Buffee(document.getElementById('editor'), {
 |--------|------|---------|-------------|
 | `colorPrimary` | string | `"#B2B2B2"` | Text and status bar color |
 | `colorSecondary` | string | `"#212026"` | Gutter and status background |
-| `viewportRows` | number | `20` | Visible lines |
+| `viewportRows` | number | (auto) | Fixed visible lines (omit to auto-fit) |
+| `viewportCols` | number | (auto) | Fixed text columns (omit to fill parent) |
 | `lineHeight` | number | `24` | Line height in pixels |
 | `indentation` | number | `4` | Spaces for indent/unindent |
 | `expandtab` | number | `4` | Tab width (0 = hard tabs) |
 | `showGutter` | boolean | `true` | Show line numbers |
 | `showStatusLine` | boolean | `true` | Show status bar |
-| `autoFitViewport` | boolean | `false` | Auto-size viewport to container height |
+| `autoFitViewport` | boolean | `true`* | Auto-size viewport to container (*false if viewportRows specified) |
 | `logger` | function | `console.log` | Custom logger |
 
 ---
