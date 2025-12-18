@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Themes</title>
+  <link rel="stylesheet" href="reset.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="themes/drak.css">
+  <link rel="stylesheet" href="themes/kai.css">
+  <link rel="stylesheet" href="themes/lit.css">
+  <link rel="stylesheet" href="themes/nord.css">
+  <link rel="stylesheet" href="themes/darkly.css">
+  <link rel="stylesheet" href="themes/gruv.css">
+  <script src="buffee.js"></script>
+  <style>
+    .theme-section {
+      margin-bottom: 40px;
+    }
+    details {
+      margin-top: 10px;
+    }
+    details summary {
+      cursor: pointer;
+      color: #666;
+    }
+    details pre {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <nav id="nav"></nav>
+  <script>
+    fetch('navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="index.html">home</a> / Themes</p>
+
+  <h1>Theme Gallery</h1>
+  <p>A collection of color themes for Buffee. Add the theme class to your editor element.</p>
+
+  <!-- Drak -->
+  <section class="theme-section">
+    <h2>Drak</h2>
+    <blockquote class="wb no-select buffee-themepack1 drak" tabindex="0" id="ed-drak">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1;"></div>
+      </div>
+      <div class="wb-status">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+    <details>
+      <summary>View CSS</summary>
+      <pre id="css-drak"></pre>
+    </details>
+  </section>
+
+  <!-- Kai -->
+  <section class="theme-section">
+    <h2>Kai</h2>
+    <blockquote class="wb no-select buffee-themepack1 kai" tabindex="0" id="ed-kai">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1;"></div>
+      </div>
+      <div class="wb-status">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+    <details>
+      <summary>View CSS</summary>
+      <pre id="css-kai"></pre>
+    </details>
+  </section>
+
+  <!-- Lit -->
+  <section class="theme-section">
+    <h2>Lit</h2>
+    <blockquote class="wb no-select buffee-themepack1 lit" tabindex="0" id="ed-lit">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1;"></div>
+      </div>
+      <div class="wb-status">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+    <details>
+      <summary>View CSS</summary>
+      <pre id="css-lit"></pre>
+    </details>
+  </section>
+
+  <!-- Nord -->
+  <section class="theme-section">
+    <h2>Nord</h2>
+    <blockquote class="wb no-select buffee-themepack1 nord" tabindex="0" id="ed-nord">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1;"></div>
+      </div>
+      <div class="wb-status">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+    <details>
+      <summary>View CSS</summary>
+      <pre id="css-nord"></pre>
+    </details>
+  </section>
+
+  <!-- Darkly -->
+  <section class="theme-section">
+    <h2>Darkly</h2>
+    <blockquote class="wb no-select buffee-themepack1 darkly" tabindex="0" id="ed-darkly">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1;"></div>
+      </div>
+      <div class="wb-status">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+    <details>
+      <summary>View CSS</summary>
+      <pre id="css-darkly"></pre>
+    </details>
+  </section>
+
+  <!-- Gruv -->
+  <section class="theme-section">
+    <h2>Gruv</h2>
+    <blockquote class="wb no-select buffee-themepack1 gruv" tabindex="0" id="ed-gruv">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines" style="flex: 1;"></div>
+      </div>
+      <div class="wb-status">
+        <div><span class="wb-linecount"></span></div>
+        <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+      </div>
+    </blockquote>
+    <details>
+      <summary>View CSS</summary>
+      <pre id="css-gruv"></pre>
+    </details>
+  </section>
+
+  <script>
+    const sampleCode = `function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+// Calculate first 10 Fibonacci numbers
+for (let i = 0; i < 10; i++) {
+  console.log(fibonacci(i));
+}`;
+
+    const themes = ['drak', 'kai', 'lit', 'nord', 'darkly', 'gruv'];
+
+    themes.forEach(theme => {
+      const el = document.getElementById('ed-' + theme);
+      const editor = new Buffee(el, {
+        viewportRows: 10,
+        viewportCols: 60
+      });
+      editor.Model.text = sampleCode;
+
+      // Load CSS into accordion
+      fetch('themes/' + theme + '.css')
+        .then(r => r.text())
+        .then(css => {
+          document.getElementById('css-' + theme).textContent = css;
+        });
+    });
+  </script>
+</body>
+</html>

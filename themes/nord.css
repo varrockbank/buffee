@@ -1,0 +1,12 @@
+/* Nord Theme */
+.buffee-themepack1.nord {
+  background-color: #2e3440;
+  color: #d8dee9;
+}
+.buffee-themepack1.nord .wb-selection {
+  background-color: #5e81ac;
+  mix-blend-mode: normal;
+}
+.buffee-themepack1.nord .wb-cursor {
+  background-color: #88c0d0;
+}

@@ -1,0 +1,12 @@
+/* Lit Theme */
+.buffee-themepack1.lit {
+  background-color: #ffffff;
+  color: #24292e;
+}
+.buffee-themepack1.lit .wb-selection {
+  background-color: #b4d5fe;
+  mix-blend-mode: normal;
+}
+.buffee-themepack1.lit .wb-cursor {
+  background-color: #24292e;
+}

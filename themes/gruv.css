@@ -1,0 +1,12 @@
+/* Gruv Theme */
+.buffee-themepack1.gruv {
+  background-color: #282828;
+  color: #ebdbb2;
+}
+.buffee-themepack1.gruv .wb-selection {
+  background-color: #83a598;
+  mix-blend-mode: normal;
+}
+.buffee-themepack1.gruv .wb-cursor {
+  background-color: #fe8019;
+}

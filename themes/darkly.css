@@ -1,0 +1,12 @@
+/* Darkly Theme */
+.buffee-themepack1.darkly {
+  background-color: #002b36;
+  color: #839496;
+}
+.buffee-themepack1.darkly .wb-selection {
+  background-color: #268bd2;
+  mix-blend-mode: normal;
+}
+.buffee-themepack1.darkly .wb-cursor {
+  background-color: #cb4b16;
+}

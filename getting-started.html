@@ -17,7 +17,7 @@
   <h1>Getting Started</h1>
 
   <h2>1. Required CSS</h2>
-  <p>Include <code>style.css</code> for structural styles, then define your colors:</p>
+  <p>Include the css found in <a href="style.css">style.css</a> for structural styles, then define your colors:</p>
   <pre>&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;style&gt;
 .wb {
@@ -31,33 +31,6 @@
   background-color: #FF6B6B;
 }
 &lt;/style&gt;</pre>
-
-  <p>Or include everything inline:</p>
-  <pre>.wb {
-  background-color: #282C34;
-  color: #B2B2B2;
-  position: relative;
-  outline: none;
-  font-family: 'Menlo', 'Consolas', monospace;
-  display: flex;
-  flex-direction: column;
-}
-.wb-content { display: flex; flex: 1; overflow: hidden; }
-.no-select { user-select: none; }
-.wb-clipboard-bridge {
-  position: fixed; left: 0; top: 1px;
-  width: 0; height: 1px; opacity: 0; pointer-events: none;
-}
-.wb .wb-lines { overflow-x: hidden; }
-.wb .wb-lines pre::before { content: "\200B"; }
-.wb .wb-lines pre { margin: 0; overflow: visible; white-space: pre; }
-.wb .wb-selection {
-  background-color: #EDAD10;
-  position: absolute;
-  mix-blend-mode: difference;
-}
-.wb .wb-cursor { background-color: #FF6B6B; mix-blend-mode: exclusion; }
-.wb .wb-status span { padding-right: 4px; }</pre>
 
   <h2>2. Required HTML Structure</h2>
   <p><strong>All elements required.</strong> Missing any causes errors.</p>
@@ -92,7 +65,7 @@
   </ul>
 
   <h2>3. Include the Script</h2>
-  <p>This provides the <code>Buffee</code> constructor function.</p>
+  <p>Include the function <code>Buffee</code> found in <a href="buffee.js">Buffee.js</a></p>
   <pre>&lt;script src="buffee.js"&gt;&lt;/script&gt;</pre>
   <p>Or minified:</p>
   <pre>&lt;script src="dist.buffee.min.js"&gt;&lt;/script&gt;</pre>
