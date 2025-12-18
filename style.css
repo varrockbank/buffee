@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 7.7.0-alpha.1
+ * @version 7.7.1-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -19,6 +19,8 @@
   font-family: 'Menlo', 'Consolas', monospace;
   display: flex;
   flex-direction: column;
+  --wb-cell: 24px;
+  --wb-padding: 4px;
 }
 
 /* Content area (gutter + lines) */
@@ -52,6 +54,7 @@
   overflow-x: hidden;
   background-color: transparent;
   position: relative;
+  margin: var(--wb-padding);
 }
 
 /* Line elements */
@@ -86,7 +89,7 @@
 .wb .wb-status {
   display: flex;
   justify-content: space-between;
-  padding: 6px;
+  padding: 6px; /** refactor to css variable*/
 }
 .wb .wb-status span {
   padding-right: 4px;
@@ -94,6 +97,8 @@
 
 .wb .wb-gutter {
   text-align: right;
+  padding-top: var(--wb-padding);
+  padding-right: calc(var(--wb-padding) * 2);
 }
 
 .wb .wb-layer-text {
@@ -114,7 +119,6 @@
   z-index: 400; /** config */
 }
 
-.wb { --wb-cell: 24px; /** config */ }
 .wb .wb-cursor { height: var(--wb-cell); }
 .wb .wb-cursor, .wb .wb-gutter, .wb .wb-lines, .wb .wb-selection {
   font-size: var(--wb-cell); line-height: var(--wb-cell);

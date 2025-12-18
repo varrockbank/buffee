@@ -17,7 +17,6 @@
 
 /**
  * @typedef {Object} BuffeeAdvancedConfig
- * @property {number} [editorPaddingPX=4] - Padding around the editor in pixels
  * @property {number} [gutterPadding=1] - Padding for the gutter in characters
  * @property {function(string): void} [logger=console] - Logger with log and warning methods
  */
@@ -48,7 +47,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.0-alpha.1";
+  this.version = "7.7.1-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -67,7 +66,6 @@ function Buffee(node, config = {}) {
 
   // Advanced configuration with defaults
   const {
-    editorPaddingPX = 4,
     gutterPadding = 1,
     logger = console,
   } = advanced;
@@ -81,7 +79,6 @@ function Buffee(node, config = {}) {
 
   const $e = node.querySelector('.wb-lines');
   Object.assign($e.style, {
-    margin: editorPaddingPX+'px',
     tabSize: expandtab || 4
   });
 
@@ -95,14 +92,13 @@ function Buffee(node, config = {}) {
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
-  const lineHeight = parseFloat(getComputedStyle($cursor).getPropertyValue("--wb-cell"));
+  const lineHeight = parseFloat(getComputedStyle(node).getPropertyValue("--wb-cell"));
+  const editorPaddingPX = parseFloat(getComputedStyle(node).getPropertyValue("--wb-padding"));
+
   Object.assign($status.style, {
-    padding: '6px', // TODO: remove. 
     display: showStatusLine ? '' : 'none'
   });
   Object.assign($gutter.style, {
-    paddingTop: editorPaddingPX+'px',
-    paddingRight: editorPaddingPX*2+'px',
     width: gutterSize+gutterPadding+'ch',
     display: showGutter ? '' : 'none'
   });
