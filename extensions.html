@@ -65,7 +65,7 @@ await editor.UltraHighCapacity.appendLines(lines)</pre>
   <p><code>ios.js</code></p>
   <p>Touch interactions and on-screen keyboard input for iOS devices.</p>
   <pre>if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-  BuffeeIOS(editor, { lineHeight: 24 })
+  BuffeeIOS(editor)
 }
 editor.iOS.focus()   // Show keyboard
 editor.iOS.destroy() // Cleanup</pre>

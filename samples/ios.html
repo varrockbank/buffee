@@ -23,7 +23,7 @@
   <p>Touch interactions and on-screen keyboard input for iOS devices.</p>
 
   <h2>JavaScript</h2>
-  <pre>BuffeeIOS(editor, { lineHeight: 24 })
+  <pre>BuffeeIOS(editor)
 editor.iOS.focus()   // Show keyboard
 editor.iOS.destroy() // Cleanup</pre>
 
@@ -54,7 +54,7 @@ editor.iOS.destroy() // Cleanup</pre>
     // On non-iOS devices this still works but the touch handling
     // is primarily useful on iOS where keyboard input needs special handling
     if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-      BuffeeIOS(editor, { lineHeight: 24 });
+      BuffeeIOS(editor);
     }
 
     editor.Model.text = `// iOS Support Demo

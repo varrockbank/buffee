@@ -119,7 +119,6 @@ To disable auto-fit, specify `viewportRows` or explicitly set `autoFitViewport: 
 const editor = new Buffee(document.getElementById('editor'), {
   // viewportRows: 20,  // Omit to auto-fit, or specify for fixed height
   // viewportCols: 80,  // Omit to fill parent, or specify for fixed width
-  lineHeight: 24,
   indentation: 4,
   showGutter: true,
   showStatusLine: true,
@@ -132,7 +131,6 @@ const editor = new Buffee(document.getElementById('editor'), {
 |--------|------|---------|-------------|
 | `viewportRows` | number | (auto) | Fixed visible lines (omit to auto-fit) |
 | `viewportCols` | number | (auto) | Fixed text columns (omit to fill parent) |
-| `lineHeight` | number | `24` | Line height in pixels |
 | `indentation` | number | `4` | Spaces for indent/unindent |
 | `expandtab` | number | `4` | Tab width (0 = hard tabs) |
 | `showGutter` | boolean | `true` | Show line numbers |
@@ -157,10 +155,14 @@ editor.expandtab = 0;  // Hard tabs (not recommended - cursor positioning may br
 ## Line Height (`editor.lineHeight`)
 
 ```javascript
-editor.lineHeight;  // 24 (default)
+editor.lineHeight;  // 24 (default, from CSS --wb-cell)
 ```
 
-Read-only. Returns the line height in pixels. Useful for extensions that need to position elements.
+Read-only. Returns the line height in pixels, derived from CSS variable `--wb-cell`. To customize, override in CSS:
+
+```css
+.wb { --wb-cell: 20px; }
+```
 
 **Warning:** Do not modify this value - changing it will cause rendering issues.
 

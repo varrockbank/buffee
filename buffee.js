@@ -44,19 +44,17 @@
  * const editor = new Buffee(document.getElementById('editor'), {
  *   viewportRows: 25,
  *   showGutter: true,
- *   lineHeight: 20
  * });
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.6.9-alpha.1";
+  this.version = "7.7.0-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
   const viewportRowsSpecified = 'viewportRows' in config;
   const {
     viewportRows = 20,
-    lineHeight = 24,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
     gutterSize: initialGutterSize = 2,
@@ -83,19 +81,12 @@ function Buffee(node, config = {}) {
 
   const $e = node.querySelector('.wb-lines');
   Object.assign($e.style, {
-    lineHeight: lineHeight+'px',
-    fontSize: lineHeight+'px',
     margin: editorPaddingPX+'px',
     tabSize: expandtab || 4
   });
 
   // Cursor layer - shows head position distinctly within a selection
   const $cursor = node.querySelector(".wb-cursor");
-  Object.assign($cursor.style, {
-    height: lineHeight+'px',
-    fontSize: lineHeight+'px',
-  });
-
   const $textLayer = node.querySelector(".wb-layer-text");
   const $status = node.querySelector('.wb-status');
   const $statusLineCoord = node.querySelector('.wb-coordinate');
@@ -104,13 +95,12 @@ function Buffee(node, config = {}) {
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
+  const lineHeight = parseFloat(getComputedStyle($cursor).getPropertyValue("--wb-cell"));
   Object.assign($status.style, {
-    padding: '6px',
+    padding: '6px', // TODO: remove. 
     display: showStatusLine ? '' : 'none'
   });
   Object.assign($gutter.style, {
-    fontSize: lineHeight+'px',
-    lineHeight: lineHeight+'px',
     paddingTop: editorPaddingPX+'px',
     paddingRight: editorPaddingPX*2+'px',
     width: gutterSize+gutterPadding+'ch',
@@ -985,12 +975,11 @@ function Buffee(node, config = {}) {
     for (let i = fromIndex; i < toIndex; i++) {
       const sel = document.createElement("div");
       sel.className = "wb-selection";
+      // TODO: move to style.css
       Object.assign(sel.style, {
         display: 'block',
         visibility: 'hidden',
         width: '1ch',
-        height: lineHeight+'px',
-        fontSize: lineHeight+'px',
         top: i * lineHeight+'px'
       });
       $selections[i] = fragmentSelections.appendChild(sel);

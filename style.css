@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 7.6.9-alpha.1
+ * @version 7.7.0-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -114,3 +114,8 @@
   z-index: 400; /** config */
 }
 
+.wb { --wb-cell: 24px; /** config */ }
+.wb .wb-cursor { height: var(--wb-cell); }
+.wb .wb-cursor, .wb .wb-gutter, .wb .wb-lines, .wb .wb-selection {
+  font-size: var(--wb-cell); line-height: var(--wb-cell);
+}

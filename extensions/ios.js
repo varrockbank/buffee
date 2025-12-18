@@ -8,13 +8,11 @@
  * Initializes iOS support extension for a Buffee instance.
  *
  * @param {Buffee} vbuf - The Buffee instance to extend
- * @param {Object} [options] - Configuration options
- * @param {number} [options.lineHeight=24] - Line height in pixels for touch positioning
  * @returns {Object} The iOS API object
  */
-function BuffeeIOS(vbuf, options = {}) {
-  const { lineHeight = 24 } = options;
+function BuffeeIOS(vbuf) {
   const { $e } = vbuf._internals;
+  const lineHeight = vbuf.lineHeight;
   const { Selection } = vbuf;
 
   const editingArea = $e.querySelector('.wb-lines');
