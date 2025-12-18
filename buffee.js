@@ -49,7 +49,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.6.6-alpha.1";
+  this.version = "7.6.7-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -93,43 +93,36 @@ function Buffee(node, config = {}) {
   });
 
   // Text layer - contains all pre elements for line content
-  const $textLayer = document.createElement("div");
-  $textLayer.className = "wb-layer-text";
+  const $textLayer = node.querySelector(".wb-layer-text");
   Object.assign($textLayer.style, {
     zIndex: zIndexText,
   });
-  $e.appendChild($textLayer);
 
   // Element layer - for UI elements (buttons, prompts, etc.) added by extensions
-  const $elementLayer = document.createElement("div");
-  $elementLayer.className = "wb-layer-elements";
+  const $elementLayer = node.querySelector(".wb-layer-elements");
   Object.assign($elementLayer.style, {
     zIndex: zIndexElements,
   });
-  $e.appendChild($elementLayer);
 
   // Cursor layer - shows head position distinctly within a selection
-  const $cursor = document.createElement("div");
-  $cursor.className = "wb-cursor";
+  const $cursor = node.querySelector(".wb-cursor");
   Object.assign($cursor.style, {
     height: lineHeight+'px',
     fontSize: lineHeight+'px',
     zIndex: zIndexCursor
   });
-  $e.appendChild($cursor);
 
   const $status = node.querySelector('.wb-status');
+  const $statusLineCoord = node.querySelector('.wb-coordinate');
+  const $lineCounter = node.querySelector('.wb-linecount');
+  const $indentation = node.querySelector('.wb-indentation');
+  const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
+  const $gutter = node.querySelector('.wb-gutter');
+
   Object.assign($status.style, {
     padding: '6px',
     display: showStatusLine ? '' : 'none'
   });
-  const $statusLineCoord = node.querySelector('.wb-coordinate');
-  const $lineCounter = node.querySelector('.wb-linecount');
-  const $indentation = node.querySelector('.wb-indentation');
-
-  const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
-
-  const $gutter = node.querySelector('.wb-gutter');
   Object.assign($gutter.style, {
     fontSize: lineHeight+'px',
     lineHeight: lineHeight+'px',

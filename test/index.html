@@ -69,12 +69,12 @@
         .pane { width: 50%; display: flex; flex-direction: column; }
         .pane-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; min-height: 32px; }
         .pane-content { width: 100%; }
-        .editor-wrapper { display: flex; height: 100%; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+        .editor-wrapper { display: flex; height: 100%; border: 1px solid #ccc; border-radius: 4px;  }
         .line-numbers { background: #f4f4f4; padding: 1rem 0.75rem; text-align: right; font-family: monospace; font-size: 14px; line-height: 1.5; user-select: none; border-right: 1px solid #ccc; color: #666; }
         .dsl-editor-container { flex: 1; position: relative; }
         .dsl-editor-textarea { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 1rem; border: none; background: transparent; color: transparent; font-family: monospace; font-size: 14px; line-height: 1.5; resize: none; outline: none; white-space: pre; z-index: 2; caret-color: #333; }
         .dsl-editor-textarea::selection { background: rgba(14, 99, 156, 0.3); }
-        .dsl-editor-highlight { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 1rem; background: white; font-family: monospace; font-size: 14px; line-height: 1.5; white-space: pre; overflow: hidden; z-index: 1; pointer-events: none; }
+        .dsl-editor-highlight { position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 1rem; background: white; font-family: monospace; font-size: 14px; line-height: 1.5; white-space: pre;  z-index: 1; pointer-events: none; }
 
         /* DSL syntax colors */
         .dsl-keyword { color: #0e639c; font-weight: 600; }
@@ -123,11 +123,11 @@
 
         /* Buffee editor */
         .wb { background-color: #282C34; color: #B2B2B2; position: relative; outline: none; font-family: monospace; display: flex; flex-direction: column; }
-        .wb-content { display: flex; flex: 1; overflow: hidden; }
+        .wb-content { display: flex; flex: 1;  }
         .no-select { user-select: none; }
         .wb-clipboard-bridge { position: fixed; left: 0; top: 1px; width: 0; height: 1px; opacity: 0; pointer-events: none; }
         .wb .wb-lines pre::before { content: "\200B"; }
-        .wb .wb-lines pre { margin: 0; overflow: hidden; }
+        .wb .wb-lines pre { margin: 0;  }
         .wb .wb-selection { background-color: #EDAD10; position: absolute; mix-blend-mode: difference; }
         .wb .wb-cursor { background-color: #FF6B6B; mix-blend-mode: difference; }
         .wb .wb-status span { padding-right: 4px; }
@@ -135,12 +135,12 @@
         /* DSL editor specific */
         #dsl-editor { border: 1px solid #ccc; background: white; color: #333; width: 100%; }
         #dsl-editor .wb-gutter { background: #f4f4f4; color: #666; }
-        #dsl-editor .wb-lines { flex: 1; overflow: hidden; }
+        #dsl-editor .wb-lines { flex: 1;  }
 
         /* Walkthrough panel */
         .walkthrough-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .walkthrough-backdrop.active { opacity: 1; pointer-events: auto; }
-        .walkthrough-panel { position: fixed; top: 0; bottom: 0; right: 0; width: 0; background: white; border-left: 3px solid #0e639c; z-index: 1000; overflow: hidden; transition: width 0.3s; display: flex; flex-direction: column; color: #333; }
+        .walkthrough-panel { position: fixed; top: 0; bottom: 0; right: 0; width: 0; background: white; border-left: 3px solid #0e639c; z-index: 1000;  transition: width 0.3s; display: flex; flex-direction: column; color: #333; }
         .walkthrough-panel.active { width: max(1000px, 60vw); }
         .walkthrough-header { background: #f4f4f4; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; }
         .walkthrough-close { background: #dc3545; }
@@ -247,15 +247,15 @@
                     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
                     <div class="wb-content">
                         <div class="wb-gutter"></div>
-                        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+                        <div class="wb-lines" style="flex: 1;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
                     </div>
                     <div class="wb-status" style="display: flex; justify-content: space-between;">
                         <div class="wb-status-left" style="display: flex;">
                             <span class="wb-linecount"></span>
                         </div>
                         <div class="wb-status-right" style="display: flex;">
-                            <span class="wb-coordinate"></span>
-                            <span>|</span>
+                            <span class="wb-coordinate"></span>|
+                            
                             <span class="wb-indentation"></span>
                         </div>
                     </div>
@@ -298,11 +298,11 @@
                         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
                         <div class="wb-content">
                             <div class="wb-gutter"></div>
-                            <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+                            <div class="wb-lines" style="flex: 1;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
                         </div>
                         <div class="wb-status" style="display: none;">
                             <div><span class="wb-linecount"></span></div>
-                            <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+                            <div><span class="wb-coordinate"></span>|<span class="wb-indentation"></span></div>
                         </div>
                     </blockquote>
                 </div>
@@ -320,11 +320,11 @@
                         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
                         <div class="wb-content">
                             <div class="wb-gutter"></div>
-                            <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+                            <div class="wb-lines" style="flex: 1;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
                         </div>
                         <div class="wb-status" style="display: none;">
                             <div><span class="wb-linecount"></span></div>
-                            <div><span class="wb-coordinate"></span><span class="wb-indentation"></span></div>
+                            <div><span class="wb-coordinate"></span>|<span class="wb-indentation"></span></div>
                         </div>
                     </blockquote>
                 </div>
@@ -406,7 +406,17 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
                     <div style="margin-top: 4px; font-size: 11px; opacity: 0.6; font-style: italic;">note: you can only observe but not interact with this editor</div>
                 </div>
                 <div class="editor-view-container">
-                    <div class="wb" id="walkthrough-editor"></div>
+                    <blockquote class="wb no-select" tabindex="0" id="walkthrough-editor">
+                        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+                        <div class="wb-content">
+                            <div class="wb-gutter"></div>
+                            <div class="wb-lines" style="flex: 1;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+                        </div>
+                        <div class="wb-status" style="display: none;">
+                            <div><span class="wb-linecount"></span></div>
+                            <div><span class="wb-coordinate"></span>|<span class="wb-indentation"></span></div>
+                        </div>
+                    </blockquote>
                 </div>
                 <div class="step-controls-panel">
                     <button class="step-btn" id="step-prev" onclick="walkthrough.stepPrev()">← Previous</button>
@@ -1235,13 +1245,13 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
                     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
                     <div class="wb-content">
                         <div class="wb-gutter"></div>
-                        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+                        <div class="wb-lines" style="flex: 1;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
                     </div>
                     <div class="wb-status" style="display: flex; justify-content: space-between;">
                         <div class="wb-status-left"><span class="wb-linecount"></span></div>
                         <div class="wb-status-right">
-                            <span class="wb-coordinate"></span>
-                            <span>|</span>
+                            <span class="wb-coordinate"></span>|
+                            
                             <span class="wb-indentation"></span>
                         </div>
                     </div>

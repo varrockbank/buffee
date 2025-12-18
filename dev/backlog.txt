@@ -1,4 +1,3 @@
-2. dom specified by user template doesn't match final. cause UI re-orders stuff 
 15. audit things in _internals that are used elsewhere 
 16. everywhere in web page should use buffee 
 17. wrappers in React, etc.

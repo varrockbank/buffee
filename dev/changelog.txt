@@ -1,5 +1,9 @@
 * Project Devlog 
 
+** 7.6.7-alpha.1 [2025-12-18]  gz+min: 4.82 KB (-0.02), min: 14.17 KB (-0.12)
+*** refactor
+- delegate restructuring layers DOM to HTML templating
+
 ** 7.6.6-alpha.1 [2025-12-18]  gz+min: 4.84 KB (-0.08), min: 14.29 KB (-0.27)
 *** refactor 
 - prune static css in buffee.js to style.css

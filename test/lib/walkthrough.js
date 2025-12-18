@@ -260,17 +260,16 @@ class Walkthrough {
     editorNode.className = 'wb no-select';
     editorNode.innerHTML = `
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div style="display: flex">
+      <div class="wb-content">
         <div class="wb-gutter"></div>
-        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
       </div>
       <div class="wb-status" style="display: flex; justify-content: space-between;">
         <div class="wb-status-left" style="display: flex;">
           <span class="wb-linecount"></span>
         </div>
         <div class="wb-status-right" style="display: flex;">
-          <span class="wb-coordinate"></span>
-          <span>|</span>
+          <span class="wb-coordinate"></span>|
           <span class="wb-indentation"></span>
         </div>
       </div>
@@ -458,17 +457,16 @@ class Walkthrough {
     editorNode.className = 'wb no-select';
     editorNode.innerHTML = `
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div style="display: flex">
+      <div class="wb-content">
         <div class="wb-gutter"></div>
-        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
       </div>
       <div class="wb-status" style="display: flex; justify-content: space-between;">
         <div class="wb-status-left" style="display: flex;">
           <span class="wb-linecount"></span>
         </div>
         <div class="wb-status-right" style="display: flex;">
-          <span class="wb-coordinate"></span>
-          <span>|</span>
+          <span class="wb-coordinate"></span>|
           <span class="wb-indentation"></span>
         </div>
       </div>
@@ -524,17 +522,16 @@ class Walkthrough {
     editorNode.className = 'wb no-select';
     editorNode.innerHTML = `
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div style="display: flex">
+      <div class="wb-content">
         <div class="wb-gutter"></div>
-        <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+        <div class="wb-lines" style="flex: 1; overflow: hidden;"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
       </div>
       <div class="wb-status" style="display: flex; justify-content: space-between;">
         <div class="wb-status-left" style="display: flex;">
           <span class="wb-linecount"></span>
         </div>
         <div class="wb-status-right" style="display: flex;">
-          <span class="wb-coordinate"></span>
-          <span>|</span>
+          <span class="wb-coordinate"></span>|
           <span class="wb-indentation"></span>
         </div>
       </div>
