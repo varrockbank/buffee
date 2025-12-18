@@ -1,6 +1,6 @@
 /**
  * @fileoverview Buffee, the text slayer
- * @version 7.4.1-alpha.1
+ * @version 7.4.2-alpha.1
  */
 
 /**
@@ -53,7 +53,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.4.1-alpha.1";
+  this.version = "7.4.2-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -1359,12 +1359,17 @@ function Buffee(node, config = {}) {
    */
   this._internals = {
     get head() { return head; },
+    /** Content area offset from .wb-content: { ch, px, top } */
+    get contentOffset() {
+      const ch = showGutter ? (gutterSize + gutterPadding) : 0;
+      const px = showGutter ? (editorPaddingPX * 3) : editorPaddingPX;
+      return { ch, px, top: editorPaddingPX };
+    },
     $e,
     $textLayer,
     $elementLayer,
     render,
     renderHooks,
-    zIndex: { selection: zIndexSelection, text: zIndexText, cursor: zIndexCursor, elements: zIndexElements },
     appendLines(newLines, skipRender = false) {
       Model.lines.push(...newLines.map(expandTabs));
       if (!skipRender) render(true);
