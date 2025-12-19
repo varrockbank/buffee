@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 7.7.7-alpha.1 [2025-12-19] 
+*** config 
+- gutter-padding and gutter-size is delegated to stylesheet 
+
 ** 7.7.6-alpha.1 [2025-12-19] 
 *** config 
 - autoFitViewport is enabled if viewportRow config option is omitted or set to 0

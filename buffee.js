@@ -7,7 +7,6 @@
  * @property {number} [viewportRows] - Fixed number of visible lines (if omitted, auto-fits to container height)
  * @property {number} [lineHeight=24] - Height of each line in pixels
  * @property {number} [indentation=4] - Number of spaces per indentation level
- * @property {number} [gutterSize=2] - Initial width of line number gutter in characters
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
  * @property {number} [viewportCols] - Fixed number of text columns (auto-calculates container width including gutter)
@@ -16,7 +15,6 @@
 
 /**
  * @typedef {Object} BuffeeAdvancedConfig
- * @property {number} [gutterPadding=1] - Padding for the gutter in characters
  * @property {function(string): void} [logger=console] - Logger with log and warning methods
  */
 
@@ -46,14 +44,13 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.6-alpha.1";
+  this.version = "7.7.7-alpha.1";
 
   // Extract configuration with defaults
   const {
     viewportRows,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
-    gutterSize: initialGutterSize = 2,
     showGutter = true,
     showStatusLine = true,
     viewportCols,
@@ -64,11 +61,14 @@ function Buffee(node, config = {}) {
 
   // Advanced configuration with defaults
   const {
-    gutterPadding = 1,
     logger = console,
   } = advanced;
 
-  let gutterSize = initialGutterSize;
+  const lineHeight = parseFloat(getComputedStyle(node).getPropertyValue("--wb-cell"));
+  const editorPaddingPX = parseFloat(getComputedStyle(node).getPropertyValue("--wb-padding"));
+  const gutterPadding = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-padding"));
+  let gutterSize = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-size-initial"));
+
   let indentation = initialIndentation;
   let expandtab = initialExpandtab;
 
@@ -90,14 +90,10 @@ function Buffee(node, config = {}) {
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
-  const lineHeight = parseFloat(getComputedStyle(node).getPropertyValue("--wb-cell"));
-  const editorPaddingPX = parseFloat(getComputedStyle(node).getPropertyValue("--wb-padding"));
-
   Object.assign($status.style, {
     display: showStatusLine ? '' : 'none'
   });
   Object.assign($gutter.style, {
-    width: gutterSize+gutterPadding+'ch',
     display: showGutter ? '' : 'none'
   });
 

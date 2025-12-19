@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 7.7.2-alpha.1
+ * @version 7.7.7-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -21,6 +21,8 @@
   flex-direction: column;
   --wb-cell: 24px;
   --wb-padding: 4px;
+  --wb-gutter-padding: 1ch;
+  --wb-gutter-size-initial: 2ch;
 }
 
 /* Content area (gutter + lines) */
@@ -123,4 +125,7 @@
 .wb .wb-cursor, .wb .wb-selection { height: var(--wb-cell); }
 .wb .wb-cursor, .wb .wb-gutter, .wb .wb-lines, .wb .wb-selection {
   font-size: var(--wb-cell); line-height: var(--wb-cell);
+}
+.wb .wb-gutter {
+  width: calc(var(--wb-gutter-padding) + var(--wb-gutter-size-initial));                                                                                                                                     
 }
