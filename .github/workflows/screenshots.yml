@@ -36,10 +36,23 @@ jobs:
         working-directory: ./snapshot_testing
         run: npx playwright install --with-deps chromium
 
+      - name: Run screenshot tests (verify against baselines)
+        working-directory: ./snapshot_testing
+        run: npm test
+        continue-on-error: true
+        id: verify
+
+      - name: Upload screenshot diffs (on failure)
+        if: steps.verify.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-diffs
+          path: snapshot_testing/playwright-report/
+          retention-days: 7
+
       - name: Run screenshot tests (update mode)
         working-directory: ./snapshot_testing
         run: npm run test:update
-        continue-on-error: true
 
       - name: Check for screenshot changes
         id: check_changes
@@ -72,9 +85,12 @@ jobs:
           path: snapshot_testing/playwright-report/
           retention-days: 7
 
-      - name: Run screenshot tests (verify)
-        working-directory: ./snapshot_testing
-        run: npm test
+      - name: Fail if screenshots don't match (PR only)
+        if: github.event_name == 'pull_request' && steps.verify.outcome == 'failure'
+        run: |
+          echo "::error::Screenshot tests failed! Visual changes detected."
+          echo "Review the screenshot-report artifact for diff details."
+          exit 1
 
   approve:
     runs-on: ubuntu-latest
