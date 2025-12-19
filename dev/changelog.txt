@@ -1,4 +1,8 @@
-* Project Devlog 
+* Project Devlog
+
+** 7.7.2-alpha.1 [2025-12-19]  gz+min: 4.71 KB (+0.01), min: 13.84 KB (0)
+*** fix
+- add missing height for .wb-selection in CSS (was removed when delegating lineHeight to CSS)
 
 ** 7.7.1-alpha.1 [2025-12-18]  gz+min: 4.75 KB (+0.01), min: 13.86 KB (-0.11)
 *** refactor(config)
