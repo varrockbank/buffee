@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.8-alpha.1";
+  this.version = "7.7.9-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -65,12 +65,8 @@ function Buffee(node, config = {}) {
   /** Replaces tabs with spaces (expandtab = number of spaces, 0 = keep tabs) */
   const expandTabs = s => expandtab ? s.replace(/\t/g, ' '.repeat(expandtab)) : s;
 
-  const $e = node.querySelector('.wb-lines');
-  Object.assign($e.style, {
-    tabSize: expandtab || 4
-  });
-
   // Cursor layer - shows head position distinctly within a selection
+  const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
   const $status = node.querySelector('.wb-status');
@@ -80,13 +76,9 @@ function Buffee(node, config = {}) {
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
-  Object.assign($status.style, {
-    display: showStatusLine ? '' : 'none'
-  });
-  Object.assign($gutter.style, {
-    display: showGutter ? '' : 'none'
-  });
-
+  $e.style.tabSize = expandtab || 4;                                                                                                                                                                           
+  $status.style.display = showStatusLine ? '' : 'none';                                                                                                                                                        
+  $gutter.style.display = showGutter ? '' : 'none';                                                                                                                                                            
   // Set container width if viewportCols specified
   if (viewportCols) {
     const gutterWidthCH = showGutter ? (gutterSize + gutterPadding) : 0;
@@ -446,9 +438,8 @@ function Buffee(node, config = {}) {
      * Word boundaries are whitespace, word characters, or punctuation runs.
      */
     moveWord() {
-      const s = Model.lines[head.row];
+      const s = Model.lines[head.row]; // TODO: refactor
       const n = s.length;
-
       if(head.col === n) { // Edge case: At end of line
         if (head.row < Model.lastIndex) {
           // Not at last line - move to next line
