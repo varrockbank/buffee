@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      update_baselines:
+        description: 'Update baselines and commit'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -19,8 +24,6 @@ concurrency:
 jobs:
   screenshots:
     runs-on: ubuntu-latest
-    outputs:
-      screenshots_changed: ${{ steps.check_changes.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,59 +39,50 @@ jobs:
         working-directory: ./snapshot_testing
         run: npx playwright install --with-deps chromium
 
-      - name: Run screenshot tests (update mode)
+      - name: Run screenshot tests (verify against baselines)
         working-directory: ./snapshot_testing
-        run: npm run test:update
+        run: npm test
         continue-on-error: true
+        id: verify
 
-      - name: Check for screenshot changes
-        id: check_changes
-        run: |
-          # Stage baselines to detect both new and modified files
-          git add snapshot_testing/baselines/ 2>/dev/null || true
-          if git diff --cached --quiet -- snapshot_testing/baselines/; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No screenshot changes detected"
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "Screenshot changes detected"
-            git diff --cached --stat -- snapshot_testing/baselines/
-          fi
-
-      - name: Commit updated screenshots
-        if: steps.check_changes.outputs.changed == 'true' && github.event_name == 'push'
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          # Files already staged in check step
-          git commit -m "chore: update screenshot baselines [skip ci]"
-          git push
-
-      - name: Upload screenshot diffs
+      - name: Upload screenshot diff report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: screenshot-report
-          path: snapshot_testing/playwright-report/
-          retention-days: 7
+          name: playwright
+          path: |
+            snapshot_testing/playwright-report/
+            snapshot_testing/test-results/
+            snapshot_testing/baselines/
+            snapshot_testing/actuals/
+          retention-days: 2
 
-      - name: Run screenshot tests (verify)
+      - name: Update baselines
+        if: inputs.update_baselines == true
         working-directory: ./snapshot_testing
-        run: npm test
+        run: npm run test:update
 
-  approve:
-    runs-on: ubuntu-latest
-    needs: screenshots
-    if: needs.screenshots.outputs.screenshots_changed == 'true' && github.event_name == 'push'
-    environment: github-pages
-    steps:
-      - name: Approval checkpoint
-        run: echo "Screenshots changed - deployment approved"
+      - name: Commit updated baselines
+        if: inputs.update_baselines == true
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add snapshot_testing/baselines/
+          git commit -m "chore: update screenshot baselines" || echo "No changes to commit"
+          git push
+
+      - name: Fail if screenshots don't match
+        if: steps.verify.outcome == 'failure' && inputs.update_baselines != true
+        run: |
+          echo "::error::Screenshot tests failed! Visual changes detected."
+          echo "Review the playwright artifact for diff details."
+          echo "To update baselines: Run workflow manually with 'Update baselines' checked"
+          exit 1
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [screenshots, approve]
-    if: always() && github.event_name == 'push' && needs.screenshots.result == 'success' && (needs.approve.result == 'success' || needs.approve.result == 'skipped')
+    needs: screenshots
+    if: github.event_name == 'push' && needs.screenshots.result == 'success'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
