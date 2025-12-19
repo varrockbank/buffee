@@ -7,14 +7,14 @@ module.exports = defineConfig({
   snapshotPathTemplate: '{snapshotDir}/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: 0,
-  workers: 4,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
 
   use: {
     baseURL: 'http://localhost:8080',
     screenshot: 'off',
-    trace: 'off',
+    trace: 'on-first-retry',
   },
 
   projects: [
