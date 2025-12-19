@@ -10,7 +10,6 @@
  * @property {number} [gutterSize=2] - Initial width of line number gutter in characters
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
- * @property {boolean} [autoFitViewport] - Automatically size viewport to fit container height (default: true if viewportRows not specified)
  * @property {number} [viewportCols] - Fixed number of text columns (auto-calculates container width including gutter)
  * @property {BuffeeAdvancedConfig} [advanced={}] - Advanced configuration options
  */
@@ -47,22 +46,21 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.5-alpha.1";
+  this.version = "7.7.6-alpha.1";
 
   // Extract configuration with defaults
-  // Auto-fit viewport by default unless viewportRows is explicitly specified
-  const viewportRowsSpecified = 'viewportRows' in config;
   const {
-    viewportRows = 20,
+    viewportRows,
     indentation: initialIndentation = 4,
     expandtab: initialExpandtab = 4,
     gutterSize: initialGutterSize = 2,
     showGutter = true,
     showStatusLine = true,
-    autoFitViewport = !viewportRowsSpecified,
     viewportCols,
     advanced = {}
   } = config;
+
+  const autoFitViewport = !viewportRows;
 
   // Advanced configuration with defaults
   const {
