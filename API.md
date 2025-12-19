@@ -16,7 +16,7 @@ Layout the HTML for the editor.
   <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
   <div style="display: flex;">
     <div class="wb-gutter"></div>
-    <div class="wb-lines" style="flex: 1; overflow: hidden;"></div>
+    <div class="wb-lines"></div>
   </div>
   <div class="wb-status" style="display: flex; justify-content: space-between;">
     <div class="wb-status-left"><span class="wb-linecount"></span></div>

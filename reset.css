@@ -28,33 +28,7 @@ th, td { border: 1px solid #ccc; padding: 6px 12px; text-align: left; }
 th { background: #f4f4f4; }
 
 /************* "Atomic CSS" classes for Boxes *************/
-.💪 { display: flex }                                 /* Flex like muscles.   */
-.🥷 { overflow: hidden }
-.🪜 { flex-flow: column }
-.🌳 { flex: 1 }                                       /* Grow like a tree.    */
-.🦠 { justify-content: space-between }                /* Stay spread apart.   */
 .hidden {
   display: none;
 }
 
-/************* Sample page editor styles *************/
-.sample .wb {
-  background-color: #282C34;
-  color: #B2B2B2;
-  position: relative;
-  outline: none;
-  font-family: monospace;
-}
-.sample .no-select { user-select: none; }
-.sample .wb-clipboard-bridge {
-  position: fixed; left: 0; top: 1px;
-  width: 0; height: 1px; opacity: 0; pointer-events: none;
-}
-.sample .wb .wb-lines pre::before { content: "\200B"; }
-.sample .wb .wb-lines pre { margin: 0; overflow: hidden; }
-.sample .wb .wb-selection {
-  background-color: #EDAD10;
-  position: absolute;
-  mix-blend-mode: difference;
-}
-.sample .wb .wb-status span { padding-right: 4px; }

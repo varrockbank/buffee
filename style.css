@@ -51,6 +51,7 @@
 
 /* Lines container */
 .wb .wb-lines {
+  flex: 1;
   overflow-x: hidden;
   background-color: transparent;
   position: relative;
