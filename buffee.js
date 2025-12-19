@@ -47,7 +47,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.3-alpha.1";
+  this.version = "7.7.4-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -1263,7 +1263,6 @@ function Buffee(node, config = {}) {
 
   // Auto-fit viewport to container height
   if (autoFitViewport) {
-    const $status = node.querySelector('.wb-status');
     const fitViewport = () => {
       const statusHeight = showStatusLine && $status ? $status.offsetHeight : 0;
       const availableHeight = node.clientHeight - statusHeight - (editorPaddingPX * 2);
