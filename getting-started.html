@@ -30,6 +30,11 @@
 .wb .wb-cursor {
   background-color: #FF6B6B;
 }
+.wb .wb-gutter,
+.wb .wb-status {
+  background-color: #21252B;
+  color: #636D83;
+}
 &lt;/style&gt;</pre>
 
   <h2>2. Required HTML Structure</h2>
@@ -76,11 +81,12 @@ editor.Model.lines = ["Hello, World!"]
 editor._internals.render(true);
 </pre>
   <h2>5. Auto-fit Viewport</h2>
-  <p>By default, the editor auto-fits to its container (if it has a defined height). To use fixed dimensions instead:</p>
-  <pre>new Buffee(el, { viewportRows: 20 })      // Fixed row count
+  <p>By default (when <code>viewportRows</code> is omitted), the editor auto-fits to its container height. To disable auto-fit, specify <code>viewportRows</code>:</p>
+  <pre>new Buffee(el, {})                        // Auto-fit (default)
+new Buffee(el, { viewportRows: 20 })      // Fixed row count
 new Buffee(el, { viewportCols: 80 })      // Fixed column width
 new Buffee(el, { viewportRows: 20, viewportCols: 80 }) // Both fixed</pre>
-  <p>For auto-fit to work, editor (.wb class) must be: (a) 100% of parent or (2) set height.</p>
+  <p>For auto-fit to work, the container must have a defined height (e.g., <code>height: 100%</code> with sized parent, or explicit pixels).</p>
 
 </body>
 </html>

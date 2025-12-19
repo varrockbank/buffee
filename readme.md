@@ -57,9 +57,10 @@ To test: type "A" 100+ times and move cursor to end. If misaligned, try a differ
 [style.css](style.css) contains structural styles. Bring-your-own cursor and selection color.
 
 ```css
-.wb { background-color: #282C34; color: #B2B2B2 } /* optional */
+.wb { background-color: #282C34; color: #B2B2B2 }
 .wb .wb-selection { background-color: #EDAD10 }
 .wb .wb-cursor { background-color: #FF6B6B }
+.wb .wb-gutter, .wb .wb-status { background-color: #21252B; color: #636D83 }
 ```
 
 see [themes](https://varrockbank.github.io/buffee/themes.html) for inspiration.
