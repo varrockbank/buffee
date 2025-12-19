@@ -1,6 +1,10 @@
 * Project Devlog
 
-** 7.7.7-alpha.1 [2025-12-19] 
+** 7.7.8-alpha.1 [2025-12-19]  gz+min: 4.57 KB (-0.00), min: 13.66 KB (-0.03)
+*** config 
+- remove advanced config
+
+** 7.7.7-alpha.1 [2025-12-19]
 *** config 
 - gutter-padding and gutter-size is delegated to stylesheet 
 

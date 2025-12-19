@@ -10,11 +10,6 @@
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {boolean} [showStatusLine=true] - Whether to show the status line
  * @property {number} [viewportCols] - Fixed number of text columns (auto-calculates container width including gutter)
- * @property {BuffeeAdvancedConfig} [advanced={}] - Advanced configuration options
- */
-
-/**
- * @typedef {Object} BuffeeAdvancedConfig
  * @property {function(string): void} [logger=console] - Logger with log and warning methods
  */
 
@@ -44,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.7-alpha.1";
+  this.version = "7.7.8-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -54,15 +49,10 @@ function Buffee(node, config = {}) {
     showGutter = true,
     showStatusLine = true,
     viewportCols,
-    advanced = {}
+    logger,
   } = config;
 
   const autoFitViewport = !viewportRows;
-
-  // Advanced configuration with defaults
-  const {
-    logger = console,
-  } = advanced;
 
   const lineHeight = parseFloat(getComputedStyle(node).getPropertyValue("--wb-cell"));
   const editorPaddingPX = parseFloat(getComputedStyle(node).getPropertyValue("--wb-padding"));
