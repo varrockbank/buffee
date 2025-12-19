@@ -47,7 +47,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.1-alpha.1";
+  this.version = "7.7.3-alpha.1";
 
   // Extract configuration with defaults
   // Auto-fit viewport by default unless viewportRows is explicitly specified
@@ -924,14 +924,8 @@ function Buffee(node, config = {}) {
      * @param {number} i - Number of lines to scroll (positive = down, negative = up)
      */
     scroll(i) {
-      const t0 = performance.now();
-      this.start += i;
-      this.start = $clamp(this.start, 0, Model.lastIndex);
+      this.start = $clamp(this.start + i, 0, Model.lastIndex);
       render();
-      const t1 = performance.now();
-      const millis = parseFloat(t1 - t0);
-      const lineCount = Model.lines.length;
-      logger.log(`Took ${millis.toFixed(2)} millis to scroll viewport with ${lineCount} lines. That's ${1000/millis} FPS.`);
     },
 
     /**

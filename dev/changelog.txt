@@ -1,6 +1,10 @@
 * Project Devlog
 
-** 7.7.2-alpha.1 [2025-12-19]  gz+min: 4.71 KB (+0.01), min: 13.84 KB (0)
+** 7.7.3-alpha.1 [2025-12-19]  gz+min: 4.62 KB (-0.08), min: 13.65 KB (-0.19)
+*** refactor 
+- cleanup Viewport#scroll
+
+** 7.7.2-alpha.1 [2025-12-19]
 *** fix
 - add missing height for .wb-selection in CSS (was removed when delegating lineHeight to CSS)
 

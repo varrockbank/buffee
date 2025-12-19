@@ -1,10 +1,18 @@
+Website
 15. audit things in _internals that are used elsewhere 
 16. everywhere in web page should use buffee 
+
 17. wrappers in React, etc.
+
+Refactor
 19. make buffee smart about status-line. if html present, render, no otherwise
 20. make buffee smart about gutter if html present, render, no otherwise
+
+Extensions 
 21. file loading indicator.
+
+Status Line
 22. show selection coordinates, not just cursor 
 23. accept a lambda to map to coordinates
-24. bytecount calculation can be refactored out of buffee.js
 25. status bar display should be controlled by user programmatically to alter css
+24. bytecount calculation can be refactored out of buffee.js
