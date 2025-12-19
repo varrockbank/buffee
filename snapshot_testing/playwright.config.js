@@ -35,7 +35,7 @@ module.exports = defineConfig({
 
   expect: {
     toHaveScreenshot: {
-      maxDiffPixelRatio: 0.01,
+      maxDiffPixels: 50,  // Strict: fail if more than 50 pixels differ
     },
   },
 });
