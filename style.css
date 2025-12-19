@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 7.8.1-alpha.1
+ * @version 8.0.1-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -94,7 +94,7 @@
   justify-content: space-between;
   padding: 6px; /** refactor to css variable*/
 }
-.wb .wb-status span {
+.wb .wb-status .wb-head-col, .wb .wb-status .wb-identation {
   padding-right: 4px;
 }
 
