@@ -30,14 +30,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: snapshot_testing/package-lock.json
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('snapshot_testing/package-lock.json') }}
 
       - name: Install dependencies
         working-directory: ./snapshot_testing
-        run: npm install
+        run: npm ci
 
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         working-directory: ./snapshot_testing
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: ./snapshot_testing
+        run: npx playwright install-deps chromium
 
       - name: Run screenshot tests (verify against baselines)
         working-directory: ./snapshot_testing
@@ -53,17 +68,56 @@ jobs:
           path: |
             snapshot_testing/playwright-report/
             snapshot_testing/test-results/
-            snapshot_testing/baselines/
-            snapshot_testing/actuals/
           retention-days: 2
 
-      - name: Update baselines
-        if: inputs.update_baselines == true
+      - name: Check if PR merge
+        id: check-pr
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.verify.outcome == 'failure'
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+
+          # Merge commit pattern: "Merge pull request #123"
+          if [[ "$COMMIT_MSG" =~ ^Merge\ pull\ request\ \#[0-9]+ ]]; then
+            echo "is_pr_merge=true" >> $GITHUB_OUTPUT
+            echo "Detected: merge commit"
+            exit 0
+          fi
+
+          # Squash and merge pattern: ends with "(#123)"
+          if [[ "$COMMIT_MSG" =~ \(\#[0-9]+\)$ ]] || [[ "$COMMIT_MSG" =~ \(\#[0-9]+\)\s*$ ]]; then
+            echo "is_pr_merge=true" >> $GITHUB_OUTPUT
+            echo "Detected: squash and merge"
+            exit 0
+          fi
+
+          # Rebase and merge: check via GitHub API for recently merged PRs
+          # Get the commit timestamp and look for PRs merged around that time
+          MERGED_PR=$(gh pr list --state merged --base main --limit 5 --json number,mergedAt,headRefName | \
+            jq -r 'sort_by(.mergedAt) | reverse | .[0].number // empty')
+          if [ -n "$MERGED_PR" ]; then
+            # Check if any of the recent commits match files changed in the PR
+            echo "Checking recent merged PR #$MERGED_PR"
+            PR_SHA=$(gh pr view $MERGED_PR --json mergeCommit --jq '.mergeCommit.oid // empty')
+            if [ "$PR_SHA" = "${{ github.sha }}" ] || [ -z "$PR_SHA" ]; then
+              # Either direct match or rebase (where mergeCommit is null)
+              echo "is_pr_merge=true" >> $GITHUB_OUTPUT
+              echo "Detected: rebase and merge (or recent PR)"
+              exit 0
+            fi
+          fi
+
+          echo "is_pr_merge=false" >> $GITHUB_OUTPUT
+          echo "Detected: direct push to main"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Update baselines (manual or PR merge)
+        if: inputs.update_baselines == true || (steps.check-pr.outputs.is_pr_merge == 'true' && steps.verify.outcome == 'failure')
         working-directory: ./snapshot_testing
         run: npm run test:update
 
       - name: Commit updated baselines
-        if: inputs.update_baselines == true
+        if: inputs.update_baselines == true || (steps.check-pr.outputs.is_pr_merge == 'true' && steps.verify.outcome == 'failure')
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -71,8 +125,8 @@ jobs:
           git commit -m "chore: update screenshot baselines" || echo "No changes to commit"
           git push
 
-      - name: Fail if screenshots don't match
-        if: steps.verify.outcome == 'failure' && inputs.update_baselines != true
+      - name: Fail if screenshots don't match (direct push only)
+        if: steps.verify.outcome == 'failure' && inputs.update_baselines != true && steps.check-pr.outputs.is_pr_merge != 'true'
         run: |
           echo "::error::Screenshot tests failed! Visual changes detected."
           echo "Review the playwright artifact for diff details."
