@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../themes/eva.css">
+  <link rel="stylesheet" href="../themes/boring.css">
   <style>
     fieldset { margin: 16px 0; padding: 12px; }
     .hidden { display: none; }
@@ -49,16 +50,19 @@
     Read-Only Mode (Chunked+Compressed) - Navigation only, editing disabled
   </div>
   <blockquote class="wb no-select buffee-themepack1 eva" tabindex="0" id="editor" style="border: 1px solid #444; width: 100%;">
-    <textarea class="wb-clipboard-bridge"></textarea>
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
     <div class="wb-content">
       <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-lines">
+        <div class="wb-layer-text"></div>
+        <div class="wb-layer-elements"></div>
+        <div class="wb-cursor"></div>
+      </div>
     </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; background: #38274D;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
+    <div class="wb-status" style="display: flex; justify-content: space-between;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
         <span class="wb-coordinate"></span>|
-        
         <span class="wb-indentation"></span>
       </div>
     </div>
@@ -100,17 +104,20 @@
   </fieldset>
 
   <h3>Logs:</h3>
-  <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="logs-editor" style="border: 1px solid #444; width: 100%;">
-    <textarea class="wb-clipboard-bridge"></textarea>
+  <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="logs-editor">
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
     <div class="wb-content">
       <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-lines">
+        <div class="wb-layer-text"></div>
+        <div class="wb-layer-elements"></div>
+        <div class="wb-cursor"></div>
+      </div>
     </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; background: #212026;">
-      <div><span class="wb-linecount"></span></div>
-      <div style="display: flex;">
+    <div class="wb-status" style="display: flex; justify-content: space-between;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
         <span class="wb-coordinate"></span>|
-        
         <span class="wb-indentation"></span>
       </div>
     </div>
