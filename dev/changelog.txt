@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 7.7.9-alpha.1 [2025-12-19]  gz+min: 4.56 KB (-0.00), min: 13.61 KB (-0.06)
+*** config 
+- simplify setting css in buffee.j
+
 ** 7.7.8-alpha.1 [2025-12-19]  gz+min: 4.57 KB (-0.00), min: 13.66 KB (-0.03)
 *** config 
 - remove advanced config
