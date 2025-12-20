@@ -1,7 +1,12 @@
 * Project Devlog
 
+** 8.3.0-alpha.1 [2025-12-20]  gz+min: 4.61 KB (+0.04), min: 13.67 KB (+0.17)
+*** fix
+- fix copy/cut event listeners to use $clipboardBridge
+- add cut (Ctrl+X) support
+
 ** 8.2.8-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.01), min: 13.50 KB (0)
-*** fix 
+*** fix
 - remove tabfocus outline on editor
 
 ** 8.2.7-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.01), min: 13.50 KB (-0.01)

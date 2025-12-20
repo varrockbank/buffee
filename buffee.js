@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.2.7-alpha.1";
+  this.version = "8.3.0-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -1281,9 +1281,17 @@ function Buffee(parentNode, config = {}) {
 
   // Triggered by a keydown paste event. a copy event handler can read the clipboard
   // by the standard security model. Meanwhile, we don't have to make the editor "selectable".
-  $e.addEventListener('copy', e => {
+  // Listen on $clipboardBridge since that's where focus moves on Ctrl+C/X.
+  $clipboardBridge.addEventListener('copy', e => {
     e.preventDefault();                    // take over the clipboard contents
     e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
+  });
+
+  $clipboardBridge.addEventListener('cut', e => {
+    e.preventDefault();
+    e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
+    Selection.delete();
+    $e.focus({ preventScroll: true });     // Return focus to editor
   });
 
   // Bind keyboard control to move viewport
@@ -1294,8 +1302,8 @@ function Buffee(parentNode, config = {}) {
       return;
     }
 
-    // On Ctrl/⌘+C, *don't* preventDefault. Just redirect selection briefly.
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
+    // On Ctrl/⌘+C or Ctrl/⌘+X, *don't* preventDefault. Just redirect selection briefly.
+    if ((event.metaKey || event.ctrlKey) && (event.key.toLowerCase() === 'c' || event.key.toLowerCase() === 'x')) {
       $clipboardBridge.focus({ preventScroll: true }); // Prevent browser from scrolling to textarea
       $clipboardBridge.select();
       return;
