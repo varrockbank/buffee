@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.8.6-alpha.1 [2025-12-20]  gz+min: 4.28 KB (-0.01), min: 12.68 KB (-0.02)
+*** golf 
+- golf gutter logic in render
+
 ** 8.8.5-alpha.1 [2025-12-20]  gz+min: 4.29 KB (-0.04), min: 12.70 KB (-0.07)
 *** refactor
 - always render an extra line for autoFitViewport
