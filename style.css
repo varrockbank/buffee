@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 8.1.0-alpha.1
+ * @version 8.2.0-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -88,7 +88,7 @@
   z-index: 300; /** config */
 }
 
-/* Status bar */
+/* Optional: Status bar */
 .wb .wb-status {
   display: flex;
   justify-content: space-between;

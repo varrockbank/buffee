@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.1.0-alpha.1";
+  this.version = "8.2.0-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -55,7 +55,7 @@ function Buffee(parentNode, config = {}) {
 
   const self = this;
   const frameCallbacks = callbacks || {};
-  const node = parentNode.querySelector('blockquote') || parentNode;
+  const node = parentNode.querySelector('blockquote');
 
   const autoFitViewport = !viewportRows;
 
@@ -74,7 +74,7 @@ function Buffee(parentNode, config = {}) {
   const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
-  const $status = parentNode.querySelector('.wb-status');  // Status is outside blockquote
+  const $status = parentNode.querySelector('.wb-status');
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
