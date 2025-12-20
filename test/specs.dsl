@@ -983,30 +983,30 @@ expect($gutter.style.width).toBe("4ch");
 
 # Indentation property
 
-## should have default indentation of 4
-### Default indentation is 4 spaces
-expect(fixture.wb.Mode.indentation).toBe(4);
+## should have default spaces of 4
+### Default spaces is 4 spaces
+expect(fixture.wb.Mode.spaces).toBe(4);
 
-## should update indentation at runtime
-### Setting indentation updates value and display
-fixture.wb.Mode.indentation = 2;
-expect(fixture.wb.Mode.indentation).toBe(2);
+## should update spaces at runtime
+### Setting spaces updates value and display
+fixture.wb.Mode.spaces = 2;
+expect(fixture.wb.Mode.spaces).toBe(2);
 
-## should allow changing indentation multiple times
-### Indentation can be changed multiple times
-fixture.wb.Mode.indentation = 8;
-expect(fixture.wb.Mode.indentation).toBe(8);
-fixture.wb.Mode.indentation = 4;
-expect(fixture.wb.Mode.indentation).toBe(4);
+## should allow changing spaces multiple times
+### spaces can be changed multiple times
+fixture.wb.Mode.spaces = 8;
+expect(fixture.wb.Mode.spaces).toBe(8);
+fixture.wb.Mode.spaces = 4;
+expect(fixture.wb.Mode.spaces).toBe(4);
 
-## should initialize with custom indentation from config
-### Config indentation=7 sets initial value
+## should initialize with custom spaces from config
+### Config spaces=7 sets initial value
 const customNode = document.createElement("div");
 customNode.className = "wb no-select";
 customNode.innerHTML = fixture.node.innerHTML;
 document.body.appendChild(customNode);
-const customEditor = new Buffee(customNode, { indentation: 7 });
-expect(customEditor.Mode.indentation).toBe(7);
+const customEditor = new Buffee(customNode, { spaces: 7 });
+expect(customEditor.Mode.spaces).toBe(7);
 customNode.remove();
 
 
@@ -1396,7 +1396,7 @@ expect($vp9.style.visibility).toBe("visible");
 //      → "  x".slice(3) = ""
 // Fix: charAt(k) checks each position → only 2 spaces
 //      → "  x".slice(2) = "x"
-fixture.wb.indentation = 4;
+fixture.wb.Mode.spaces = 4;
 TYPE "     a"
 enter
 TYPE "  x"

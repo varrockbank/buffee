@@ -6,7 +6,7 @@
  * @typedef {Object} BuffeeConfig
  * @property {number} [viewportRows] - Fixed number of visible lines (if omitted, auto-fits to container height)
  * @property {number} [lineHeight=24] - Height of each line in pixels
- * @property {number} [indentation=4] - Number of spaces per indentation level
+ * @property {number} [spaces=4] - Number of spaces per tab/indentation level
  * @property {boolean} [showGutter=true] - Whether to show line numbers
  * @property {number} [viewportCols] - Fixed number of text columns (auto-calculates container width including gutter)
  * @property {function(string): void} [logger=console] - Logger with log and warning methods
@@ -27,7 +27,7 @@
  *   - .wb-head-row: Cursor row display
  *   - .wb-head-col: Cursor column display
  *   - .wb-linecount: Line count display
- *   - .wb-indentation: Indentation display
+ *   - .buffee-spaces: Spaces/tab width display
  *   - .wb-clipboard-bridge: Hidden textarea for clipboard operations
  *   - .wb-gutter: Line number gutter
  * @param {BuffeeConfig} [config={}] - Configuration options
@@ -39,14 +39,13 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.8.0-alpha.1";
+  this.version = "8.8.1-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
   const {
     viewportRows,
-    indentation = 4,
-    expandtab: initialExpandtab = 4,
+    spaces = 4,
     showGutter = true,
     viewportCols,
     logger,
@@ -64,15 +63,12 @@ function Buffee(parentNode, config = {}) {
   const gutterPadding = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-padding"));
   let gutterSize = 0;  // Will be set on first render
 
-  // TODO: revisit expandtab - consider moving to Mode object
-  let expandtab = initialExpandtab;
-
-  /** Replaces tabs with spaces (expandtab = number of spaces, 0 = keep tabs) */
-  const expandTabs = s => expandtab ? s.replace(/\t/g, ' '.repeat(expandtab)) : s;
+  /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
+  const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
 
   /** Editor mode settings (shared between internal and external code) */
   const Mode = {
-    indentation,
+    spaces,
   };
 
   // Cursor layer - shows head position distinctly within a selection
@@ -82,7 +78,6 @@ function Buffee(parentNode, config = {}) {
   const $clipboardBridge = parentNode.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
-  $e.style.tabSize = expandtab || 4;                                                                                                                                                                           
   $gutter.style.display = showGutter ? '' : 'none';                                                                                                                                                            
   // Set container width if viewportCols specified
   if (viewportCols) {
@@ -474,10 +469,10 @@ function Buffee(parentNode, config = {}) {
       const [first, second] = this.ordered;
 
       for(let i = first.row; i <= second.row; i++)
-        Model.lines[i] = " ".repeat(Mode.indentation) + Model.lines[i];
+        Model.lines[i] = " ".repeat(Mode.spaces) + Model.lines[i];
 
-      first.col += Mode.indentation;
-      second.col += Mode.indentation;
+      first.col += Mode.spaces;
+      second.col += Mode.spaces;
 
       render(true);
     },
@@ -507,7 +502,7 @@ function Buffee(parentNode, config = {}) {
           indentableSpacesFromCursor = j - cursor.col ;
           j = 0; while (j < cursor.col && s.charAt(j) === ' ') j++;
           indentableSpacesLeftOfCursor = j;
-          const unindentationsFirstLine = Math.min(Mode.indentation,
+          const unindentationsFirstLine = Math.min(Mode.spaces,
             indentableSpacesLeftOfCursor + indentableSpacesFromCursor);
           Model.lines[cursor.row] = Model.lines[cursor.row].slice(unindentationsFirstLine);
           if(indentableSpacesFromCursor < unindentationsFirstLine)
@@ -515,7 +510,7 @@ function Buffee(parentNode, config = {}) {
         } else {
           const line = Model.lines[i];
           let maxUnindent = 0;
-          for(let k = 0; k < Math.min(Mode.indentation, line.length); k++) {
+          for(let k = 0; k < Math.min(Mode.spaces, line.length); k++) {
             if (line.charAt(k) === " ") {
               maxUnindent++;
             } else {
@@ -947,7 +942,7 @@ function Buffee(parentNode, config = {}) {
     frame.lineCount = Model.lastIndex + 1;
     frame.row = head.row;
     frame.col = head.col;
-    frame.indentation = Mode.indentation;
+    frame.spaces = Mode.spaces;
     frame.frameCount = lastFrame.frameCount + 1;
     // TODO: consider caching Object.entries once.
     for (const [key, callback] of Object.entries(frameCallbacks)) {
@@ -1165,15 +1160,6 @@ function Buffee(parentNode, config = {}) {
    */
   this.Mode = Mode;
 
-  Object.defineProperty(this, 'expandtab', {
-    get: () => expandtab,
-    set: (value) => {
-      expandtab = value;
-      $e.style.tabSize = expandtab || 4;
-    },
-    enumerable: true
-  });
-
   /**
    * Internal API for extensions.
    * Extensions can use renderHooks to register callbacks.
@@ -1360,7 +1346,7 @@ function Buffee(parentNode, config = {}) {
         if(event.shiftKey) {
           Selection.unindent();
         } else {
-          Selection.insert(" ".repeat(expandtab));
+          Selection.insert(" ".repeat(Mode.spaces));
         }
       }
     } else if (event.key.length > 1) {

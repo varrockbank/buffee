@@ -77,7 +77,7 @@ To disable auto-fit, specify `viewportRows`.
 const editor = new Buffee(document.getElementById('editor'), {
   // viewportRows: 20,  // Omit to auto-fit, or specify for fixed height
   // viewportCols: 80,  // Omit to fill parent, or specify for fixed width
-  indentation: 4,
+  spaces: 4,
   showGutter: true,
 });
 ```
@@ -88,21 +88,20 @@ const editor = new Buffee(document.getElementById('editor'), {
 |--------|------|---------|-------------|
 | `viewportRows` | number | (auto) | Fixed visible lines (omit to auto-fit) |
 | `viewportCols` | number | (auto) | Fixed text columns (omit to fill parent) |
-| `indentation` | number | `4` | Spaces for indent/unindent |
-| `expandtab` | number | `4` | Tab width (0 = hard tabs) |
+| `spaces` | number | `4` | Tab width and indentation (0 = hard tabs) |
 | `showGutter` | boolean | `true` | Show line numbers |
 | `logger` | function | `console.log` | Custom logger |
 
 ---
 
-## Tabs (`editor.expandtab`)
+## Spaces (`editor.Mode.spaces`)
 
-Soft tabs are enabled by default. Tab characters are replaced with spaces.
+Controls tab width and indentation. Soft tabs are enabled by default - tab characters are replaced with spaces.
 
 ```javascript
-editor.expandtab = 4;  // Tab key inserts 4 spaces, \t chars become 4 spaces
-editor.expandtab = 2;  // Use 2 spaces instead
-editor.expandtab = 0;  // Hard tabs (not recommended - cursor positioning may break)
+editor.Mode.spaces = 4;  // Tab key inserts 4 spaces, \t chars become 4 spaces (default)
+editor.Mode.spaces = 2;  // Use 2 spaces instead
+editor.Mode.spaces = 0;  // Hard tabs (not recommended - cursor positioning may break)
 ```
 
 ---
