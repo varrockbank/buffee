@@ -14,15 +14,18 @@ Layout the HTML for the editor.
 ```html
 <blockquote class="wb no-select" tabindex="0" id="editor">
   <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-  <div style="display: flex;">
+  <div class="wb-content">
     <div class="wb-gutter"></div>
-    <div class="wb-lines"></div>
+    <div class="wb-lines">
+      <div class="wb-layer-text"></div>
+      <div class="wb-layer-elements"></div>
+      <div class="wb-cursor"></div>
+    </div>
   </div>
-  <div class="wb-status" style="display: flex; justify-content: space-between;">
+  <div class="wb-status">
     <div class="wb-status-left"><span class="wb-linecount"></span></div>
     <div class="wb-status-right">
-      Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-      <span>|</span>
+      Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
       <span class="wb-indentation"></span>
     </div>
   </div>

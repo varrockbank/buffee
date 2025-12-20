@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>buffee - Elementals</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <script src="../extensions/elementals.js"></script>
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
@@ -112,6 +113,7 @@ editor.Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
     const buttonsEditor = new Buffee(buttonsEl, {
       viewportRows: 5,
       showGutter: false,
+      callbacks: BuffeeStatusLine(buttonsEl)
     });
     BuffeeElementals(buttonsEditor);
     buttonsEditor.Model.text = '\n\n\n\n';
@@ -151,6 +153,7 @@ editor.Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
     const inputsEditor = new Buffee(inputsEl, {
       viewportRows: 5,
       showGutter: false,
+      callbacks: BuffeeStatusLine(inputsEl)
     });
     BuffeeElementals(inputsEditor);
     inputsEditor.Model.text = '\n\n\n\n';
@@ -181,6 +184,7 @@ editor.Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
     const mixedEditor = new Buffee(mixedEl, {
       viewportRows: 8,
       showGutter: false,
+      callbacks: BuffeeStatusLine(mixedEl)
     });
     BuffeeElementals(mixedEditor);
     mixedEditor.Model.text = '\n\n\n\n\n\n\n';

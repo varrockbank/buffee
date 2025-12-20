@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>buffee - Editor Sizing</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../themes/boring.css">
@@ -140,34 +141,44 @@
     }
 
     // 1. Auto-rows and auto-cols (default behavior)
-    const edAutoBoth = new Buffee(document.getElementById('editor-auto-both'), {
+    const elAutoBoth = document.getElementById('editor-auto-both');
+    const edAutoBoth = new Buffee(elAutoBoth, {
+      callbacks: BuffeeStatusLine(elAutoBoth)
     });
     edAutoBoth.Model.text = ruler(120) + '\n// Auto-rows and auto-cols\n// Drag corner to resize\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 2. Auto-rows and auto-cols (pixel dimensions)
-    const edAutoBothPx = new Buffee(document.getElementById('editor-auto-both-px'), {
+    const elAutoBothPx = document.getElementById('editor-auto-both-px');
+    const edAutoBothPx = new Buffee(elAutoBothPx, {
+      callbacks: BuffeeStatusLine(elAutoBothPx)
     });
     edAutoBothPx.Model.text = ruler(120) + '\n// Auto-rows and auto-cols (pixel dimensions)\n// Dimensions on editor, not parent\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 3. Fixed-rows, fixed-cols
-    const edFixed = new Buffee(document.getElementById('editor-fixed'), {
+    const elFixed = document.getElementById('editor-fixed');
+    const edFixed = new Buffee(elFixed, {
       viewportRows: 10,
       viewportCols: 50,
+      callbacks: BuffeeStatusLine(elFixed)
     });
     edFixed.Model.text = ruler(40) + '\n' + Array.from({length: 15}, (_, i) => `Line ${i + 2}: This line is longer than 20 chars`).join('\n');
 
     // 4. Auto-rows, fixed cols
-    const edAutoRowsFixedCols = new Buffee(document.getElementById('editor-auto-rows-fixed-cols'), {
+    const elAutoRowsFixedCols = document.getElementById('editor-auto-rows-fixed-cols');
+    const edAutoRowsFixedCols = new Buffee(elAutoRowsFixedCols, {
       viewportCols: 40,
+      callbacks: BuffeeStatusLine(elAutoRowsFixedCols)
     });
     edAutoRowsFixedCols.Model.text = ruler(60) + '\n// Auto-rows, fixed 40 cols\n// Drag to resize height\n' +
       Array.from({length: 30}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 5. Fixed-rows, auto-cols
-    const edFixedRowsAutoCols = new Buffee(document.getElementById('editor-fixed-rows-auto-cols'), {
+    const elFixedRowsAutoCols = document.getElementById('editor-fixed-rows-auto-cols');
+    const edFixedRowsAutoCols = new Buffee(elFixedRowsAutoCols, {
       viewportRows: 8,
+      callbacks: BuffeeStatusLine(elFixedRowsAutoCols)
     });
     edFixedRowsAutoCols.Model.text = ruler(120) + '\n// Fixed 8 rows, auto-cols\nLine 3\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');

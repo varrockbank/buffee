@@ -43,9 +43,13 @@
   &lt;textarea class="wb-clipboard-bridge" aria-hidden="true"&gt;&lt;/textarea&gt;
   &lt;div class="wb-content"&gt;
     &lt;div class="wb-gutter"&gt;&lt;/div&gt;
-    &lt;div class="wb-lines"&gt;&lt;/div&gt;
+    &lt;div class="wb-lines"&gt;
+      &lt;div class="wb-layer-text"&gt;&lt;/div&gt;
+      &lt;div class="wb-layer-elements"&gt;&lt;/div&gt;
+      &lt;div class="wb-cursor"&gt;&lt;/div&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div class="wb-status" style="display: flex; justify-content: space-between;"&gt;
+  &lt;div class="wb-status"&gt;
     &lt;div class="wb-status-left"&gt;&lt;span class="wb-linecount"&gt;&lt;/span&gt;&lt;/div&gt;
     &lt;div class="wb-status-right"&gt;
       Ln &lt;span class="wb-head-row"&gt;&lt;/span&gt;, Col &lt;span class="wb-head-col"&gt;&lt;/span&gt;|
@@ -60,7 +64,10 @@
     <li><label><input type="checkbox"> <code>.wb-clipboard-bridge</code> - textarea</label></li>
     <li><label><input type="checkbox"> <code>.wb-content</code> - content area (gutter + lines)</label></li>
     <li><label><input type="checkbox"> <code>.wb-gutter</code> - line numbers</label></li>
-    <li><label><input type="checkbox"> <code>.wb-lines</code> - text content</label></li>
+    <li><label><input type="checkbox"> <code>.wb-lines</code> - lines container</label></li>
+    <li><label><input type="checkbox"> <code>.wb-layer-text</code> - text layer</label></li>
+    <li><label><input type="checkbox"> <code>.wb-layer-elements</code> - elements layer</label></li>
+    <li><label><input type="checkbox"> <code>.wb-cursor</code> - cursor element</label></li>
     <li><label><input type="checkbox"> <code>.wb-status</code> - status bar</label></li>
     <li><label><input type="checkbox"> <code>.wb-status-left</code> - left section</label></li>
     <li><label><input type="checkbox"> <code>.wb-status-right</code> - right section</label></li>

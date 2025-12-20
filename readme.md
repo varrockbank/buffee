@@ -70,11 +70,15 @@ see [themes](https://varrockbank.github.io/buffee/themes.html) for inspiration.
 Editor instances bind to DOM node with this structure:
 
 ```html
-<blockquote class="wb no-select" tabindex="0" id="editor" style="">
+<blockquote class="wb no-select" tabindex="0" id="editor">
   <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
   <div class="wb-content">
     <div class="wb-gutter"></div>
-    <div class="wb-lines"></div>
+    <div class="wb-lines">
+      <div class="wb-layer-text"></div>
+      <div class="wb-layer-elements"></div>
+      <div class="wb-cursor"></div>
+    </div>
   </div>
   <div class="wb-status">
     <div class="wb-status-left">

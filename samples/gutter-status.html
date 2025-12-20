@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>buffee - Gutter and Status Bar</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../themes/boring.css">
@@ -96,30 +97,38 @@
 hello();`;
 
     // Default
-    const edDefault = new Buffee(document.getElementById('editor-default'), {
+    const elDefault = document.getElementById('editor-default');
+    const edDefault = new Buffee(elDefault, {
       viewportRows: 6,
       showGutter: true,
+      callbacks: BuffeeStatusLine(elDefault)
     });
     edDefault.Model.text = content;
 
     // No gutter
-    const edNoGutter = new Buffee(document.getElementById('editor-no-gutter'), {
+    const elNoGutter = document.getElementById('editor-no-gutter');
+    const edNoGutter = new Buffee(elNoGutter, {
       viewportRows: 6,
       showGutter: false,
+      callbacks: BuffeeStatusLine(elNoGutter)
     });
     edNoGutter.Model.text = content;
 
     // No status bar
-    const edNoStatus = new Buffee(document.getElementById('editor-no-status'), {
+    const elNoStatus = document.getElementById('editor-no-status');
+    const edNoStatus = new Buffee(elNoStatus, {
       viewportRows: 6,
       showGutter: true,
+      callbacks: BuffeeStatusLine(elNoStatus)
     });
     edNoStatus.Model.text = content;
 
     // Minimal
-    const edMinimal = new Buffee(document.getElementById('editor-minimal'), {
+    const elMinimal = document.getElementById('editor-minimal');
+    const edMinimal = new Buffee(elMinimal, {
       viewportRows: 6,
       showGutter: false,
+      callbacks: BuffeeStatusLine(elMinimal)
     });
     edMinimal.Model.text = content;
   </script>

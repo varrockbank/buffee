@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>buffee - Basic Editor</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../themes/boring.css">
@@ -45,6 +46,7 @@
   <script>
     const el = document.getElementById('editor');
     const editor = new Buffee(el, {
+      callbacks: BuffeeStatusLine(el)
     });
 
     editor.Model.text = `// Welcome to buffee

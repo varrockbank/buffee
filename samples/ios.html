@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>buffee - iOS Support</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <script src="../extensions/ios.js"></script>
   <link rel="stylesheet" href="../reset.css">
   <link rel="stylesheet" href="../style.css">
@@ -47,6 +48,7 @@ editor.iOS.destroy() // Cleanup</pre>
   <script>
     const el = document.getElementById('editor');
     const editor = new Buffee(el, {
+      callbacks: BuffeeStatusLine(el)
     });
 
     // Initialize iOS support

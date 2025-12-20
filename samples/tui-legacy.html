@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>buffee - TUI Elements</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <script src="../extensions/highlights.js"></script>
   <script src="../extensions/tui-legacy.js"></script>
   <link rel="stylesheet" href="../reset.css">
@@ -107,6 +108,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const plainEditor = new Buffee(plainEl, {
       viewportRows: 3,
       showGutter: true,
+      callbacks: BuffeeStatusLine(plainEl)
     });
     BuffeeTUI(plainEditor);
     plainEditor.Model.text = '\n  Select action:';
@@ -124,6 +126,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const borderEditor = new Buffee(borderEl, {
       viewportRows: 5,
       showGutter: true,
+      callbacks: BuffeeStatusLine(borderEl)
     });
     BuffeeTUI(borderEditor);
     borderEditor.Model.text = '\n\n\n\n';
@@ -141,6 +144,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const promptEditor = new Buffee(promptEl, {
       viewportRows: 8,
       showGutter: true,
+      callbacks: BuffeeStatusLine(promptEl)
     });
     BuffeeTUI(promptEditor);
     promptEditor.Model.text = '\n\n\n\n\n\n\n';
@@ -157,6 +161,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
     const scrollEditor = new Buffee(scrollEl, {
       viewportRows: 10,
       showGutter: true,
+      callbacks: BuffeeStatusLine(scrollEl)
     });
     BuffeeTUI(scrollEditor);
     scrollEditor.Model.text = '\n\n\n\n\n\n\n\n\n';

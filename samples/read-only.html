@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>buffee - Read-Only Mode</title>
   <script src="../buffee.js"></script>
+  <script src="../extensions/callbacks.js"></script>
   <script src="../extensions/highlights.js"></script>
   <script src="../extensions/tui-legacy.js"></script>
   <script src="../extensions/ultrahighcapacity.js"></script>
@@ -82,14 +83,18 @@ function example() {
 example();`;
 
     // Option 1: TUI mode
-    const edTui = new Buffee(document.getElementById('editor-tui'), {
+    const elTui = document.getElementById('editor-tui');
+    const edTui = new Buffee(elTui, {
+      callbacks: BuffeeStatusLine(elTui)
     });
     BuffeeTUI(edTui);
     edTui.Model.text = content;
     edTui.TUI.enabled = true;
 
     // Option 2: Ultra High Capacity mode (for large files)
-    const edChunked = new Buffee(document.getElementById('editor-chunked'), {
+    const elChunked = document.getElementById('editor-chunked');
+    const edChunked = new Buffee(elChunked, {
+      callbacks: BuffeeStatusLine(elChunked)
     });
     BuffeeUltraHighCapacity(edChunked);
     edChunked.UltraHighCapacity.activate();
