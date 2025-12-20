@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.11-alpha.1";
+  this.version = "8.8.12-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -905,7 +905,6 @@ function Buffee($parent, config = {}) {
     const style = $selections[i].style;
     left != null && (style.left = left + 'ch');
     width != null && (style.width = width + 'ch');
-    style.visibility = 'visible';
   }
 
   /**
@@ -975,7 +974,7 @@ function Buffee($parent, config = {}) {
     // Update contents of line containers
     for(let i = 0; i < displayLines; i++) {
       $textLayer.children[i].textContent = Model.lines[Viewport.start + i] ?? null;
-      $selections[i].style.visibility = 'hidden';
+      $selections[i].style.width = '0ch';
     }
 
     // Call extension hooks for content overlay

@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.8.12-alpha.1 [2025-12-20]  gz+min: 4.25 KB (-0.00), min: 12.41 KB (-0.03)
+*** perf 
+- don't toggle visiblity and just change width of selection
+
 ** 8.8.11-alpha.1 [2025-12-20]  gz+min: 4.25 KB (-0.01), min: 12.44 KB (-0.04)
 *** refactor
 - streamline #sizeSelection helper call

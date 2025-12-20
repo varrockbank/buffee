@@ -1361,11 +1361,11 @@ EXPECT selection at 0,2-5,2
 // First edge at row 0 should start at col 2
 const $sel0 = fixture.node.querySelectorAll(".wb-selection")[0];
 expect($sel0.style.left).toBe("2ch");
-expect($sel0.style.visibility).toBe("visible");
+expect($sel0.style.width).toBe("4ch");
 // Middle lines (rows 1-4) should be full width (left: 0)
 const $sel2 = fixture.node.querySelectorAll(".wb-selection")[2];
-expect($sel2.style.left).toBe("0px");
-expect($sel2.style.visibility).toBe("visible");
+expect($sel2.style.left).toBe("0ch");
+expect($sel2.style.width).toBe("6ch");
 // Continue selecting down 8 more rows - this will scroll the viewport
 down 8 times with shift
 right 2 times with shift
@@ -1376,13 +1376,12 @@ expect(fixture.wb.Viewport.start).toBe(4);
 // First edge (row 0) is now ABOVE viewport - not rendered
 // Row 4 is viewport row 0, rendered as middle line (full width)
 const $vp0 = fixture.node.querySelectorAll(".wb-selection")[0];
-expect($vp0.style.left).toBe("0px");
-expect($vp0.style.visibility).toBe("visible");
+expect($vp0.style.left).toBe("0ch");
+expect($vp0.style.width).toBe("6ch");
 // Row 13 is viewport row 9 (last line of selection, excludes cursor head)
 const $vp9 = fixture.node.querySelectorAll(".wb-selection")[9];
-expect($vp9.style.left).toBe("0px");
+expect($vp9.style.left).toBe("0ch");
 expect($vp9.style.width).toBe("4ch");
-expect($vp9.style.visibility).toBe("visible");
 
 
 # Unindent
