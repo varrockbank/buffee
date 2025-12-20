@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.5-alpha.1";
+  this.version = "8.7.6-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -468,16 +468,12 @@ function Buffee(parentNode, config = {}) {
      * No-op if there is no selection.
      */
     indent() {
-      if(!this.isSelection) return;
-      const [first, second] = this.ordered;
-
-      for(let i = first.row; i <= second.row; i++)
-        Model.lines[i] = " ".repeat(indentation) + Model.lines[i];
-
-      first.col += indentation;
-      second.col += indentation;
-
-      render(true);
+      if(this.isSelection) {
+        const [first, second] = this.ordered, s = ' '.repeat(indentation);
+        for(let i = first.row; i <= second.row; Model.lines[i] = s + Model.lines[i++]);
+        first.col += indentation, second.col += indentation;
+        render(true);
+      }
     },
 
     /**
@@ -1347,7 +1343,6 @@ function Buffee(parentNode, config = {}) {
         }
       }
     } else if (interactive !== 1) { // navigation-only or read-only mode: no editing
-      return;
     } else if (event.key === "Backspace") {
       Selection.delete();
     } else if (event.key === "Enter") {
