@@ -20,7 +20,7 @@
 /**
  * Creates a new Buffee virtual buffer editor instance.
  * @constructor
- * @param {HTMLElement} node - Container element
+ * @param {HTMLElement} parentNode - Container element
  * @param {BuffeeConfig} [config={}] - Configuration options
  * @example
  * const editor = new Buffee(document.getElementById('editor'), {
@@ -30,7 +30,8 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.8.1-alpha.1";
+  this.version = "8.8.2-alpha.1";
+  const self = this;
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -42,33 +43,28 @@ function Buffee(parentNode, config = {}) {
     logger,
     callbacks
   } = config;
-
-  const self = this;
-  const frameCallbacks = callbacks || {};
-  const node = parentNode.querySelector('.wb-elements');
-
-  const autoFitViewport = !viewportRows;
-
-  const lineHeight = parseFloat(getComputedStyle(node).getPropertyValue("--wb-cell"));
-  const editorPaddingPX = parseFloat(getComputedStyle(node).getPropertyValue("--wb-padding"));
-  const gutterPadding = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-padding"));
-  let gutterSize = 0;  // Will be set on first render
-
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
-
   /** Editor mode settings (shared between internal and external code) */
   const Mode = {
     spaces,
   };
+  const frameCallbacks = callbacks || {};
+  const autoFitViewport = !viewportRows;
 
-  // Cursor layer - shows head position distinctly within a selection
-  const $e = node.querySelector('.wb-lines');
-  const $cursor = node.querySelector(".wb-cursor");
-  const $textLayer = node.querySelector(".wb-layer-text");
-  const $clipboardBridge = parentNode.querySelector('.wb-clipboard-bridge');
-  const $gutter = node.querySelector('.wb-gutter');
+  const prop = p => parseFloat(getComputedStyle(parentNode).getPropertyValue(p));
+  const lineHeight = prop("--wb-cell");
+  const editorPaddingPX = prop("--wb-padding");
+  const gutterPadding = prop("--wb-gutter-padding");
+  const $ = (n, q) => n.querySelector(q); 
+  const node = $(parentNode, '.wb-elements');
+  const $e = $(node, '.wb-lines');
+  const $cursor = $(node, '.wb-cursor');
+  const $textLayer = $(node, '.wb-layer-text');
+  const $clipboardBridge = $(parentNode, '.wb-clipboard-bridge');
+  const $gutter = $(node, '.wb-gutter');
 
+  let gutterSize = 0;  // Will be set on first render
   $gutter.style.display = showGutter ? '' : 'none';                                                                                                                                                            
   // Set container width if viewportCols specified
   if (viewportCols) {
@@ -79,7 +75,7 @@ function Buffee(parentNode, config = {}) {
   }
   // Set container height if viewportRows specified (don't use flex: 1)
   if (viewportRows) {
-    const $statusInside = node.querySelector('.wb-status');
+    const $statusInside = $(node, '.wb-status');
     const statusHeight = $statusInside ? $statusInside.offsetHeight : 0;
     node.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
     node.style.flex = 'none';
