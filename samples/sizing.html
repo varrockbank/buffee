@@ -128,7 +128,7 @@
   <p><code>.wb { height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 55 })</code></p>
   <p>Fixed 55 columns, rows auto-calculated from height. Note: status bar stretches to container width while content is narrower.</p>
-  <div class="wb buffee-themepack1 boring" id="editor-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666;">
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
     <textarea class="wb-clipboard-bridge"></textarea>
     <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
@@ -148,7 +148,7 @@
   <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 55 })</code></p>
   <p>Same as example 6, but with <code>width: fit-content</code> so the container shrinks to match content width.</p>
-  <div class="wb buffee-themepack1 boring" id="editor-fit-content" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content;">
+  <div class="wb buffee-themepack1 boring" id="editor-fit-content" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content; resize: vertical; overflow: hidden;">
     <textarea class="wb-clipboard-bridge"></textarea>
     <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
@@ -169,7 +169,7 @@
   <p><code>.wb-status { contain: inline-size; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 20 })</code></p>
   <p>When <code>viewportCols</code> is small, status line content may be wider than editor. Use <code>contain: inline-size</code> on status bar so gutter + lines determine container width.</p>
-  <div class="wb buffee-themepack1 boring" id="editor-contain" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content;">
+  <div class="wb buffee-themepack1 boring" id="editor-contain" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content; resize: vertical; overflow: hidden;">
     <textarea class="wb-clipboard-bridge"></textarea>
     <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
