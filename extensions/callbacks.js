@@ -9,10 +9,10 @@ function BuffeeStatusLine(node) {
   const $lineCounter = node.querySelector('.wb-linecount');
 
   return {
-    _headRow: $headRow ? (row => $headRow.innerHTML = row + 1) : null,
-    _headCol: $headCol ? (col => $headCol.innerHTML = col + 1) : null,
-    _lc: $lineCounter ? ((lineCount, buffee) => {
-      $lineCounter.textContent = `${lineCount.toLocaleString()}L, originally: ${buffee.Model.originalLineCount}L ${buffee.Model.byteCount} bytes`;
+    _headRow: $headRow ? (frame => $headRow.innerHTML = frame.row + 1) : null,
+    _headCol: $headCol ? (frame => $headCol.innerHTML = frame.col + 1) : null,
+    _lc: $lineCounter ? ((frame, buffee) => {
+      $lineCounter.textContent = `${frame.lineCount.toLocaleString()}L, originally: ${buffee.Model.originalLineCount}L ${buffee.Model.byteCount} bytes`;
     }) : null
   };
 }
