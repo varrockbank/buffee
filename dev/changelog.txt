@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.7.1-alpha.1 [2025-12-20]  gz+min: 4.44 KB (-0.04), min: 13.27 KB (-0.09)
+*** golf 
+- prune deadbranches
+
 ** 8.7.0-alpha.1 [2025-12-20]  gz+min: 4.50 KB (-0.02), min: 13.36 KB (-0.06)
 *** refactor 
 - refactor CSS for selection to css file

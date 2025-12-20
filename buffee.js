@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.0-alpha.1";
+  this.version = "8.7.1-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -195,8 +195,6 @@ function Buffee(parentNode, config = {}) {
           }
           // else: at start of file, No-Op
         }
-      } else {
-        logger.warning(`Do not support moving by multiple values (${value}) yet `);
       }
       render();
     },
@@ -407,7 +405,6 @@ function Buffee(parentNode, config = {}) {
      */
     moveBackWord() {
       const s = Model.lines[head.row];
-      const n = s.length;
 
       if(head.col === 0) {
         if(head.row > 0) {
@@ -445,7 +442,7 @@ function Buffee(parentNode, config = {}) {
      * Word boundaries are whitespace, word characters, or punctuation runs.
      */
     moveWord() {
-      const s = Model.lines[head.row]; // TODO: refactor
+      const s = Model.lines[head.row];
       const n = s.length;
       if(head.col === n) { // Edge case: At end of line
         if (head.row < Model.lastIndex) {
@@ -1391,7 +1388,6 @@ function Buffee(parentNode, config = {}) {
       }
     } else if (event.key.length > 1) {
       logger.warn('Ignoring unknown key: ', event.code, event.key);
-    } else if (event.key === "Shift") {
     } else if (event.key === " ") {
       event.preventDefault();
       Selection.insert(" ");
