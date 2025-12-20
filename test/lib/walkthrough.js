@@ -281,7 +281,7 @@ class Walkthrough {
         </div>
         <div class="wb-status-right" style="display: flex;">
           Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
-          <span class="wb-indentation"></span>
+          <span class="buffee-spaces"></span>
         </div>
       </div>
     `;
@@ -485,7 +485,7 @@ class Walkthrough {
         </div>
         <div class="wb-status-right" style="display: flex;">
           Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
-          <span class="wb-indentation"></span>
+          <span class="buffee-spaces"></span>
         </div>
       </div>
     `;
@@ -550,7 +550,7 @@ class Walkthrough {
         </div>
         <div class="wb-status-right" style="display: flex;">
           Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
-          <span class="wb-indentation"></span>
+          <span class="buffee-spaces"></span>
         </div>
       </div>
     `;

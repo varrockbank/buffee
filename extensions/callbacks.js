@@ -7,7 +7,7 @@ function BuffeeStatusLine(node) {
   const $headRow = node.querySelector('.wb-head-row');
   const $headCol = node.querySelector('.wb-head-col');
   const $lineCounter = node.querySelector('.wb-linecount');
-  const $indentation = node.querySelector('.wb-indentation');
+  const $spaces = node.querySelector('.buffee-spaces');
 
   const callbacks = {};
   if ($headRow) callbacks.row = frame => $headRow.innerHTML = frame.row + 1;
@@ -15,6 +15,6 @@ function BuffeeStatusLine(node) {
   if ($lineCounter) callbacks.lineCount = (frame, buffee) => {
     $lineCounter.textContent = `${frame.lineCount.toLocaleString()}L, originally: ${buffee.Model.originalLineCount}L ${buffee.Model.byteCount} bytes`;
   };
-  if ($indentation) callbacks.indentation = frame => $indentation.innerHTML = `Spaces: ${frame.indentation}`;
+  if ($spaces) callbacks.spaces = frame => $spaces.innerHTML = `Spaces: ${frame.spaces}`;
   return callbacks;
 }

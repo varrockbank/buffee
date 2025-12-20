@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.8.1-alpha.1 [2025-12-20]  gz+min: 4.33 KB (-0.05), min: 12.91 KB (-0.16)
+*** refactor
+- consolidate indentation and expandtab into single Mode.spaces setting
+
 ** 8.8.0-alpha.1 [2025-12-20]  gz+min: 4.37 KB (-0.04), min: 13.07 KB (-0.06)
 *** refactor
 - expose Mode object. Call indentation render callback.

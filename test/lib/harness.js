@@ -58,7 +58,7 @@ function createEditorNode() {
       <div class="wb-status-right">
         Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
-        <span class="wb-indentation"></span>
+        <span class="buffee-spaces"></span>
       </div>
     </div>
   `;
