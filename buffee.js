@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.4.0-alpha.1";
+  this.version = "8.6.0-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -185,9 +185,9 @@ function Buffee(parentNode, config = {}) {
         if (head.col > 0) {                                   // Move left 1 character.
           maxCol = --head.col;
         } else {
-          if (head.row > 0) {                                 // Move to end of previous line (on last char, not past it)
+          if (head.row > 0) {                                 // Move to end of previous line (phantom newline position)
             head.row--;
-            maxCol = head.col = Math.max(0, Model.lines[head.row].length - 1);
+            maxCol = head.col = Model.lines[head.row].length;
             // Scroll viewport if cursor went above visible area
             if (head.row < Viewport.start) {
               Viewport.start = head.row;
