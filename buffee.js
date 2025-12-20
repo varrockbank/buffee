@@ -1203,7 +1203,7 @@ function Buffee(parentNode, config = {}) {
     get: () => indentation,
     set: (value) => {
       indentation = value;
-      const e = node.querySelector('.wb-indentation');
+      const e = parentNode.querySelector('.wb-indentation');
       if (e) e.innerHTML = `Spaces: ${indentation}`;
     },
     enumerable: true
