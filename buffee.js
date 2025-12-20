@@ -38,8 +38,8 @@
  * });
  * editor.Model.text = 'Hello, World!';
  */
-function Buffee(node, config = {}) {
-  this.version = "8.0.5-alpha.1";
+function Buffee(parentNode, config = {}) {
+  this.version = "8.1.0-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -55,6 +55,7 @@ function Buffee(node, config = {}) {
 
   const self = this;
   const frameCallbacks = callbacks || {};
+  const node = parentNode.querySelector('blockquote') || parentNode;
 
   const autoFitViewport = !viewportRows;
 
@@ -73,7 +74,7 @@ function Buffee(node, config = {}) {
   const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
-  const $status = node.querySelector('.wb-status');
+  const $status = parentNode.querySelector('.wb-status');  // Status is outside blockquote
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
@@ -1247,7 +1248,7 @@ function Buffee(node, config = {}) {
   if (autoFitViewport) {
     const fitViewport = () => {
       const statusHeight = $status ? $status.offsetHeight : 0;
-      const availableHeight = node.clientHeight - statusHeight - (editorPaddingPX * 2);
+      const availableHeight = parentNode.clientHeight - statusHeight - (editorPaddingPX * 2);
       const exactLines = availableHeight / lineHeight;
       const newSize = Math.floor(exactLines);
       const hasPartialSpace = exactLines > newSize;
@@ -1259,7 +1260,7 @@ function Buffee(node, config = {}) {
     };
     // Use requestAnimationFrame to ensure layout is complete before measuring
     requestAnimationFrame(fitViewport);
-    new ResizeObserver(fitViewport).observe(node);
+    new ResizeObserver(fitViewport).observe(parentNode);
   } else {
     render(true);
   }

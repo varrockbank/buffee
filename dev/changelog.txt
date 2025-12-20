@@ -1,8 +1,12 @@
 * Project Devlog
 
+** 8.1.0-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.03), min: 13.52 KB (+0.03)
+*** refactor
+- separate parentNode from blockquote for optional status line placement
+
 ** 8.0.6-alpha.1 [2025-12-19]  gz+min: 4.55 KB (+0.02), min: 13.42 KB (+0.03)
-*** status line 
-- make spacing off elements more consistent 
+*** status line
+- make spacing off elements more consistent
 
 ** 8.0.5-alpha.1 [2025-12-19]  gz+min: 4.56 KB (+0.02), min: 13.49 KB (+0.03)
 *** feature
