@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.8.1-alpha.1";
+  this.version = "7.8.2-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -965,9 +965,10 @@ function Buffee(node, config = {}) {
       $lineCounter.textContent = `${lineCount.toLocaleString()}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
     }
 
-    // Use total line count so gutter doesn't resize while scrolling
+    // Use largest visible line number so gutter fits current viewport
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
-    const digitsInLargestLineNumber = Math.max(2, Model.lines.length.toString().length);
+    const largestVisibleLineNumber = Viewport.end + 1;
+    const digitsInLargestLineNumber = Math.max(2, largestVisibleLineNumber.toString().length);
     if(digitsInLargestLineNumber !== gutterSize) {
       gutterSize = digitsInLargestLineNumber;
       $gutter.style.width = gutterSize + gutterPadding + 'ch';
