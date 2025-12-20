@@ -246,17 +246,19 @@
             <div class="editor-container">
                 <div class="wb no-select">
                     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-                    <div class="wb-content">
-                        <div class="wb-gutter"></div>
-                        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-                    </div>
+                    <blockquote>
+                        <div class="wb-content">
+                            <div class="wb-gutter"></div>
+                            <div class="wb-lines" tabindex="0"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+                        </div>
+                    </blockquote>
                     <div class="wb-status" style="display: flex; justify-content: space-between;">
                         <div class="wb-status-left" style="display: flex;">
                             <span class="wb-linecount"></span>
                         </div>
                         <div class="wb-status-right" style="display: flex;">
                             Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
-                            
+
                             <span class="wb-indentation"></span>
                         </div>
                     </div>
@@ -295,17 +297,19 @@
                     </div>
                 </div>
                 <div class="pane-content">
-                    <blockquote class="wb no-select" tabindex="0" id="dsl-editor">
+                    <div class="wb no-select" id="dsl-editor">
                         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-                        <div class="wb-content">
-                            <div class="wb-gutter"></div>
-                            <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-                        </div>
+                        <blockquote>
+                            <div class="wb-content">
+                                <div class="wb-gutter"></div>
+                                <div class="wb-lines" tabindex="0"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+                            </div>
+                        </blockquote>
                         <div class="wb-status" style="display: none;">
                             <div><span class="wb-linecount"></span></div>
                             <div>Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|<span class="wb-indentation"></span></div>
                         </div>
-                    </blockquote>
+                    </div>
                 </div>
             </div>
             <div class="pane">
@@ -317,13 +321,15 @@
                     </div>
                 </div>
                 <div class="pane-content">
-                    <blockquote class="wb no-select" tabindex="0" id="js-output">
+                    <div class="wb no-select" id="js-output">
                         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-                        <div class="wb-content">
-                            <div class="wb-gutter"></div>
-                            <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-                        </div>
-                    </blockquote>
+                        <blockquote>
+                            <div class="wb-content">
+                                <div class="wb-gutter"></div>
+                                <div class="wb-lines" tabindex="0"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+                            </div>
+                        </blockquote>
+                    </div>
                 </div>
             </div>
         </main>
@@ -403,17 +409,19 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
                     <div style="margin-top: 4px; font-size: 11px; opacity: 0.6; font-style: italic;">note: you can only observe but not interact with this editor</div>
                 </div>
                 <div class="editor-view-container">
-                    <blockquote class="wb no-select" tabindex="0" id="walkthrough-editor">
+                    <div class="wb no-select" id="walkthrough-editor">
                         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-                        <div class="wb-content">
-                            <div class="wb-gutter"></div>
-                            <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-                        </div>
+                        <blockquote>
+                            <div class="wb-content">
+                                <div class="wb-gutter"></div>
+                                <div class="wb-lines" tabindex="0"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+                            </div>
+                        </blockquote>
                         <div class="wb-status" style="display: none;">
                             <div><span class="wb-linecount"></span></div>
                             <div>Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|<span class="wb-indentation"></span></div>
                         </div>
-                    </blockquote>
+                    </div>
                 </div>
                 <div class="step-controls-panel">
                     <button class="step-btn" id="step-prev" onclick="walkthrough.stepPrev()">← Previous</button>
@@ -1237,21 +1245,23 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
             const container = document.createElement('div');
             container.style.cssText = 'position: absolute; left: -9999px; top: -9999px; width: 600px; height: 400px; visibility: hidden;';
             container.innerHTML = `
-                <blockquote class="wb no-select" tabindex="0">
+                <div class="wb no-select">
                     <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-                    <div class="wb-content">
-                        <div class="wb-gutter"></div>
-                        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-                    </div>
+                    <blockquote>
+                        <div class="wb-content">
+                            <div class="wb-gutter"></div>
+                            <div class="wb-lines" tabindex="0"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+                        </div>
+                    </blockquote>
                     <div class="wb-status" style="display: flex; justify-content: space-between;">
                         <div class="wb-status-left"><span class="wb-linecount"></span></div>
                         <div class="wb-status-right">
                             Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
-                            
+
                             <span class="wb-indentation"></span>
                         </div>
                     </div>
-                </blockquote>
+                </div>
             `;
             document.body.appendChild(container);
             const el = container.querySelector('.wb');
