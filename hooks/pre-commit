@@ -60,7 +60,7 @@ echo "Generating dist/buffee.min.js..."
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
     if git cat-file -e HEAD:dist/buffee.min.js 2>/dev/null; then
         OLD_SIZE=$(git show HEAD:dist/buffee.min.js | wc -c | tr -d ' ')
-        OLD_GZIPPED=$(git show HEAD:dist/buffee.min.js | gzip -c | wc -c)
+        OLD_GZIPPED=$(git show HEAD:dist/buffee.min.js | gzip -cn | wc -c)
     else
         OLD_SIZE=0
         OLD_GZIPPED=0
@@ -74,7 +74,7 @@ terser buffee.js -c -m -o dist/buffee.min.js
 
 if [ $? -eq 0 ]; then
     NEW_SIZE=$(wc -c < dist/buffee.min.js | tr -d ' ')
-    NEW_GZIPPED=$(gzip -c dist/buffee.min.js | wc -c)
+    NEW_GZIPPED=$(gzip -cn dist/buffee.min.js | wc -c)
     MINIFIED_KB=$(echo "$NEW_SIZE" | awk '{printf "%.2f", $1/1024}')
     GZIPPED_KB=$(echo "$NEW_GZIPPED" | awk '{printf "%.2f", $1/1024}')
 
@@ -83,6 +83,7 @@ if [ $? -eq 0 ]; then
     echo "  Gzipped+Minified:  ${GZIPPED_KB} KB"
 
     if [ $OLD_SIZE -ne 0 ]; then
+        echo "DEBUG: OLD_GZIPPED=$OLD_GZIPPED NEW_GZIPPED=$NEW_GZIPPED"
         DIFF=$((NEW_SIZE - OLD_SIZE))
         DIFF_GZIPPED=$((NEW_GZIPPED - OLD_GZIPPED))
         DIFF_KB=$(echo "$DIFF" | awk '{printf "%.2f", $1/1024}')

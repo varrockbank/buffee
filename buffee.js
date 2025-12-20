@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.2-alpha.1";
+  this.version = "8.7.3-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -130,10 +130,8 @@ function Buffee(parentNode, config = {}) {
       if (value > 0) {
         // Move down
         if (head.row < Model.lastIndex) {
-          head.row++;
           // Adjust column to fit new line's length
-          const lineLen = Model.lines[head.row].length;
-          head.col = Math.min(maxCol, lineLen);
+          head.col = Math.min(maxCol, Model.lines[++head.row].length);
 
           // Scroll viewport if cursor went below visible area
           if (head.row > Viewport.end) {
@@ -144,11 +142,8 @@ function Buffee(parentNode, config = {}) {
       } else {
         // Move up
         if (head.row > 0) {
-          head.row--;
           // Adjust column to fit new line's length
-          const lineLen = Model.lines[head.row].length;
-          head.col = Math.min(maxCol, lineLen);
-
+          head.col = Math.min(maxCol, Model.lines[--head.row].length);
           // Scroll viewport if cursor went above visible area
           if (head.row < Viewport.start) {
             Viewport.start = head.row;
