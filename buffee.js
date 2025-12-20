@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.7-alpha.1";
+  this.version = "8.8.8-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -902,19 +902,6 @@ function Buffee($parent, config = {}) {
   let lastFrame = { lineCount: -1, row: -1, col: -1, frameCount: -1 };
 
   /**
-   * Creates and appends selection overlay elements for viewport rows [fromIndex, toIndex).
-   * @private
-   */
-  function addSelections(fromIndex, toIndex) {
-    for (let i = fromIndex; i < toIndex; i++) {
-      const sel = $selections[i] = fragmentSelections.appendChild(document.createElement("div"));
-      sel.className = "wb-selection";
-      sel.style.top = i * lineHeight+'px';
-    }
-    $l.appendChild(fragmentSelections);
-  }
-
-  /**
    * Renders the editor viewport, selection, and calls extension hooks.
    * @private
    * @returns {Buffee} The Buffee instance for chaining
@@ -952,11 +939,17 @@ function Buffee($parent, config = {}) {
     if(Viewport.delta) {
       if (Viewport.delta > 0) {
         // Add new line containers and selections
+        const base = $selections.length;
         for (let i = 0; i < Viewport.delta; i++) {
           fragmentLines.appendChild(document.createElement("pre"));
+
+          const sel = $selections[base + i] = fragmentSelections.appendChild(document.createElement("div"));
+          sel.className = "wb-selection";
+          sel.style.top = (base + i) * lineHeight + 'px';
         }
         $textLayer.appendChild(fragmentLines);
-        addSelections($selections.length, displayLines);
+        $l.appendChild(fragmentSelections);
+
       } else if (Viewport.delta < 0) {
         // Remove excess line containers and selections
         for (let i = 0; i < -Viewport.delta; i++) {
@@ -974,8 +967,7 @@ function Buffee($parent, config = {}) {
 
     // Update contents of line containers
     for(let i = 0; i < displayLines; i++) {
-      const lineIndex = Viewport.start + i;
-      $textLayer.children[i].textContent = Model.lines[lineIndex] ?? null;
+      $textLayer.children[i].textContent = Model.lines[Viewport.start + i] ?? null;
     }
 
     // Call extension hooks for content overlay
@@ -1010,8 +1002,8 @@ function Buffee($parent, config = {}) {
     for (let absRow = firstEdge.row + 1; absRow <= secondEdge.row - 1; absRow++) {
       const viewportRow = absRow - Viewport.start;
       if (viewportRow >= 0 && viewportRow < Viewport.size) {
-        $selections[viewportRow].style.visibility = 'visible';
         $selections[viewportRow].style.left = 0;
+        $selections[viewportRow].style.visibility = 'visible';
         const content = Model.lines[absRow];
         // +1 for phantom newline character (shows newline is part of selection)
         $selections[viewportRow].style.width = (content.length + 1) + 'ch';
@@ -1021,7 +1013,6 @@ function Buffee($parent, config = {}) {
     // Render the first edge line (if within viewport)
     if (firstViewportRow >= 0 && firstViewportRow < Viewport.size) {
       $selections[firstViewportRow].style.left = firstEdge.col + 'ch';
-
       if (secondEdge.row === firstEdge.row) {
         // Single-line selection (excludes cursor head position)
         const width = secondEdge.col - firstEdge.col;
