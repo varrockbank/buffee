@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.2.1-alpha.1";
+  this.version = "8.2.2-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -74,7 +74,6 @@ function Buffee(parentNode, config = {}) {
   const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
-  const $status = parentNode.querySelector('.wb-status');
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
@@ -86,6 +85,11 @@ function Buffee(parentNode, config = {}) {
     // Gutter has paddingRight: editorPaddingPX*2, lines has margin: editorPaddingPX (left+right)
     const extraPX = showGutter ? editorPaddingPX * 4 : editorPaddingPX * 2;
     node.style.width = `calc(${gutterWidthCH + viewportCols}ch + ${extraPX}px)`;
+  }
+  // Set container height if viewportRows specified (don't use flex: 1)
+  if (viewportRows) {
+    node.style.height = (viewportRows * lineHeight + editorPaddingPX * 2) + 'px';
+    node.style.flex = 'none';
   }
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
