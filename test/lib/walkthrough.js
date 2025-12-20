@@ -5,6 +5,14 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Dedent: remove common leading whitespace from all lines
+function dedent(lines) {
+  const nonEmptyLines = lines.filter(l => l.trim().length > 0);
+  if (nonEmptyLines.length === 0) return lines;
+  const minIndent = Math.min(...nonEmptyLines.map(l => l.match(/^(\s*)/)[1].length));
+  return lines.map(l => l.slice(minIndent));
+}
+
 /**
  * Walkthrough - Handles step recording and interactive walkthrough UI
  */
@@ -111,7 +119,7 @@ class Walkthrough {
     const fullSource = test.fnSource;
     const bodyMatch = fullSource.match(/^[^{]*\{\n?([\s\S]*)\n?\s*\}$/);
     const body = bodyMatch ? bodyMatch[1] : fullSource;
-    const sourceLines = body.split('\n');
+    const sourceLines = dedent(body.split('\n'));
 
     // Map steps to source code lines by matching step descriptions
     const lineToStep = new Map();
@@ -235,16 +243,18 @@ class Walkthrough {
 
         let className = 'code-line';
         let content = highlighted || '&nbsp;';
+        let markers = '';
 
         if (isError) {
           className += ' error-line';
-          content = `${content}<span class="error-marker">✗</span>`;
+          markers += `<span class="error-marker">✗</span>`;
         } else if (isStep) {
           className += ' step-line';
-          content = `${content}<span class="step-marker">${stepNum + 1}</span>`;
+          markers += `<span class="step-marker">${stepNum + 1}</span>`;
         }
 
-        return `<div class="${className}" data-step="${stepNum !== undefined ? stepNum : ''}">${content}</div>`;
+        const markersHtml = markers ? `<div class="code-line-markers">${markers}</div>` : '';
+        return `<div class="${className}" data-step="${stepNum !== undefined ? stepNum : ''}"><div class="code-line-content">${content}</div>${markersHtml}</div>`;
       }).join('');
 
       // Store DSL-specific data for renderCode
@@ -303,6 +313,13 @@ class Walkthrough {
     history.replaceState(null, null, window.location.pathname + window.location.search);
   }
 
+  toggleFullscreen() {
+    const panel = document.getElementById('walkthrough-panel');
+    const btn = document.getElementById('walkthrough-expand-btn');
+    panel.classList.toggle('fullscreen');
+    btn.textContent = panel.classList.contains('fullscreen') ? '⛶ Collapse' : '⛶ Expand';
+  }
+
   renderCode() {
     if (!this.currentTest) return;
 
@@ -316,7 +333,7 @@ class Walkthrough {
     const fullSource = test.fnSource;
     const bodyMatch = fullSource.match(/^[^{]*\{\n?([\s\S]*)\n?\s*\}$/);
     const body = bodyMatch ? bodyMatch[1] : fullSource;
-    const sourceLines = body.split('\n');
+    const sourceLines = dedent(body.split('\n'));
 
     // Determine which expects should be revealed based on current step
     const totalSteps = this.steps.length;
@@ -355,18 +372,18 @@ class Walkthrough {
 
       const onclick = isStepLine ? `onclick="walkthrough.jumpToStep(${stepNum})"` : '';
 
-      let leftMarker = '';
-      let rightMarker = '';
+      let markers = '';
       if (isStepLine) {
-        rightMarker += `<span class="step-marker">${stepNum + 1}</span>`;
+        markers += `<span class="step-marker">${stepNum + 1}</span>`;
       }
       if (isFailureLine && shouldRevealExpect) {
-        rightMarker += `<span class="error-marker">✗</span>`;
+        markers += `<span class="error-marker">✗</span>`;
       } else if (isSuccessLine && shouldRevealExpect) {
-        rightMarker += `<span class="success-marker">✓</span>`;
+        markers += `<span class="success-marker">✓</span>`;
       }
 
-      return `<div class="${classes}" data-step="${stepNum ?? ''}" ${onclick}>${leftMarker}${line}${rightMarker}</div>`;
+      const markersHtml = markers ? `<div class="code-line-markers">${markers}</div>` : '';
+      return `<div class="${classes}" data-step="${stepNum ?? ''}" ${onclick}><div class="code-line-content">${line}</div>${markersHtml}</div>`;
     }).join('');
 
     codeView.innerHTML = codeHtml;
@@ -424,18 +441,18 @@ class Walkthrough {
           ? highlightDSL(line)
           : escapeHtml(line);
 
-        let leftMarker = '';
-        let rightMarker = '';
+        let markers = '';
         if (isStepLine) {
-          rightMarker += `<span class="step-marker">${stepNum + 1}</span>`;
+          markers += `<span class="step-marker">${stepNum + 1}</span>`;
         }
         if (isFailureLine && shouldRevealExpect) {
-          rightMarker += `<span class="error-marker">✗</span>`;
+          markers += `<span class="error-marker">✗</span>`;
         } else if (isSuccessLine && shouldRevealExpect) {
-          rightMarker += `<span class="success-marker">✓</span>`;
+          markers += `<span class="success-marker">✓</span>`;
         }
 
-        return `<div class="${classes}" data-step="${stepNum ?? ''}" ${onclick}>${leftMarker}${highlighted}${rightMarker}</div>`;
+        const markersHtml = markers ? `<div class="code-line-markers">${markers}</div>` : '';
+        return `<div class="${classes}" data-step="${stepNum ?? ''}" ${onclick}><div class="code-line-content">${highlighted}</div>${markersHtml}</div>`;
       }).join('');
 
       dslCodeView.innerHTML = dslCodeHtml;

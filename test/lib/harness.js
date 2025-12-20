@@ -30,6 +30,7 @@
 const Key = {
   Enter: 'Enter',
   Backspace: 'Backspace',
+  Tab: 'Tab',
   ArrowLeft: 'ArrowLeft',
   ArrowRight: 'ArrowRight',
   ArrowUp: 'ArrowUp',
