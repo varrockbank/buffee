@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 8.2.8-alpha.1
+ * @version 8.7.0-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -78,6 +78,9 @@
   left: 0ch;
   top: 0ch;
   position: absolute;
+  display: block;
+  visibility: 'hidden';
+  width: '1ch';
   mix-blend-mode: difference;
 }
 
