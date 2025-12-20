@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "8.0.2-alpha.1";
+  this.version = "8.0.4-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -931,10 +931,13 @@ function Buffee(node, config = {}) {
       return Model.lines.slice(this.start, this.end + 1);
     },
   };
-
+  
   /** @private Tracks last render state for optimization */
-  const lastRender = {
-    lineCount: -1
+  const lastFrame = {
+    frame: 0,
+    lineCount: 0,
+    row: 0,
+    col: 0
   };
 
   /**
@@ -965,10 +968,20 @@ function Buffee(node, config = {}) {
    * @returns {Buffee} The Buffee instance for chaining
    */
   function render(renderLineContainers = false) {
-    if (lastRender.lineCount !== Model.lastIndex + 1 ) {
-      const lineCount = lastRender.lineCount = Model.lastIndex + 1;
-      _lc && _lc(lineCount, self);
+    // TODO: perhaps track lineCount only if _lc defined.
+    if (lastFrame.lineCount !== Model.lastIndex + 1 ) {
+      lastFrame.lineCount = Model.lastIndex + 1;
+      _lc && _lc(lastFrame, self);
     }
+    if (lastFrame.row !== head.row) {
+      lastFrame.row = head.row;
+      _headRow && _headRow(lastFrame);
+    } 
+    if (lastFrame.col !== head.col) {
+      lastFrame.col = head.col;
+      _headCol && _headCol(lastFrame);
+    }
+    lastFrame.frame++;
 
     // Use total line count so gutter doesn't resize while scrolling
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
@@ -1042,9 +1055,6 @@ function Buffee(node, config = {}) {
       for (const hook of renderHooks.onRenderComplete) {
         hook($e, Viewport);
       }
-      
-      _headRow && _headRow(head.row);
-      _headCol && _headCol(head.col);
 
       return this;
     }
@@ -1147,9 +1157,6 @@ function Buffee(node, config = {}) {
     for (const hook of renderHooks.onRenderComplete) {
       hook($e, Viewport);
     }
-
-    _headRow && _headRow(head.row);
-    _headCol && _headCol(head.col);
 
     return this;
   }

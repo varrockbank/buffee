@@ -1,6 +1,6 @@
 * Project Devlog
 
-** 8.0.2-alpha.1 [2025-12-19]  gz+min: 4.53 KB (-0.01), min: 13.42 KB (-0.19)
+** 8.0.4-alpha.1 [2025-12-19]  gz+min: 4.55 KB (+0.04), min: 13.46 KB (+0.04)
 *** feature
 - client can customize status line's coordinate with custom HTML for row/col to be slotted
 
