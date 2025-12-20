@@ -1,8 +1,12 @@
 * Project Devlog
 
+** 8.2.4-alpha.1 [2025-12-20]  gz+min: 4.60 KB (+0.01), min: 13.53 KB (0)
+*** fix 
+- suppress outline around editor focus 
+
 ** 8.2.3-alpha.1 [2025-12-20]  gz+min: 4.60 KB (+0.04), min: 13.53 KB (+0.09)
-*** feat 
-- 
+*** fix 
+- behavior of buffee height when inside container 
 
 ** 8.2.2-alpha.1 [2025-12-20]  gz+min: 4.57 KB (+0.03), min: 13.45 KB (+0.02)
 *** fix

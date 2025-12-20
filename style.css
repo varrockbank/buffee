@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 8.2.3-alpha.1
+ * @version 8.2.4-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -15,7 +15,6 @@
 /* Main container */
 .wb {
   position: relative;
-  outline: none;
   font-family: 'Menlo', 'Consolas', monospace;
   display: flex;
   flex-direction: column;
@@ -38,6 +37,7 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  outline: none;
 }
 
 /* Prevent text selection on editor chrome */
