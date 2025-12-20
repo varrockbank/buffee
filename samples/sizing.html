@@ -84,7 +84,7 @@
     </div>
   </div>
 
-  <h2>4. viewportRows larger than container</h2>
+  <h2>4. viewportRows larger than container (clipped)</h2>
   <p><code>.wb { height: 400px; padding: 20px; overflow: hidden; }</code></p>
   <p><code>new Buffee(el, { viewportRows: 20 })</code></p>
   <p>Container is 400px tall, but viewportRows requests 20 rows. Use <code>overflow: hidden</code> to clip.</p>
@@ -124,11 +124,11 @@
     </div>
   </div>
 
-  <h2>6. Auto-rows, fixed-cols (editor doesn't span full width of container, status line does)</h2>
+  <h2>6. Auto-rows, fixed-cols (status bar stretches)</h2>
   <p><code>.wb { height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 55 })</code></p>
-  <p>Fixed 40 columns, rows auto-calculated from height. Note: status bar stretches to container width while content is narrower.</p>
-  <div class="wb buffee-themepack1 boring" id="editor-auto-rows-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666;">
+  <p>Fixed 55 columns, rows auto-calculated from height. Note: status bar stretches to container width while content is narrower.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666;">
     <textarea class="wb-clipboard-bridge"></textarea>
     <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
@@ -144,7 +144,7 @@
     </div>
   </div>
 
-  <h2>7. Auto-rows, fixed-cols (get container to shrink status line)</h2>
+  <h2>7. Auto-rows, fixed-cols (fit-content)</h2>
   <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 55 })</code></p>
   <p>Same as example 6, but with <code>width: fit-content</code> so the container shrinks to match content width.</p>
@@ -164,12 +164,12 @@
     </div>
   </div>
 
-  <h2>8. Auto-rows, fixed-cols (status line clipped)</h2>
+  <h2>8. Auto-rows, fixed-cols (contain: inline-size)</h2>
   <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
   <p><code>.wb-status { contain: inline-size; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 20 })</code></p>
-  <p>When <code>viewportCols</code> is small, status line content may be wider than editor. Use <code>contain: inline-size</code> on status bar to prevent its content from affecting <code>fit-content</code> calculation.</p>
-  <div class="wb buffee-themepack1 boring" id="editor-example-8" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content;">
+  <p>When <code>viewportCols</code> is small, status line content may be wider than editor. Use <code>contain: inline-size</code> on status bar so gutter + lines determine container width.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-contain" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content;">
     <textarea class="wb-clipboard-bridge"></textarea>
     <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
@@ -237,13 +237,13 @@
     edFixedRowsScroll.Model.text = ruler(80) + '\n// viewportRows: 20 exceeds container height\n// Scroll to see more\n' +
       Array.from({length: 25}, (_, i) => `Line ${i + 4}`).join('\n');
 
-    // 6. Auto-rows, fixed-cols
-    const elAutoRowsFixedCols = document.getElementById('editor-auto-rows-fixed-cols');
-    const edAutoRowsFixedCols = new Buffee(elAutoRowsFixedCols, {
+    // 6. Auto-rows, fixed-cols (status bar stretches)
+    const elFixedCols = document.getElementById('editor-fixed-cols');
+    const edFixedCols = new Buffee(elFixedCols, {
       viewportCols: 55,
-      callbacks: BuffeeStatusLine(elAutoRowsFixedCols)
+      callbacks: BuffeeStatusLine(elFixedCols)
     });
-    edAutoRowsFixedCols.Model.text = ruler(40) + '\n// Auto-rows, fixed 40 cols\n// Status bar stretches to container\n' +
+    edFixedCols.Model.text = ruler(55) + '\n// Fixed 55 cols\n// Status bar stretches\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 7. Auto-rows, fixed-cols (fit-content)
@@ -252,16 +252,16 @@
       viewportCols: 55,
       callbacks: BuffeeStatusLine(elFitContent)
     });
-    edFitContent.Model.text = ruler(40) + '\n// Auto-rows, fixed 40 cols\n// width: fit-content\n' +
+    edFitContent.Model.text = ruler(55) + '\n// Fixed 55 cols\n// width: fit-content\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
-    // 8. Auto-rows, fixed-cols (status line clipped)
-    const elExample8 = document.getElementById('editor-example-8');
-    const edExample8 = new Buffee(elExample8, {
+    // 8. Auto-rows, fixed-cols (contain: inline-size)
+    const elContain = document.getElementById('editor-contain');
+    const edContain = new Buffee(elContain, {
       viewportCols: 20,
-      callbacks: BuffeeStatusLine(elExample8)
+      callbacks: BuffeeStatusLine(elContain)
     });
-    edExample8.Model.text = ruler(20) + '\n// Small viewportCols\n// Status clipped\n' +
+    edContain.Model.text = ruler(20) + '\n// Fixed 20 cols\n// contain: inline-size\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
   </script>
