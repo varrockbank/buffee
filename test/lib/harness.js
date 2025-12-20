@@ -47,13 +47,11 @@ function createEditorNode() {
   const node = document.createElement('div');
   node.className = 'wb';
   node.innerHTML = `
-    <blockquote class="no-select" tabindex="0">
-      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      </div>
-    </blockquote>
+    <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
     <div class="wb-status">
       <div class="wb-status-left"><span class="wb-linecount"></span></div>
       <div class="wb-status-right">
@@ -78,7 +76,7 @@ function createEditorNode() {
 class EditorTestHarness {
   constructor(node, size = 10) {
     this.node = node;
-    this.blockquote = node.querySelector('blockquote') || node;  // Event target
+    this.blockquote = node.querySelector('.wb-elements') || node;  // Event target
     this.wb = new Buffee(node, { viewportRows: size, callbacks: BuffeeStatusLine(node) });
     this.walkthrough = new Walkthrough();
 

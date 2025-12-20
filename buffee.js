@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.2.5-alpha.1";
+  this.version = "8.2.6-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -55,7 +55,7 @@ function Buffee(parentNode, config = {}) {
 
   const self = this;
   const frameCallbacks = callbacks || {};
-  const node = parentNode.querySelector('blockquote');
+  const node = parentNode.querySelector('.wb-elements');
 
   const autoFitViewport = !viewportRows;
 
@@ -71,7 +71,6 @@ function Buffee(parentNode, config = {}) {
   const expandTabs = s => expandtab ? s.replace(/\t/g, ' '.repeat(expandtab)) : s;
 
   // Cursor layer - shows head position distinctly within a selection
-  const $content = node; // blockquote is the content container
   const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
@@ -1254,8 +1253,8 @@ function Buffee(parentNode, config = {}) {
   // Auto-fit viewport to container height
   if (autoFitViewport) {
     const fitViewport = () => {
-      // $content is flex: 1, so it fills remaining space after status line (if inside blockquote)
-      const availableHeight = $content.clientHeight;
+      // .wb-elements is flex: 1, so it fills remaining space after status line
+      const availableHeight = node.clientHeight;
       const exactLines = availableHeight / lineHeight;
       const newSize = Math.floor(exactLines);
       const hasPartialSpace = exactLines > newSize;

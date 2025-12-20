@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 8.2.5-alpha.1
+ * @version 8.2.6-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -24,8 +24,8 @@
   --wb-gutter-size-initial: 2ch;
 }
 
-/* Blockquote is the content area (gutter + lines) */
-.wb > blockquote {
+/* Content area (gutter + lines) */
+.wb > .wb-elements {
   display: flex;
   flex: 1;
   overflow: hidden;
