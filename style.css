@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 7.7.7-alpha.1
+ * @version 7.8.0-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -54,7 +54,7 @@
 /* Lines container */
 .wb .wb-lines {
   flex: 1;
-  overflow-x: hidden;
+  overflow: hidden;
   background-color: transparent;
   position: relative;
   margin: var(--wb-padding);
