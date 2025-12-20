@@ -914,30 +914,30 @@ TYPE "10"
 // Now 10 lines, gutter should still be 3ch (2 digits fits 10)
 expect($gutter.style.width).toBe("3ch");
 
-## should not resize gutter when scrolling
-### Gutter based on total lines, not viewport position
+## should resize gutter based on visible lines
+### Gutter based on viewport position, not total lines
 // Add 15 lines (more than viewport of 10)
 fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15";
 const $gutter = fixture.node.querySelector(".wb-gutter");
-// Gutter is 3ch (2 digits + 1 padding) for 15 lines
+// Viewport shows lines 1-10, largest visible = 10, gutter = 3ch
 expect($gutter.style.width).toBe("3ch");
-// Scroll down - gutter should NOT change
+// Scroll down - still 2-digit line numbers visible
 fixture.wb.Viewport.scroll(2);
 expect($gutter.style.width).toBe("3ch");
-// Scroll back up - gutter should NOT change
+// Scroll back up
 fixture.wb.Viewport.scroll(-2);
 expect($gutter.style.width).toBe("3ch");
 
-## should grow gutter at 100 lines
-### Gutter grows from 2 to 3 digits at 100 lines
-// Create 99 lines
-fixture.wb.Model.text = Array(99).fill("x").join("\n");
-const $gutter = fixture.node.querySelector(".wb-gutter");
-// 99 lines = 2 digits, gutter = 3ch
-expect($gutter.style.width).toBe("3ch");
-// Add line 100
+## should grow gutter when scrolling to 3-digit lines
+### Gutter grows from 2 to 3 digits when line 100 is visible
+// Create 100 lines
 fixture.wb.Model.text = Array(100).fill("x").join("\n");
-// 100 lines = 3 digits, gutter = 4ch
+const $gutter = fixture.node.querySelector(".wb-gutter");
+// Viewport at top shows lines 1-10, gutter = 3ch (2 digits + 1 padding)
+expect($gutter.style.width).toBe("3ch");
+// Navigate to line 100
+down 99 times
+// Now largest visible = 100 (3 digits), gutter = 4ch
 expect($gutter.style.width).toBe("4ch");
 
 

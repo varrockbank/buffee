@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.2.7-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.01), min: 13.50 KB (-0.01)
+*** fix 
+- gutter width should be based on viewport lines, not model
+
 ** 8.2.6-alpha.1 [2025-12-20]
 *** refactor 
 - isolate blockquote, semantically, the the text lines

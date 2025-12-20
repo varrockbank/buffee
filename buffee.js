@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.2.6-alpha.1";
+  this.version = "8.2.7-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -980,16 +980,15 @@ function Buffee(parentNode, config = {}) {
     lastFrame = frame;
     frame = temp;
 
-    // Use total line count so gutter doesn't resize while scrolling
+    // Use viewport's largest visible line number for gutter width
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
-    const digitsInLargestLineNumber = Math.max(2, Model.lines.length.toString().length);
+    const displayLines = Viewport.size + (renderExtraLine ? 1 : 0);
+    const largestVisibleLineNumber = Viewport.start + displayLines;
+    const digitsInLargestLineNumber = Math.max(2, largestVisibleLineNumber.toString().length);
     if(digitsInLargestLineNumber !== gutterSize) {
       gutterSize = digitsInLargestLineNumber;
       $gutter.style.width = gutterSize + gutterPadding + 'ch';
     }
-
-    // Display size includes extra partial line when autoFitViewport
-    const displayLines = Viewport.size + (renderExtraLine ? 1 : 0);
 
     $gutter.textContent = null;
     for (let i = 0; i < displayLines; i++) {
