@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.4-alpha.1";
+  this.version = "8.8.5-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -75,14 +75,13 @@ function Buffee($parent, config = {}) {
   }
   // Set container height if viewportRows specified (don't use flex: 1)
   if (viewportRows) {
-    const statusHeight = $($e, '.wb-status')?.offsetHeight ?? 0;
-    $e.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
-    $e.style.flex = 'none';
+    const linesHeight = viewportRows * lineHeight + 'px';
+    $textLayer.style.height = linesHeight;
+    $gutter.style.height = linesHeight;
   }
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
   let lastDisplayLines = 0; // Track display lines for delta-based updates
-  let renderExtraLine = false; // When autoFitViewport, render +1 line for partial space
 
   const [fragmentLines, fragmentSelections, fragmentGutters] = [0,0,0]
     .map(() => document.createDocumentFragment());
@@ -942,7 +941,7 @@ function Buffee($parent, config = {}) {
 
     // Use viewport's largest visible line number for gutter width
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
-    const displayLines = Viewport.size + (renderExtraLine ? 1 : 0);
+    const displayLines = Viewport.size + (autoFitViewport ? 1 : 0);
     const largestVisibleLineNumber = Viewport.start + displayLines;
     const digitsInLargestLineNumber = Math.max(2, largestVisibleLineNumber.toString().length);
     if(digitsInLargestLineNumber !== gutterSize) {
@@ -1176,13 +1175,9 @@ function Buffee($parent, config = {}) {
   if (autoFitViewport) {
     const fitViewport = () => {
       // .wb-elements is flex: 1, so it fills remaining space after status line
-      const availableHeight = $e.clientHeight;
-      const exactLines = availableHeight / lineHeight;
-      const newSize = Math.floor(exactLines);
-      const hasPartialSpace = exactLines > newSize;
-      if (newSize > 0 && (newSize !== Viewport.size || hasPartialSpace !== renderExtraLine)) {
+      const newSize = Math.floor($e.clientHeight / lineHeight);
+      if (newSize > 0 && newSize !== Viewport.size) {
         Viewport.size = newSize;
-        renderExtraLine = hasPartialSpace;
         render(true);
       }
     };
