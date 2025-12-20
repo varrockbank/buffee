@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.8-alpha.1";
+  this.version = "8.7.9-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -507,8 +507,7 @@ function Buffee(parentNode, config = {}) {
           const line = Model.lines[i];
           let maxUnindent = 0;
           for(let k = 0; k < Math.min(indentation, line.length); k++) {
-            // TODO: potential bug. should be k?
-            if (line.charAt(0) === " ") {
+            if (line.charAt(k) === " ") {
               maxUnindent++;
             } else {
               break;

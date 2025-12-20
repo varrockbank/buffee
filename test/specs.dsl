@@ -1389,3 +1389,30 @@ expect($vp9.style.left).toBe("0px");
 expect($vp9.style.width).toBe("4ch");
 expect($vp9.style.visibility).toBe("visible");
 
+
+# Unindent
+
+## should only unindent actual leading spaces on middle lines
+### Bug: unindent checks charAt(0) instead of charAt(k) for middle lines
+// Bug only triggers on middle lines of multi-line selection
+// (not first/last)
+// Middle line "  x" has 2 leading spaces, indentation=4
+// Bug: charAt(0) always ' ', counts all 3 chars as unindentable
+//      → "  x".slice(3) = ""
+// Fix: charAt(k) checks each position → only 2 spaces
+//      → "  x".slice(2) = "x"
+fixture.wb.indentation = 4;
+TYPE "     a"
+enter
+TYPE "  x"
+enter
+TYPE "    b"
+up 2 times
+left with meta
+down 2 times with shift
+right with meta, shift
+tab with shift
+expect(fixture.wb.Model.lines[0]).toBe(" a");
+expect(fixture.wb.Model.lines[1]).toBe("x");
+expect(fixture.wb.Model.lines[2]).toBe("b");
+
