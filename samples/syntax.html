@@ -61,25 +61,27 @@
 editor.Syntax.setLanguage('javascript')
 editor.Syntax.enabled = true</pre>
   <div style="border: 1px solid #444;">
-    <blockquote class="wb no-select buffee-themepack1 eva" tabindex="0" id="editor" style="width: 100%; height: 100%;">
-      <textarea class="wb-clipboard-bridge"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines">
-          <div class="wb-layer-text"></div>
-          <div class="wb-layer-elements"></div>
-          <div class="wb-cursor"></div>
+    <div class="wb buffee-themepack1 eva" id="editor" style="width: 100%; height: 100%;">
+      <blockquote class="no-select" tabindex="0">
+        <textarea class="wb-clipboard-bridge"></textarea>
+        <div class="wb-content">
+          <div class="wb-gutter"></div>
+          <div class="wb-lines">
+            <div class="wb-layer-text"></div>
+            <div class="wb-layer-elements"></div>
+            <div class="wb-cursor"></div>
+          </div>
         </div>
-      </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between;">
-        <div><span class="wb-linecount"></span></div>
+      </blockquote>
+      <div class="wb-status">
+        <div class="wb-status-left"><span class="wb-linecount"></span></div>
         <div class="wb-status-right">
           Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+          <span class="wb-status-divider">|</span>
           <span class="wb-indentation"></span>
         </div>
       </div>
-    </blockquote>
+    </div>
   </div>
 
   <h2>State Cache Visualization</h2>

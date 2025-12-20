@@ -54,25 +54,27 @@
 
     <!-- Main Playground -->
     <section>
-      <blockquote cite="" class="wb no-select buffee-themepack1 eva" tabindex="0" id="playground">
-        <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+      <div class="wb buffee-themepack1 eva" id="playground">
+        <blockquote class="no-select" tabindex="0">
+          <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
           <div class="wb-content">
-              <div class="wb-gutter"></div>
-              <div class="wb-lines">
-                  <div class="wb-layer-text"></div>
-                  <div class="wb-layer-elements"></div>
-                  <div class="wb-cursor"></div>
-              </div>
+            <div class="wb-gutter"></div>
+            <div class="wb-lines">
+              <div class="wb-layer-text"></div>
+              <div class="wb-layer-elements"></div>
+              <div class="wb-cursor"></div>
+            </div>
           </div>
-          <div class="wb-status">
-              <div class="wb-status-left"><span class="wb-linecount"></span></div>
-              <div class="wb-status-right">
-                  Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-                  <span>|</span>
-                  <span class="wb-indentation"></span>
-              </div>
+        </blockquote>
+        <div class="wb-status">
+          <div class="wb-status-left"><span class="wb-linecount"></span></div>
+          <div class="wb-status-right">
+            Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+            <span class="wb-status-divider">|</span>
+            <span class="wb-indentation"></span>
           </div>
-      </blockquote>
+        </div>
+      </div>
     </section>
 
     <!-- About -->
@@ -121,7 +123,35 @@
         <input type="text" id="tui-content" value="Foobar" style="width: 120px;">
         <button id="tui-add-btn">Add Element</button>
       </div>
-      <blockquote cite="" class="wb no-select buffee-themepack1 kai" tabindex="0" id="tui-demo">
+      <div class="wb buffee-themepack1 kai" id="tui-demo">
+        <blockquote class="no-select" tabindex="0">
+          <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+          <div class="wb-content">
+            <div class="wb-gutter"></div>
+            <div class="wb-lines">
+              <div class="wb-layer-text"></div>
+              <div class="wb-layer-elements"></div>
+              <div class="wb-cursor"></div>
+            </div>
+          </div>
+        </blockquote>
+        <div class="wb-status">
+          <div class="wb-status-left"><span class="wb-linecount"></span></div>
+          <div class="wb-status-right">
+            Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+            <span class="wb-status-divider">|</span>
+            <span class="wb-indentation"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dynamic Data Demo -->
+    <section>
+      <h3>HackerNews Front Page</h3>
+      <p>Example of loading data from APIs.</p>
+    <div class="wb buffee-themepack1 hn" id="hackernews">
+      <blockquote class="no-select" tabindex="0">
         <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
         <div class="wb-content">
           <div class="wb-gutter"></div>
@@ -131,34 +161,8 @@
             <div class="wb-cursor"></div>
           </div>
         </div>
-        <div class="wb-status">
-          <div class="wb-status-left">
-            <span class="wb-linecount"></span>
-          </div>
-          <div class="wb-status-right">
-            Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
-            <span class="wb-indentation"></span>
-          </div>
-        </div>
       </blockquote>
-    </section>
-
-    <!-- Dynamic Data Demo -->
-    <section>
-      <h3>HackerNews Front Page</h3>
-      <p>Example of loading data from APIs.</p>
-    <blockquote cite="" class="wb no-select buffee-themepack1 hn" tabindex="0" id="hackernews">
-      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines">
-          <div class="wb-layer-text"></div>
-          <div class="wb-layer-elements"></div>
-          <div class="wb-cursor"></div>
-        </div>
-      </div>
-    </blockquote>
+    </div>
     </section>
   </div> <!-- End container -->
 
