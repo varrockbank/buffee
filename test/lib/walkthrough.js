@@ -49,15 +49,16 @@ class Walkthrough {
   replayStep(harness, stepIndex) {
     const step = this.steps[stepIndex];
     const meta = step.metadata;
+    const target = harness.blockquote;  // .wb-lines where Buffee listens
 
     if (meta.type === 'type') {
       for (const char of meta.text) {
-        dispatchKey(harness.node, char);
+        dispatchKey(target, char);
       }
     } else if (meta.type === 'press') {
       const count = meta.count || 1;
       for (let i = 0; i < count; i++) {
-        dispatchKey(harness.node, meta.key, meta.modifiers);
+        dispatchKey(target, meta.key, meta.modifiers);
       }
     }
   }
@@ -257,7 +258,7 @@ class Walkthrough {
 
     // Create editor instance
     const editorNode = document.getElementById('walkthrough-editor');
-    editorNode.className = 'wb no-select';
+    editorNode.className = 'wb';
     editorNode.innerHTML = `
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="no-select wb-elements">
@@ -454,7 +455,7 @@ class Walkthrough {
 
     // Reset editor and replay up to previous step
     const editorNode = document.getElementById('walkthrough-editor');
-    editorNode.className = 'wb no-select';
+    editorNode.className = 'wb';
     editorNode.innerHTML = `
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="no-select wb-elements">
@@ -519,7 +520,7 @@ class Walkthrough {
     if (!this.currentTest) return;
 
     const editorNode = document.getElementById('walkthrough-editor');
-    editorNode.className = 'wb no-select';
+    editorNode.className = 'wb';
     editorNode.innerHTML = `
       <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
       <div class="no-select wb-elements">
