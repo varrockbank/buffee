@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.8.9-alpha.1 [2025-12-20]  gz+min: 4.27 KB (-0.00), min: 12.62 KB (-0.03)
+*** perf
+- hide selections and update line contents in single pass
+
 ** 8.8.8-alpha.1 [2025-12-20]  gz+min: 4.26 KB (-0.02), min: 12.64 KB (-0.05)
 *** refactor 
 - render selections and line containers in single pass

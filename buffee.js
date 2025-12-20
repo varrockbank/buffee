@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.8-alpha.1";
+  this.version = "8.8.9-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -968,17 +968,12 @@ function Buffee($parent, config = {}) {
     // Update contents of line containers
     for(let i = 0; i < displayLines; i++) {
       $textLayer.children[i].textContent = Model.lines[Viewport.start + i] ?? null;
+      $selections[i].style.visibility = 'hidden';
     }
 
     // Call extension hooks for content overlay
     for (const hook of renderHooks.onRenderContent) {
       hook($l, Viewport);
-    }
-
-    // * BEGIN render selection
-    // Hide all selections
-    for (let i = 0; i < $selections.length; i++) {
-      $selections[i].style.visibility = 'hidden';
     }
 
     // In read-only mode (-1), hide cursor and skip selection rendering
@@ -1062,6 +1057,7 @@ function Buffee($parent, config = {}) {
       // Snap to character boundary to prevent accumulated drift
       $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
     } else {
+      // TODO: why do we ever do this
       $cursor.style.visibility = 'hidden';
     }
 
