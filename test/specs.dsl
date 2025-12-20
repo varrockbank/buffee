@@ -328,6 +328,46 @@ down
 down
 EXPECT cursor at 2,8
 
+## should move left from col 0 to phantom newline position
+### Move left from start of line goes to phantom newline
+TYPE "Hello"
+enter
+TYPE "World"
+left with meta
+EXPECT cursor at 1,0
+left
+EXPECT cursor at 0,5
+
+## should restore phantom newline position when moving back to long line
+### Long to short to long restores phantom newline
+TYPE "Hello World"
+enter
+TYPE "Hi"
+up
+EXPECT cursor at 0,2
+down
+EXPECT cursor at 1,2
+up
+EXPECT cursor at 0,2
+right with meta
+EXPECT cursor at 0,11
+down
+EXPECT cursor at 1,2
+up
+EXPECT cursor at 0,11
+
+## should restore phantom newline position when moving back to short line
+### Short to long to short restores phantom newline
+TYPE "Hi"
+enter
+TYPE "Hello World"
+up
+EXPECT cursor at 0,2
+down
+EXPECT cursor at 1,11
+up
+EXPECT cursor at 0,2
+
 
 # Meta+Arrow navigation
 
