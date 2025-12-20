@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.3-alpha.1";
+  this.version = "8.8.4-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -75,8 +75,7 @@ function Buffee($parent, config = {}) {
   }
   // Set container height if viewportRows specified (don't use flex: 1)
   if (viewportRows) {
-    const $statusInside = $($e, '.wb-status');
-    const statusHeight = $statusInside ? $statusInside.offsetHeight : 0;
+    const statusHeight = $($e, '.wb-status')?.offsetHeight ?? 0;
     $e.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
     $e.style.flex = 'none';
   }
