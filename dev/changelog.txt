@@ -1,5 +1,8 @@
 * Project Devlog
 
+** 8.7.5-alpha.1 [2025-12-20]  gz+min: 4.41 KB (-0.00), min: 13.17 KB (-0.00)
+*** golf #addSelections method
+
 ** 8.7.4-alpha.1 [2025-12-20]  gz+min: 4.41 KB (-0.00), min: 13.17 KB (-0.01)
 *** golf 
 

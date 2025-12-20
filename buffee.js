@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.4-alpha.1";
+  this.version = "8.7.5-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -928,10 +928,9 @@ function Buffee(parentNode, config = {}) {
    */
   function addSelections(fromIndex, toIndex) {
     for (let i = fromIndex; i < toIndex; i++) {
-      const sel = document.createElement("div");
+      const sel = $selections[i] = fragmentSelections.appendChild(document.createElement("div"));
       sel.className = "wb-selection";
-      sel.style.top = i * lineHeight+'px'
-      $selections[i] = fragmentSelections.appendChild(sel);
+      sel.style.top = i * lineHeight+'px';
     }
     $e.appendChild(fragmentSelections);
   }
