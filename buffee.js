@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.3-alpha.1";
+  this.version = "8.7.4-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -1327,11 +1327,10 @@ function Buffee(parentNode, config = {}) {
             Viewport.start = targetAbsRow - Viewport.size + 1;
           }
 
-          const targetCol = Math.min(edge.col, Model.lines[targetAbsRow].length);
-          maxCol = targetCol;
+          maxCol = Math.min(edge.col, Model.lines[targetAbsRow].length);
           Selection.setCursor({
             row: targetAbsRow,
-            col: targetCol
+            col: maxCol
           });
           render(true);
         }
