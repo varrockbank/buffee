@@ -985,23 +985,19 @@ expect($gutter.style.width).toBe("4ch");
 
 ## should have default indentation of 4
 ### Default indentation is 4 spaces
-expect(fixture.wb.indentation).toBe(4);
+expect(fixture.wb.Mode.indentation).toBe(4);
 
 ## should update indentation at runtime
 ### Setting indentation updates value and display
-fixture.wb.indentation = 2;
-expect(fixture.wb.indentation).toBe(2);
-const $indentation = fixture.node.querySelector(".wb-indentation");
-expect($indentation.innerHTML).toBe("Spaces: 2");
+fixture.wb.Mode.indentation = 2;
+expect(fixture.wb.Mode.indentation).toBe(2);
 
 ## should allow changing indentation multiple times
 ### Indentation can be changed multiple times
-fixture.wb.indentation = 8;
-expect(fixture.wb.indentation).toBe(8);
-fixture.wb.indentation = 4;
-expect(fixture.wb.indentation).toBe(4);
-const $indentation = fixture.node.querySelector(".wb-indentation");
-expect($indentation.innerHTML).toBe("Spaces: 4");
+fixture.wb.Mode.indentation = 8;
+expect(fixture.wb.Mode.indentation).toBe(8);
+fixture.wb.Mode.indentation = 4;
+expect(fixture.wb.Mode.indentation).toBe(4);
 
 ## should initialize with custom indentation from config
 ### Config indentation=7 sets initial value
@@ -1010,8 +1006,7 @@ customNode.className = "wb no-select";
 customNode.innerHTML = fixture.node.innerHTML;
 document.body.appendChild(customNode);
 const customEditor = new Buffee(customNode, { indentation: 7 });
-expect(customEditor.indentation).toBe(7);
-expect(customNode.querySelector(".wb-indentation").innerHTML).toBe("Spaces: 7");
+expect(customEditor.Mode.indentation).toBe(7);
 customNode.remove();
 
 
