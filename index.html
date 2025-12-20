@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="themes/hn.css">
 <link rel="stylesheet" href="themes/kai.css">
 <script src="buffee.js"></script>
+<script src="extensions/callbacks.js"></script>
 <script src="extensions/highlights.js"></script>
 <script src="extensions/tui-legacy.js"></script>
 </head>
@@ -184,7 +185,8 @@
   window.addEventListener("DOMContentLoaded", () => {
     const mainElement = document.getElementById("playground");
     const primary = new Buffee(mainElement, {
-      viewportRows: 20
+      viewportRows: 20,
+      callbacks: BuffeeStatusLine(mainElement)
     });
     mainElement.focus();
     window.primary = primary;
@@ -195,6 +197,7 @@
     const hackerNewsElement = document.getElementById('hackernews');
     const hackernews = new Buffee(hackerNewsElement, {
       viewportRows: 20,
+      callbacks: BuffeeStatusLine(hackerNewsElement)
     });
 
     fetch("assets/instructions.txt")
@@ -237,6 +240,7 @@
     const tuiDemoElement = document.getElementById('tui-demo');
     const tuiDemo = new Buffee(tuiDemoElement, {
       viewportRows: 15,
+      callbacks: BuffeeStatusLine(tuiDemoElement)
     });
     BuffeeTUI(tuiDemo);  // Initialize TUI extension
 

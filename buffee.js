@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "8.0.1-alpha.1";
+  this.version = "8.0.2-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -50,7 +50,16 @@ function Buffee(node, config = {}) {
     showGutter = true,
     viewportCols,
     logger,
+    callbacks
   } = config;
+
+  const self = this;
+
+  const {
+    _headRow,
+    _headCol,
+    _lc,
+  } = callbacks || {};
 
   const autoFitViewport = !viewportRows;
 
@@ -70,9 +79,6 @@ function Buffee(node, config = {}) {
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
   const $status = node.querySelector('.wb-status');
-  const $headRow = node.querySelector('.wb-head-row');
-  const $headCol = node.querySelector('.wb-head-col');
-  const $lineCounter = node.querySelector('.wb-linecount');
   const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
@@ -959,9 +965,9 @@ function Buffee(node, config = {}) {
    * @returns {Buffee} The Buffee instance for chaining
    */
   function render(renderLineContainers = false) {
-    if ($lineCounter && lastRender.lineCount !== Model.lastIndex + 1 ) {
+    if (lastRender.lineCount !== Model.lastIndex + 1 ) {
       const lineCount = lastRender.lineCount = Model.lastIndex + 1;
-      $lineCounter.textContent = `${lineCount.toLocaleString()}L, originally: ${Model.originalLineCount}L ${Model.byteCount} bytes`;
+      _lc && _lc(lineCount, self);
     }
 
     // Use total line count so gutter doesn't resize while scrolling
@@ -1036,8 +1042,9 @@ function Buffee(node, config = {}) {
       for (const hook of renderHooks.onRenderComplete) {
         hook($e, Viewport);
       }
-      if ($headRow) $headRow.innerHTML = head.row + 1;
-      if ($headCol) $headCol.innerHTML = head.col + 1;
+      
+      _headRow && _headRow(head.row);
+      _headCol && _headCol(head.col);
 
       return this;
     }
@@ -1141,8 +1148,8 @@ function Buffee(node, config = {}) {
       hook($e, Viewport);
     }
 
-    if ($headRow) $headRow.innerHTML = head.row + 1;
-    if ($headCol) $headCol.innerHTML = head.col + 1;
+    _headRow && _headRow(head.row);
+    _headCol && _headCol(head.col);
 
     return this;
   }
