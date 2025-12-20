@@ -143,7 +143,10 @@
         .walkthrough-backdrop.active { opacity: 1; pointer-events: auto; }
         .walkthrough-panel { position: fixed; top: 0; bottom: 0; right: 0; width: 0; background: white; border-left: 3px solid #0e639c; z-index: 1000;  transition: width 0.3s; display: flex; flex-direction: column; color: #333; }
         .walkthrough-panel.active { width: max(1000px, 60vw); }
+        .walkthrough-panel.fullscreen { width: 100vw; border-left: none; }
         .walkthrough-header { background: #f4f4f4; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; }
+        .walkthrough-header-buttons { display: flex; gap: 8px; }
+        .walkthrough-expand { background: #6c757d; }
         .walkthrough-close { background: #dc3545; }
         .walkthrough-body { display: flex; flex: 1; min-height: 0; }
         .walkthrough-left { flex: 1; background: #f8f8f8; border-right: 1px solid #ccc; display: flex; flex-direction: column; }
@@ -154,7 +157,7 @@
         .walkthrough-compile-warning { background: #fff3cd; border-bottom: 2px solid #b8860b; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .walkthrough-compile-warning .warning-icon { color: #b8860b; }
         #walkthrough-compile-warning-text { color: #856404; font-weight: 600; }
-        .code-view { flex: 1; overflow: auto; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.5; background: white; }
+        .code-view { flex: 1; overflow: auto; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.5; background: white; white-space: pre-wrap; }
         .code-view pre { margin: 0; color: #333; }
 
         /* Highlight.js light theme for walkthrough */
@@ -171,17 +174,20 @@
         .code-view .hljs-attr { color: #e50000; }
         .code-view .hljs-property { color: #001080; }
         .code-view .hljs-punctuation { color: #333; }
-        .code-line { padding: 2px 8px; line-height: 1.6; }
+        .code-line { padding: 2px 8px; line-height: 1.6; display: flex; align-items: center; }
+        .code-line:nth-child(odd) { background: #f9f9f9; }
+        .code-line-content { white-space: pre; flex: 1; }
+        .code-line-markers { flex-shrink: 0; display: flex; gap: 4px; margin-left: 10px; }
         .code-line.step-line { cursor: pointer; border-left: 3px solid transparent; padding-left: 5px; }
         .code-line.step-line:hover { background: #f0f0f0; }
         .code-line.step-line.current { background: #cce5ff; border-left-color: #0e639c; font-weight: bold; }
         .code-line.step-line.completed { background: #d4edda; border-left-color: #28a745; }
         .code-line.error-line { background: #f8d7da; border-left: 3px solid #dc3545; padding-left: 5px; }
         .code-line.success-line { background: #d4edda; border-left: 3px solid #28a745; padding-left: 5px; }
-        .error-marker, .success-marker, .step-marker { float: right; margin-left: 8px; font-weight: bold; }
+        .error-marker, .success-marker, .step-marker { font-weight: bold; }
         .error-marker { color: #dc3545; }
         .success-marker { color: #28a745; }
-        .step-marker { width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 11px; color: white; background: #0e639c; border-radius: 50%; display: inline-block; }
+        .step-marker { width: 20px; height: 20px; line-height: 20px; text-align: center; font-size: 11px; color: white; background: #0e639c; border-radius: 50%; }
         .editor-view-container { flex: 1; padding: 16px; overflow: auto; background: #f8f8f8; }
         .step-controls-panel { background: #f4f4f4; padding: 12px 16px; border-top: 1px solid #ccc; display: flex; gap: 8px; align-items: center; }
         .step-btn { background: #0e639c; padding: 8px 16px; font-size: 13px; }
@@ -201,7 +207,8 @@
             .then(html => document.getElementById('nav').innerHTML = html);
     </script>
     <p><a href="../index.html">home</a> / Tests</p>
-    <h1>Unit Test Runner</h1>
+    <h1>Unit Tests</h1>
+    <h3>This test setup was AI generated with adult supervision. </h3>
 
     <div class="tabs">
         <button class="tab active" data-tab="tests">Tests</button>
@@ -381,7 +388,10 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
                 <span>Test Case: </span><strong id="walkthrough-test-name"></strong>
                 <span style="margin-left: 12px; opacity: 0.7; font-size: 12px;" id="walkthrough-test-desc"></span>
             </div>
-            <button class="walkthrough-close" onclick="walkthrough.close()">Close (<code style="background: none; color: inherit; font-size: inherit;">Esc</code>)</button>
+            <div class="walkthrough-header-buttons">
+                <button class="walkthrough-expand" onclick="walkthrough.toggleFullscreen()" id="walkthrough-expand-btn">⛶ Expand</button>
+                <button class="walkthrough-close" onclick="walkthrough.close()">Close (<code style="background: none; color: inherit; font-size: inherit;">Esc</code>)</button>
+            </div>
         </div>
         <div class="walkthrough-body">
             <div class="walkthrough-left">

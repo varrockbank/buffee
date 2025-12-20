@@ -22,7 +22,8 @@ class DSLTranspiler {
     // Map special keys to Key constants
     this.specialKeyMap = {
       'backspace': 'Backspace',
-      'enter': 'Enter'
+      'enter': 'Enter',
+      'tab': 'Tab'
     };
   }
 
