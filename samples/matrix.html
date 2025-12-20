@@ -21,21 +21,21 @@
   <h1>Matrix Digital Rain</h1>
   <p>Classic "falling code" effect demonstrating continuous buffer updates and character randomization.</p>
 
-  <blockquote class="wb no-select buffee-themepack1 neo" tabindex="0" id="editor" style="border: 1px solid #00ff41; width: 100%;">
+  <div class="wb buffee-themepack1 neo" id="editor" style="border: 1px solid #00ff41; width: 100%;">
     <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="wb-content">
+    <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
     </div>
     <div class="wb-status" style="display: none;">
-      <div><span class="wb-linecount"></span></div>
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
       <div class="wb-status-right">
         Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
         <span class="wb-indentation"></span>
       </div>
     </div>
-  </blockquote>
+  </div>
 
   <script>
     const editorEl = document.getElementById('editor');

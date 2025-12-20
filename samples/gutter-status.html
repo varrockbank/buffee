@@ -19,79 +19,122 @@
   <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Gutter and Status Bar</p>
 
   <h1>Gutter and Status Bar</h1>
-  <p>Gutter visibility: <code>showGutter</code> option. Status bar visibility: omit element or use <code>display: none</code></p>
+  <p>Gutter visibility: <code>showGutter</code> option. Status bar: omit <code>.wb-status</code> element from template.</p>
 
-  <h2>Default (gutter + status bar)</h2>
-  <p><code>new Buffee(el, { showGutter: true })</code></p>
-  <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-default" style="border: 1px solid #444; width: 500px;">
+  <h2>1. Default (gutter + status bar)</h2>
+  <p><code>new Buffee(el)</code></p>
+  <div class="wb buffee-themepack1 boring" id="editor-default">
     <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="wb-content">
+    <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
     </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; ">
-      <div><span class="wb-linecount"></span></div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
       <div class="wb-status-right">
         Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
         <span class="wb-indentation"></span>
       </div>
     </div>
-  </blockquote>
+  </div>
 
-  <h2>No gutter (line numbers hidden)</h2>
+  <h2>2. No gutter</h2>
   <p><code>new Buffee(el, { showGutter: false })</code></p>
-  <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-no-gutter" style="border: 1px solid #444; width: 500px;">
+  <div class="wb buffee-themepack1 boring" id="editor-no-gutter">
     <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="wb-content">
+    <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
     </div>
-    <div class="wb-status" style="display: flex; justify-content: space-between; ">
-      <div><span class="wb-linecount"></span></div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
       <div class="wb-status-right">
         Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
         <span class="wb-indentation"></span>
       </div>
     </div>
-  </blockquote>
+  </div>
 
-  <h2>No status bar</h2>
-  <p>CSS: <code>.wb-status { display: none; }</code></p>
-  <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-no-status" style="border: 1px solid #444; width: 500px;">
+  <h2>3. No status line</h2>
+  <p>Omit the <code>.wb-status</code> element from the template:</p>
+  <details>
+    <summary>View template</summary>
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="wb"&gt;
+  &lt;textarea class="wb-clipboard-bridge"&gt;&lt;/textarea&gt;
+  &lt;div class="no-select wb-elements"&gt;
+    &lt;div class="wb-gutter"&gt;&lt;/div&gt;
+    &lt;div class="wb-lines" tabindex="0"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+  <span style="color: #c00; text-decoration: line-through;">&lt;div class="wb-status"&gt;...&lt;/div&gt;</span>
+&lt;/div&gt;</pre>
+  </details>
+  <div class="wb buffee-themepack1 boring" id="editor-no-status"
     <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="wb-content">
+    <div class="no-select wb-elements">
       <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
     </div>
-    <div class="wb-status" style="display: none;">
-      <div><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
-        <span class="wb-indentation"></span>
-      </div>
-    </div>
-  </blockquote>
+  </div>
 
-  <h2>Minimal (no gutter, no status bar)</h2>
-  <p><code>new Buffee(el, { showGutter: false })</code> + CSS: <code>.wb-status { display: none; }</code></p>
-  <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-minimal" style="border: 1px solid #444; width: 500px;">
+  <h2>4. Status line on top</h2>
+  <p>Place <code>.wb-status</code> before <code>.wb-elements</code> in the template:</p>
+  <details>
+    <summary>View template</summary>
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="wb"&gt;
+  &lt;textarea class="wb-clipboard-bridge"&gt;&lt;/textarea&gt;
+  <span style="color: #0a0;">&lt;div class="wb-status"&gt;...&lt;/div&gt;</span>
+  &lt;div class="no-select wb-elements"&gt;
+    &lt;div class="wb-gutter"&gt;&lt;/div&gt;
+    &lt;div class="wb-lines" tabindex="0"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+  </details>
+  <div class="wb buffee-themepack1 boring" id="editor-status-top">
     <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="wb-content">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-    </div>
-    <div class="wb-status" style="display: none;">
-      <div><span class="wb-linecount"></span></div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
       <div class="wb-status-right">
         Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
         <span class="wb-indentation"></span>
       </div>
     </div>
-  </blockquote>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+  </div>
+
+  <h2>6. Gutter on right</h2>
+  <p>Place <code>.wb-gutter</code> after <code>.wb-lines</code> in the template:</p>
+  <details>
+    <summary>View template</summary>
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="wb"&gt;
+  &lt;textarea class="wb-clipboard-bridge"&gt;&lt;/textarea&gt;
+  &lt;div class="no-select wb-elements"&gt;
+    &lt;div class="wb-lines" tabindex="0"&gt;...&lt;/div&gt;
+    <span style="color: #0a0;">&lt;div class="wb-gutter"&gt;&lt;/div&gt;</span>
+  &lt;/div&gt;
+  &lt;div class="wb-status"&gt;...&lt;/div&gt;
+&lt;/div&gt;</pre>
+  </details>
+  <div class="wb buffee-themepack1 boring" id="editor-gutter-right">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <div class="wb-gutter"></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </div>
 
   <script>
     const content = `function hello() {
@@ -112,7 +155,7 @@ hello();`;
     // No gutter
     const elNoGutter = document.getElementById('editor-no-gutter');
     const edNoGutter = new Buffee(elNoGutter, {
-      viewportRows: 6,
+      viewportRows: 10,
       showGutter: false,
       callbacks: BuffeeStatusLine(elNoGutter)
     });
@@ -121,20 +164,28 @@ hello();`;
     // No status bar
     const elNoStatus = document.getElementById('editor-no-status');
     const edNoStatus = new Buffee(elNoStatus, {
-      viewportRows: 6,
-      showGutter: true,
-      callbacks: BuffeeStatusLine(elNoStatus)
+      viewportRows: 10,
+      showGutter: true
     });
     edNoStatus.Model.text = content;
 
-    // Minimal
-    const elMinimal = document.getElementById('editor-minimal');
-    const edMinimal = new Buffee(elMinimal, {
-      viewportRows: 6,
-      showGutter: false,
-      callbacks: BuffeeStatusLine(elMinimal)
+    // Status line on top
+    const elStatusTop = document.getElementById('editor-status-top');
+    const edStatusTop = new Buffee(elStatusTop, {
+      viewportRows: 10,
+      showGutter: true,
+      callbacks: BuffeeStatusLine(elStatusTop)
     });
-    edMinimal.Model.text = content;
+    edStatusTop.Model.text = content;
+
+    // Gutter on right
+    const elGutterRight = document.getElementById('editor-gutter-right');
+    const edGutterRight = new Buffee(elGutterRight, {
+      viewportRows: 10,
+      showGutter: true,
+      callbacks: BuffeeStatusLine(elGutterRight)
+    });
+    edGutterRight.Model.text = content;
   </script>
 </body>
 </html>

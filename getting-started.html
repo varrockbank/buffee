@@ -39,14 +39,14 @@
 
   <h2>2. Required HTML Structure</h2>
   <p>Add HTML outlined in <a href="template.html">template.html</a>.</p>
-  <pre>&lt;blockquote class="wb no-select" tabindex="0" id="editor"&gt;
+  <pre>&lt;div class="wb" id="editor"&gt;
   &lt;textarea class="wb-clipboard-bridge" aria-hidden="true"&gt;&lt;/textarea&gt;
-  &lt;div class="wb-content"&gt;
+  &lt;div class="no-select wb-elements"&gt;
     &lt;div class="wb-gutter"&gt;&lt;/div&gt;
-    &lt;div class="wb-lines"&gt;
-        &lt;div class="wb-layer-text"&gt;&lt;/div&gt;
-        &lt;div class="wb-layer-elements"&gt;&lt;/div&gt;
-        &lt;div class="wb-cursor"&gt;&lt;/div&gt;
+    &lt;div class="wb-lines" tabindex="0"&gt;
+      &lt;blockquote class="wb-layer-text"&gt;&lt;/blockquote&gt;
+      &lt;div class="wb-layer-elements"&gt;&lt;/div&gt;
+      &lt;div class="wb-cursor"&gt;&lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="wb-status"&gt;
@@ -57,7 +57,7 @@
       &lt;span class="wb-indentation"&gt;&lt;/span&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-&lt;/blockquote&gt;</pre>
+&lt;/div&gt;</pre>
 
   <h2>3. Include the Buffee</h2>
   <p>Buffee is just a JavaScript function made globally available when you include <a href="dist/buffee.min.js">dist/buffee.min.js</a></p>

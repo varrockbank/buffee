@@ -1,14 +1,14 @@
-<blockquote class="wb no-select" tabindex="0" id="editor">
+<div class="wb" id="editor">
   <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-  <div class="wb-content">
-    <div class="wb-gutter"></div>
-    <div class="wb-lines">
-        <div class="wb-layer-text"></div>
-        <div class="wb-layer-elements"></div>
-        <div class="wb-cursor"></div>
-    </div>
+  <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0">
+          <blockquote class="wb-layer-text"></blockquote>
+          <div class="wb-layer-elements"></div>
+          <div class="wb-cursor"></div>
+      </div>
   </div>
-  <div class="wb-status">
+  <div class="wb-status"> <!-- optional. can place on top -->
     <div class="wb-status-left"><span class="wb-linecount"></span></div>
     <div class="wb-status-right">
       Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
@@ -16,4 +16,4 @@
       <span class="wb-indentation"></span>
     </div>
   </div>
-</blockquote>
+</div>

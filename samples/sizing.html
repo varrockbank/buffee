@@ -22,119 +22,167 @@
   <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Editor Sizing</p>
 
   <h1>Editor Sizing</h1>
-  <p>By default, the editor auto-fits to its container. Use <code>viewportRows</code> and <code>viewportCols</code> to fix dimensions.</p>
+  <p>By default, the editor auto-fits to its container. Use <code>viewportRows</code> to fix the number of visible rows.</p>
 
-  <h2>1. Auto-rows, auto-cols (fill parent container)</h2>
-  <p>Parent CSS: <code>div { width: 960px; height: 300px; padding: 20px;  }</code></p>
-  <p>Editor CSS: <code>.wb { width: 100%; height: 100%; }</code></p>
+  <h2>1. Auto-rows, auto-cols (recommended)</h2>
+  <p><code>.wb { width: 960px; height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, {})</code></p>
-  <p>Default behavior: auto-fit rows and cols to parent container. Drag bottom-right to resize.</p>
-  <div style="width: 960px; height: 300px; padding: 20px; border: 2px dashed #666; resize: both; overflow: hidden;">
-    <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-auto-both" style="width: 100%; height: 100%;">
-      <textarea class="wb-clipboard-bridge"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between; ">
-        <div><span class="wb-linecount"></span></div>
-        <div class="wb-status-right">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+  <p>Default behavior: auto-fit rows and cols. Drag bottom-right to resize.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-auto-both" style="width: 960px; height: 300px; padding: 20px; border: 2px dashed #666; resize: both; overflow: hidden;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
-          <span class="wb-indentation"></span>
-        </div>
+        <span class="wb-indentation"></span>
       </div>
-    </blockquote>
+    </div>
   </div>
 
-  <h2>2. Auto-rows, auto-cols (fixed pixel size)</h2>
-  <p>Parent CSS: <code>div { padding: 20px; }</code></p>
-  <p>Editor CSS: <code>.wb { width: 640px; height: 300px; }</code></p>
-  <p><code>new Buffee(el, {})</code></p>
-  <p>Same as above but dimensions set directly on editor instead of inheriting from parent.</p>
-  <div style="border: 2px dashed #666; padding: 20px;">
-    <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-auto-both-px" style="width: 640px; height: 300px;">
-      <textarea class="wb-clipboard-bridge"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between; ">
-        <div><span class="wb-linecount"></span></div>
-        <div class="wb-status-right">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
-          <span class="wb-indentation"></span>
-        </div>
-      </div>
-    </blockquote>
-  </div>
-
-  <h2>3. Fixed-rows, fixed-cols</h2>
-  <p>Parent CSS: <code>div { background: #ccc; padding: 20px; }</code></p>
-  <p>Editor CSS: <code></code></p>
-  <p><code>new Buffee(el, { viewportRows: 10, viewportCols: 50 })</code></p>
-  <p>Width auto-calculated to fit exactly 50 text columns (plus gutter). Content extends beyond both dimensions.</p>
-  <div style="border: 2px solid #666; padding: 20px;">
-    <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-fixed">
-      <textarea class="wb-clipboard-bridge"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between; ">
-        <div><span class="wb-linecount"></span></div>
-        <div class="wb-status-right">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
-          <span class="wb-indentation"></span>
-        </div>
-      </div>
-    </blockquote>
-  </div>
-
-  <h2>4. Auto-rows, fixed-cols</h2>
-  <p>Parent CSS: <code>div { height: 300px;  }</code></p>
-  <p>Editor CSS: <code>.wb { height: 100%; }</code></p>
-  <p><code>new Buffee(el, { viewportCols: 40 })</code></p>
-  <div style="height: 300px; border: 2px dashed #666; padding: 20px; resize: vertical; overflow: hidden;">
-    <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-auto-rows-fixed-cols" style="height: 100%;">
-      <textarea class="wb-clipboard-bridge"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between; ">
-        <div><span class="wb-linecount"></span></div>
-        <div class="wb-status-right">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
-          <span class="wb-indentation"></span>
-        </div>
-      </div>
-    </blockquote>
-  </div>
-
-  <h2>5. Fixed-rows, auto-cols</h2>
-  <p>Parent CSS: <code>div { width: 640px; padding: 20px;  }</code></p>
-  <p>Editor CSS: <code>.wb { width: 100%; }</code></p>
+  <h2>2. Fixed-rows, auto-cols</h2>
+  <p><code>.wb { width: 640px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { viewportRows: 8 })</code></p>
-  <div style="width: 640px; border: 2px dashed #666; padding: 20px; resize: horizontal; overflow: hidden;">
-    <blockquote class="wb no-select buffee-themepack1 boring" tabindex="0" id="editor-fixed-rows-auto-cols" style="width: 100%;">
-      <textarea class="wb-clipboard-bridge"></textarea>
-      <div class="wb-content">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between; ">
-        <div><span class="wb-linecount"></span></div>
-        <div class="wb-status-right">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+  <p>Fixed 8 rows, columns auto-calculated from width. Drag to resize width.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-rows-auto-cols" style="width: 640px; padding: 20px; border: 2px dashed #666; resize: horizontal; overflow: hidden;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
         <span class="wb-status-divider">|</span>
-          <span class="wb-indentation"></span>
-        </div>
+        <span class="wb-indentation"></span>
       </div>
-    </blockquote>
+    </div>
+  </div>
+
+  <h2>3. viewportRows smaller than container</h2>
+  <p><code>.wb { height: 400px; padding: 20px; }</code></p>
+  <p><code>new Buffee(el, { viewportRows: 5 })</code></p>
+  <p>Container is 400px tall, but editor only shows 5 rows. viewportRows takes precedence instead of autofill remaining space.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-rows-large-container" style="height: 400px; padding: 20px; border: 2px solid #666;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </div>
+
+  <h2>4. viewportRows larger than container (clipped)</h2>
+  <p><code>.wb { height: 400px; padding: 20px; overflow: hidden; }</code></p>
+  <p><code>new Buffee(el, { viewportRows: 20 })</code></p>
+  <p>Container is 400px tall, but viewportRows requests 20 rows. Use <code>overflow: hidden</code> to clip.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-rows-overflow" style="height: 400px; padding: 20px; border: 2px solid #666; overflow: hidden;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </div>
+
+  <h2>5. viewportRows larger than container (scrollable)</h2>
+  <p><code>.wb { height: 400px; padding: 20px; overflow: scroll; display: block; }</code></p>
+  <p><code>new Buffee(el, { viewportRows: 20 })</code></p>
+  <p>Container is 400px tall, but viewportRows requests 20 rows. Use <code>overflow: scroll</code> and <code>display: block</code> to scroll.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-rows-scroll" style="height: 400px; padding: 20px; border: 2px solid #666; overflow: scroll; display: block;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </div>
+
+  <h2>6. Auto-rows, fixed-cols (status bar stretches)</h2>
+  <p><code>.wb { height: 300px; padding: 20px; }</code></p>
+  <p><code>new Buffee(el, { viewportCols: 55 })</code></p>
+  <p>Fixed 55 columns, rows auto-calculated from height. Note: status bar stretches to container width while content is narrower.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </div>
+
+  <h2>7. Auto-rows, fixed-cols (fit-content)</h2>
+  <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
+  <p><code>new Buffee(el, { viewportCols: 55 })</code></p>
+  <p>Same as example 6, but with <code>width: fit-content</code> so the container shrinks to match content width.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fit-content" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
+  </div>
+
+  <h2>8. Auto-rows, fixed-cols (contain: inline-size)</h2>
+  <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
+  <p><code>.wb-status { contain: inline-size; }</code></p>
+  <p><code>new Buffee(el, { viewportCols: 20 })</code></p>
+  <p>When <code>viewportCols</code> is small, status line content may be wider than editor. Use <code>contain: inline-size</code> on status bar so gutter + lines determine container width.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-contain" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content;">
+    <textarea class="wb-clipboard-bridge"></textarea>
+    <div class="no-select wb-elements">
+      <div class="wb-gutter"></div>
+      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    </div>
+    <div class="wb-status" style="contain: inline-size;">
+      <div class="wb-status-left"><span class="wb-linecount"></span></div>
+      <div class="wb-status-right">
+        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+        <span class="wb-status-divider">|</span>
+        <span class="wb-indentation"></span>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -153,39 +201,67 @@
     edAutoBoth.Model.text = ruler(120) + '\n// Auto-rows and auto-cols\n// Drag corner to resize\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
-    // 2. Auto-rows and auto-cols (pixel dimensions)
-    const elAutoBothPx = document.getElementById('editor-auto-both-px');
-    const edAutoBothPx = new Buffee(elAutoBothPx, {
-      callbacks: BuffeeStatusLine(elAutoBothPx)
-    });
-    edAutoBothPx.Model.text = ruler(120) + '\n// Auto-rows and auto-cols (pixel dimensions)\n// Dimensions on editor, not parent\n' +
-      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
-
-    // 3. Fixed-rows, fixed-cols
-    const elFixed = document.getElementById('editor-fixed');
-    const edFixed = new Buffee(elFixed, {
-      viewportRows: 10,
-      viewportCols: 50,
-      callbacks: BuffeeStatusLine(elFixed)
-    });
-    edFixed.Model.text = ruler(40) + '\n' + Array.from({length: 15}, (_, i) => `Line ${i + 2}: This line is longer than 20 chars`).join('\n');
-
-    // 4. Auto-rows, fixed cols
-    const elAutoRowsFixedCols = document.getElementById('editor-auto-rows-fixed-cols');
-    const edAutoRowsFixedCols = new Buffee(elAutoRowsFixedCols, {
-      viewportCols: 40,
-      callbacks: BuffeeStatusLine(elAutoRowsFixedCols)
-    });
-    edAutoRowsFixedCols.Model.text = ruler(60) + '\n// Auto-rows, fixed 40 cols\n// Drag to resize height\n' +
-      Array.from({length: 30}, (_, i) => `Line ${i + 4}`).join('\n');
-
-    // 5. Fixed-rows, auto-cols
+    // 2. Fixed-rows, auto-cols
     const elFixedRowsAutoCols = document.getElementById('editor-fixed-rows-auto-cols');
     const edFixedRowsAutoCols = new Buffee(elFixedRowsAutoCols, {
       viewportRows: 8,
       callbacks: BuffeeStatusLine(elFixedRowsAutoCols)
     });
     edFixedRowsAutoCols.Model.text = ruler(120) + '\n// Fixed 8 rows, auto-cols\nLine 3\n' +
+      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 3. viewportRows smaller than container
+    const elFixedRowsLarge = document.getElementById('editor-fixed-rows-large-container');
+    const edFixedRowsLarge = new Buffee(elFixedRowsLarge, {
+      viewportRows: 5,
+      callbacks: BuffeeStatusLine(elFixedRowsLarge)
+    });
+    edFixedRowsLarge.Model.text = ruler(80) + '\n// viewportRows: 5 overrides container height\n' +
+      Array.from({length: 10}, (_, i) => `Line ${i + 3}`).join('\n');
+
+    // 4. viewportRows larger than container
+    const elFixedRowsOverflow = document.getElementById('editor-fixed-rows-overflow');
+    const edFixedRowsOverflow = new Buffee(elFixedRowsOverflow, {
+      viewportRows: 20,
+      callbacks: BuffeeStatusLine(elFixedRowsOverflow)
+    });
+    edFixedRowsOverflow.Model.text = ruler(80) + '\n// viewportRows: 20 exceeds container height\n' +
+      Array.from({length: 25}, (_, i) => `Line ${i + 3}`).join('\n');
+
+    // 5. viewportRows larger than container (scrollable)
+    const elFixedRowsScroll = document.getElementById('editor-fixed-rows-scroll');
+    const edFixedRowsScroll = new Buffee(elFixedRowsScroll, {
+      viewportRows: 20,
+      callbacks: BuffeeStatusLine(elFixedRowsScroll)
+    });
+    edFixedRowsScroll.Model.text = ruler(80) + '\n// viewportRows: 20 exceeds container height\n// Scroll to see more\n' +
+      Array.from({length: 25}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 6. Auto-rows, fixed-cols (status bar stretches)
+    const elFixedCols = document.getElementById('editor-fixed-cols');
+    const edFixedCols = new Buffee(elFixedCols, {
+      viewportCols: 55,
+      callbacks: BuffeeStatusLine(elFixedCols)
+    });
+    edFixedCols.Model.text = ruler(55) + '\n// Fixed 55 cols\n// Status bar stretches\n' +
+      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 7. Auto-rows, fixed-cols (fit-content)
+    const elFitContent = document.getElementById('editor-fit-content');
+    const edFitContent = new Buffee(elFitContent, {
+      viewportCols: 55,
+      callbacks: BuffeeStatusLine(elFitContent)
+    });
+    edFitContent.Model.text = ruler(55) + '\n// Fixed 55 cols\n// width: fit-content\n' +
+      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 8. Auto-rows, fixed-cols (contain: inline-size)
+    const elContain = document.getElementById('editor-contain');
+    const edContain = new Buffee(elContain, {
+      viewportCols: 20,
+      callbacks: BuffeeStatusLine(elContain)
+    });
+    edContain.Model.text = ruler(20) + '\n// Fixed 20 cols\n// contain: inline-size\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
   </script>

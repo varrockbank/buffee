@@ -9,6 +9,7 @@ See `template.html` for the required HTML structure. Missing any element will ca
 - `test/lib/harness.js` (createEditorNode function)
 - `index.html` (all editor instances)
 - `samples/*.html` (all sample files)
+- `themes.html`
 
 ## Cursor Model (Vim-style)
 

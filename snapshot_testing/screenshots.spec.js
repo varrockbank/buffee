@@ -10,16 +10,16 @@ const pages = [
 
   // Samples
   { name: 'samples-index', path: '/samples/' },
-  { name: 'samples-basic-editor', path: '/samples/basic-editor.html' },
+  { name: 'samples-basic', path: '/samples/basic.html' },
   { name: 'samples-gutter-status', path: '/samples/gutter-status.html' },
-  { name: 'samples-read-only', path: '/samples/read-only.html' },
+  { name: 'samples-readonly', path: '/samples/readonly.html' },
   { name: 'samples-sizing', path: '/samples/sizing.html' },
-  { name: 'samples-tui-legacy', path: '/samples/tui-legacy.html' },
+  { name: 'samples-tui', path: '/samples/tui.html' },
   { name: 'samples-elementals', path: '/samples/elementals.html' },
   { name: 'samples-syntax', path: '/samples/syntax.html' },
   { name: 'samples-ios', path: '/samples/ios.html' },
-  { name: 'samples-ultra-high-capacity', path: '/samples/ultra-high-capacity.html' },
-  { name: 'samples-ascii-movie', path: '/samples/ascii-movie.html' },
+  { name: 'samples-loader', path: '/samples/loader.html' },
+  { name: 'samples-movie', path: '/samples/movie.html' },
 
   // Test pages
   { name: 'test-index', path: '/test/' },

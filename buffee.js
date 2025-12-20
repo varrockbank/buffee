@@ -38,8 +38,8 @@
  * });
  * editor.Model.text = 'Hello, World!';
  */
-function Buffee(node, config = {}) {
-  this.version = "8.0.5-alpha.1";
+function Buffee(parentNode, config = {}) {
+  this.version = "8.2.7-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -55,6 +55,7 @@ function Buffee(node, config = {}) {
 
   const self = this;
   const frameCallbacks = callbacks || {};
+  const node = parentNode.querySelector('.wb-elements');
 
   const autoFitViewport = !viewportRows;
 
@@ -73,8 +74,7 @@ function Buffee(node, config = {}) {
   const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
-  const $status = node.querySelector('.wb-status');
-  const $clipboardBridge = node.querySelector('.wb-clipboard-bridge');
+  const $clipboardBridge = parentNode.querySelector('.wb-clipboard-bridge');
   const $gutter = node.querySelector('.wb-gutter');
 
   $e.style.tabSize = expandtab || 4;                                                                                                                                                                           
@@ -85,6 +85,13 @@ function Buffee(node, config = {}) {
     // Gutter has paddingRight: editorPaddingPX*2, lines has margin: editorPaddingPX (left+right)
     const extraPX = showGutter ? editorPaddingPX * 4 : editorPaddingPX * 2;
     node.style.width = `calc(${gutterWidthCH + viewportCols}ch + ${extraPX}px)`;
+  }
+  // Set container height if viewportRows specified (don't use flex: 1)
+  if (viewportRows) {
+    const $statusInside = node.querySelector('.wb-status');
+    const statusHeight = $statusInside ? $statusInside.offsetHeight : 0;
+    node.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
+    node.style.flex = 'none';
   }
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
@@ -973,16 +980,15 @@ function Buffee(node, config = {}) {
     lastFrame = frame;
     frame = temp;
 
-    // Use total line count so gutter doesn't resize while scrolling
+    // Use viewport's largest visible line number for gutter width
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
-    const digitsInLargestLineNumber = Math.max(2, Model.lines.length.toString().length);
+    const displayLines = Viewport.size + (renderExtraLine ? 1 : 0);
+    const largestVisibleLineNumber = Viewport.start + displayLines;
+    const digitsInLargestLineNumber = Math.max(2, largestVisibleLineNumber.toString().length);
     if(digitsInLargestLineNumber !== gutterSize) {
       gutterSize = digitsInLargestLineNumber;
       $gutter.style.width = gutterSize + gutterPadding + 'ch';
     }
-
-    // Display size includes extra partial line when autoFitViewport
-    const displayLines = Viewport.size + (renderExtraLine ? 1 : 0);
 
     $gutter.textContent = null;
     for (let i = 0; i < displayLines; i++) {
@@ -1202,7 +1208,7 @@ function Buffee(node, config = {}) {
     get: () => indentation,
     set: (value) => {
       indentation = value;
-      const e = node.querySelector('.wb-indentation');
+      const e = parentNode.querySelector('.wb-indentation');
       if (e) e.innerHTML = `Spaces: ${indentation}`;
     },
     enumerable: true
@@ -1246,8 +1252,8 @@ function Buffee(node, config = {}) {
   // Auto-fit viewport to container height
   if (autoFitViewport) {
     const fitViewport = () => {
-      const statusHeight = $status ? $status.offsetHeight : 0;
-      const availableHeight = node.clientHeight - statusHeight - (editorPaddingPX * 2);
+      // .wb-elements is flex: 1, so it fills remaining space after status line
+      const availableHeight = node.clientHeight;
       const exactLines = availableHeight / lineHeight;
       const newSize = Math.floor(exactLines);
       const hasPartialSpace = exactLines > newSize;
@@ -1265,7 +1271,7 @@ function Buffee(node, config = {}) {
   }
 
   // Reading clipboard from the keydown listener involves a different security model.
-  node.addEventListener('paste', e => {
+  $e.addEventListener('paste', e => {
     e.preventDefault(); // stop browser from inserting raw clipboard text
     const text = e.clipboardData.getData("text/plain");
     if (text) {
@@ -1275,13 +1281,13 @@ function Buffee(node, config = {}) {
 
   // Triggered by a keydown paste event. a copy event handler can read the clipboard
   // by the standard security model. Meanwhile, we don't have to make the editor "selectable".
-  node.addEventListener('copy', e => {
+  $e.addEventListener('copy', e => {
     e.preventDefault();                    // take over the clipboard contents
     e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
   });
 
   // Bind keyboard control to move viewport
-  node.addEventListener('keydown', event => {
+  $e.addEventListener('keydown', event => {
     // Do nothing for Meta+V (on Mac) or Ctrl+V (on Windows/Linux) as to avoid conflict with the paste event.
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "v") {
       // just return, no preventDefault, no custom handling

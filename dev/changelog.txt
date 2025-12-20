@@ -1,8 +1,48 @@
 * Project Devlog
 
+** 8.2.8-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.01), min: 13.50 KB (0)
+*** fix 
+- remove tabfocus outline on editor
+
+** 8.2.7-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.01), min: 13.50 KB (-0.01)
+*** fix 
+- gutter width should be based on viewport lines, not model
+
+** 8.2.6-alpha.1 [2025-12-20]
+*** refactor 
+- isolate blockquote, semantically, the the text lines
+
+** 8.2.5-alpha.1 [2025-12-20]  gz+min: 4.59 KB (+0.01), min: 13.50 KB (-0.03)
+*** refactor 
+- flatten html structure 
+
+** 8.2.4-alpha.1 [2025-12-20]  gz+min: 4.60 KB (+0.01), min: 13.53 KB (0)
+*** fix 
+- suppress outline around editor focus 
+
+** 8.2.3-alpha.1 [2025-12-20]  gz+min: 4.60 KB (+0.04), min: 13.53 KB (+0.09)
+*** fix 
+- behavior of buffee height when inside container 
+
+** 8.2.2-alpha.1 [2025-12-20]  gz+min: 4.57 KB (+0.03), min: 13.45 KB (+0.02)
+*** fix
+- viewportRows explictly specified takes precedence over flexbox autoheight
+
+** 8.2.1-alpha.1 [2025-12-20]  gz+min: 4.55 KB (+0.01), min: 13.43 KB (0)
+*** fix
+- height calculation on buffee should not care about status line anymore
+
+** 8.2.0-alpha.1 [2025-12-20]  gz+min: 4.57 KB (+0.01), min: 13.45 KB (0)
+*** refactor
+- new parentNode dom structure is required
+
+** 8.1.0-alpha.1 [2025-12-20]  gz+min: 4.58 KB (+0.03), min: 13.52 KB (+0.03)
+*** refactor
+- separate parentNode from blockquote for optional status line placement
+
 ** 8.0.6-alpha.1 [2025-12-19]  gz+min: 4.55 KB (+0.02), min: 13.42 KB (+0.03)
-*** status line 
-- make spacing off elements more consistent 
+*** status line
+- make spacing off elements more consistent
 
 ** 8.0.5-alpha.1 [2025-12-19]  gz+min: 4.56 KB (+0.02), min: 13.49 KB (+0.03)
 *** feature
