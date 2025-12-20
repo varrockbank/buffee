@@ -12,6 +12,4 @@ Extensions
 
 Status Line
 22. show selection coordinates, not just cursor 
-23. accept a lambda to map to coordinates
-25. status bar display should be controlled by user programmatically to alter css
 24. bytecount calculation can be refactored out of buffee.js

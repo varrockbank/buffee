@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 8.2.0-alpha.1
+ * @version 8.2.1-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -30,6 +30,12 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+}
+
+/* Blockquote fills remaining space in flex container */
+.wb > blockquote {
+  flex: 1;
+  min-height: 0;
 }
 
 /* Prevent text selection on editor chrome */
@@ -93,6 +99,7 @@
   display: flex;
   justify-content: space-between;
   padding: 6px 10px; /** refactor to css variable*/
+  z-index: 600;
 }
 
 .wb .wb-gutter {

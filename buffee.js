@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.2.0-alpha.1";
+  this.version = "8.2.1-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -1247,8 +1247,7 @@ function Buffee(parentNode, config = {}) {
   // Auto-fit viewport to container height
   if (autoFitViewport) {
     const fitViewport = () => {
-      const statusHeight = $status ? $status.offsetHeight : 0;
-      const availableHeight = parentNode.clientHeight - statusHeight - (editorPaddingPX * 2);
+      const availableHeight = node.clientHeight - (editorPaddingPX * 2);
       const exactLines = availableHeight / lineHeight;
       const newSize = Math.floor(exactLines);
       const hasPartialSpace = exactLines > newSize;
@@ -1260,7 +1259,7 @@ function Buffee(parentNode, config = {}) {
     };
     // Use requestAnimationFrame to ensure layout is complete before measuring
     requestAnimationFrame(fitViewport);
-    new ResizeObserver(fitViewport).observe(parentNode);
+    new ResizeObserver(fitViewport).observe(node);
   } else {
     render(true);
   }

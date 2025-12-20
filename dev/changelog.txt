@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.2.1-alpha.1 [2025-12-20]  gz+min: 4.55 KB (+0.01), min: 13.43 KB (0)
+*** fix
+- height calculation on buffee should not care about status line anymore
+
 ** 8.2.0-alpha.1 [2025-12-20]  gz+min: 4.57 KB (+0.01), min: 13.45 KB (0)
 *** refactor
 - new parentNode dom structure is required
