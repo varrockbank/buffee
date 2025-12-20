@@ -20,7 +20,7 @@
 /**
  * Creates a new Buffee virtual buffer editor instance.
  * @constructor
- * @param {HTMLElement} parentNode - Container element
+ * @param {HTMLElement} $parent - Container element
  * @param {BuffeeConfig} [config={}] - Configuration options
  * @example
  * const editor = new Buffee(document.getElementById('editor'), {
@@ -29,8 +29,8 @@
  * });
  * editor.Model.text = 'Hello, World!';
  */
-function Buffee(parentNode, config = {}) {
-  this.version = "8.8.2-alpha.1";
+function Buffee($parent, config = {}) {
+  this.version = "8.8.3-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -52,17 +52,17 @@ function Buffee(parentNode, config = {}) {
   const frameCallbacks = callbacks || {};
   const autoFitViewport = !viewportRows;
 
-  const prop = p => parseFloat(getComputedStyle(parentNode).getPropertyValue(p));
+  const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
   const lineHeight = prop("--wb-cell");
   const editorPaddingPX = prop("--wb-padding");
   const gutterPadding = prop("--wb-gutter-padding");
   const $ = (n, q) => n.querySelector(q); 
-  const node = $(parentNode, '.wb-elements');
-  const $e = $(node, '.wb-lines');
-  const $cursor = $(node, '.wb-cursor');
-  const $textLayer = $(node, '.wb-layer-text');
-  const $clipboardBridge = $(parentNode, '.wb-clipboard-bridge');
-  const $gutter = $(node, '.wb-gutter');
+  const $e = $($parent, '.wb-elements');
+  const $l = $($e, '.wb-lines');
+  const $cursor = $($e, '.wb-cursor');
+  const $textLayer = $($e, '.wb-layer-text');
+  const $clipboardBridge = $($parent, '.wb-clipboard-bridge');
+  const $gutter = $($e, '.wb-gutter');
 
   let gutterSize = 0;  // Will be set on first render
   $gutter.style.display = showGutter ? '' : 'none';                                                                                                                                                            
@@ -71,14 +71,14 @@ function Buffee(parentNode, config = {}) {
     const gutterWidthCH = showGutter ? (gutterSize + gutterPadding) : 0;
     // Gutter has paddingRight: editorPaddingPX*2, lines has margin: editorPaddingPX (left+right)
     const extraPX = showGutter ? editorPaddingPX * 4 : editorPaddingPX * 2;
-    node.style.width = `calc(${gutterWidthCH + viewportCols}ch + ${extraPX}px)`;
+    $e.style.width = `calc(${gutterWidthCH + viewportCols}ch + ${extraPX}px)`;
   }
   // Set container height if viewportRows specified (don't use flex: 1)
   if (viewportRows) {
-    const $statusInside = $(node, '.wb-status');
+    const $statusInside = $($e, '.wb-status');
     const statusHeight = $statusInside ? $statusInside.offsetHeight : 0;
-    node.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
-    node.style.flex = 'none';
+    $e.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
+    $e.style.flex = 'none';
   }
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
@@ -915,7 +915,7 @@ function Buffee(parentNode, config = {}) {
       sel.className = "wb-selection";
       sel.style.top = i * lineHeight+'px';
     }
-    $e.appendChild(fragmentSelections);
+    $l.appendChild(fragmentSelections);
   }
 
   /**
@@ -984,7 +984,7 @@ function Buffee(parentNode, config = {}) {
 
       // Call extension hooks for container rebuild
       for (const hook of renderHooks.onContainerRebuild) {
-        hook($e, Viewport);
+        hook($l, Viewport);
       }
     }
 
@@ -996,7 +996,7 @@ function Buffee(parentNode, config = {}) {
 
     // Call extension hooks for content overlay
     for (const hook of renderHooks.onRenderContent) {
-      hook($e, Viewport);
+      hook($l, Viewport);
     }
 
     // * BEGIN render selection
@@ -1010,7 +1010,7 @@ function Buffee(parentNode, config = {}) {
       $cursor.style.visibility = 'hidden';
       // Skip to render complete hooks
       for (const hook of renderHooks.onRenderComplete) {
-        hook($e, Viewport);
+        hook($l, Viewport);
       }
 
       return this;
@@ -1071,28 +1071,28 @@ function Buffee(parentNode, config = {}) {
       $cursor.style.visibility = 'visible';
 
       // Horizontal scroll to keep cursor in view
-      const containerRect = $e.getBoundingClientRect();
+      const containerRect = $l.getBoundingClientRect();
       const cursorRect = $cursor.getBoundingClientRect();
       const charWidth = cursorRect.width || 14;
 
       if (cursorRect.left < containerRect.left) {
         const deficit = containerRect.left - cursorRect.left;
         const charsToScroll = Math.ceil(deficit / charWidth);
-        $e.scrollLeft -= charsToScroll * charWidth;
+        $l.scrollLeft -= charsToScroll * charWidth;
       } else if (cursorRect.right > containerRect.right) {
         const deficit = cursorRect.right - containerRect.right;
         const charsToScroll = Math.ceil(deficit / charWidth);
-        $e.scrollLeft += charsToScroll * charWidth;
+        $l.scrollLeft += charsToScroll * charWidth;
       }
       // Snap to character boundary to prevent accumulated drift
-      $e.scrollLeft = Math.round($e.scrollLeft / charWidth) * charWidth;
+      $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
     } else {
       $cursor.style.visibility = 'hidden';
     }
 
     // Call extension hooks for render complete
     for (const hook of renderHooks.onRenderComplete) {
-      hook($e, Viewport);
+      hook($l, Viewport);
     }
 
     return this;
@@ -1161,8 +1161,9 @@ function Buffee(parentNode, config = {}) {
         px: showGutter ? (editorPaddingPX * 3) : editorPaddingPX,
         top: editorPaddingPX
       };
-    },    
+    },
     $e,
+    $l,
     $textLayer,
     render,
     renderHooks,
@@ -1176,7 +1177,7 @@ function Buffee(parentNode, config = {}) {
   if (autoFitViewport) {
     const fitViewport = () => {
       // .wb-elements is flex: 1, so it fills remaining space after status line
-      const availableHeight = node.clientHeight;
+      const availableHeight = $e.clientHeight;
       const exactLines = availableHeight / lineHeight;
       const newSize = Math.floor(exactLines);
       const hasPartialSpace = exactLines > newSize;
@@ -1188,13 +1189,13 @@ function Buffee(parentNode, config = {}) {
     };
     // Use requestAnimationFrame to ensure layout is complete before measuring
     requestAnimationFrame(fitViewport);
-    new ResizeObserver(fitViewport).observe(node);
+    new ResizeObserver(fitViewport).observe($e);
   } else {
     render(true);
   }
 
   // Reading clipboard from the keydown listener involves a different security model.
-  $e.addEventListener('paste', e => {
+  $l.addEventListener('paste', e => {
     e.preventDefault(); // stop browser from inserting raw clipboard text
     const text = e.clipboardData.getData("text/plain");
     if (text) {
@@ -1214,11 +1215,11 @@ function Buffee(parentNode, config = {}) {
     e.preventDefault();
     e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
     Selection.delete();
-    $e.focus({ preventScroll: true });     // Return focus to editor
+    $l.focus({ preventScroll: true });     // Return focus to editor
   });
 
   // Bind keyboard control to move viewport
-  $e.addEventListener('keydown', event => {
+  $l.addEventListener('keydown', event => {
     // Do nothing for Meta+V (on Mac) or Ctrl+V (on Windows/Linux) as to avoid conflict with the paste event.
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "v") {
       // just return, no preventDefault, no custom handling
