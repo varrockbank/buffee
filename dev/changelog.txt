@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.4.0-alpha.1 [2025-12-20]  gz+min: 4.53 KB (+0.01), min: 13.44 KB (0)
+*** fix 
+- off-by-1 bug with cut, copy, delete, replace, insert, selection, should be everything left of cursor. 
+
 ** 8.3.0-alpha.1 [2025-12-20]
 *** fix 
 - copy and cut not working

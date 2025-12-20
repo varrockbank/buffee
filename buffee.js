@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.3.0-alpha.1";
+  this.version = "8.4.0-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -257,7 +257,7 @@ function Buffee(parentNode, config = {}) {
       if(left.row === right.row) {
         const text = Model.lines[left.row];
         const isLastLine = left.row === Model.lastIndex;
-        const selectedText = text.slice(left.col, right.col + 1);
+        const selectedText = text.slice(left.col, right.col);
 
         // If selection extends to phantom newline position and there is a newline
         if (right.col >= text.length && !isLastLine) {
@@ -266,7 +266,7 @@ function Buffee(parentNode, config = {}) {
         return [selectedText];
       } else {
         const firstLine = Model.lines[left.row].slice(left.col);
-        const lastLine = Model.lines[right.row].slice(0, right.col + 1);
+        const lastLine = Model.lines[right.row].slice(0, right.col);
         const middle = Model.lines.slice(left.row + 1, right.row);
         return [firstLine, ...middle, lastLine]
       }
@@ -1078,20 +1078,8 @@ function Buffee(parentNode, config = {}) {
       $selections[firstViewportRow].style.left = firstEdge.col + 'ch';
 
       if (secondEdge.row === firstEdge.row) {
-        // Single-line selection
-        let width = secondEdge.col - firstEdge.col + 1;
-        const text = Model.lines[firstEdge.row];
-        const isLastLine = firstEdge.row === Model.lastIndex;
-
-        // When selecting backwards from EOL position, don't show phantom newline
-        if (!Selection.isForwardSelection && secondEdge.col > firstEdge.col && secondEdge.col >= text.length) {
-          width--;
-        }
-        // When on last line (no newline exists), clamp width to actual text
-        else if (isLastLine && secondEdge.col >= text.length && firstEdge.col < secondEdge.col) {
-          width = Math.min(width, text.length - firstEdge.col);
-        }
-
+        // Single-line selection (excludes cursor head position)
+        const width = secondEdge.col - firstEdge.col;
         $selections[firstViewportRow].style.width = width + 'ch';
         $selections[firstViewportRow].style.visibility = 'visible';
       } else {
@@ -1104,20 +1092,12 @@ function Buffee(parentNode, config = {}) {
     }
 
     // Render the second edge line (if within viewport and multi-line selection)
+    // Excludes cursor head position
     if (secondEdge.row !== firstEdge.row && secondViewportRow >= 0 && secondViewportRow < Viewport.size) {
       const text = Model.lines[secondEdge.row];
-      const isLastLine = secondEdge.row === Model.lastIndex;
 
       $selections[secondViewportRow].style.left = '0';  // Last line of selection starts from column 0
-
-      let width;
-      if (secondEdge.col >= text.length && !isLastLine) {
-        // Selection extends to phantom newline position, and there is a newline
-        width = text.length + 1;
-      } else {
-        width = Math.min(secondEdge.col + 1, text.length);
-      }
-      $selections[secondViewportRow].style.width = width + 'ch';
+      $selections[secondViewportRow].style.width = Math.min(secondEdge.col, text.length) + 'ch';
       $selections[secondViewportRow].style.visibility = 'visible';
     }
     // * END render selection
