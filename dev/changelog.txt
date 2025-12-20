@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.8.13-alpha.1 [2025-12-20]  gz+min: 4.27 KB (+0.02), min: 12.49 KB (+0.08)
+*** refactor 
+- make auto-fit a property on Viewport
+
 ** 8.8.12-alpha.1 [2025-12-20]  gz+min: 4.25 KB (-0.00), min: 12.41 KB (-0.03)
 *** perf 
 - don't toggle visiblity and just change width of selection

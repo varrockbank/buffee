@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.12-alpha.1";
+  this.version = "8.8.13-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -50,8 +50,6 @@ function Buffee($parent, config = {}) {
     spaces,
   };
   const frameCallbacks = callbacks || {};
-  const autoFitViewport = !viewportRows;
-
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
   const lineHeight = prop("--wb-cell");
   const editorPaddingPX = prop("--wb-padding");
@@ -151,9 +149,8 @@ function Buffee($parent, config = {}) {
         } else {
           if (head.row < Model.lastIndex) {                   // Move to beginning of next line.
             maxCol = head.col = 0;
-            head.row++;
             // Scroll viewport if cursor went below visible area
-            if (head.row > Viewport.end) {
+            if (++head.row > Viewport.end) {
               Viewport.start = head.row - Viewport.size + 1;
             }
           }
@@ -164,8 +161,7 @@ function Buffee($parent, config = {}) {
           maxCol = --head.col;
         } else {
           if (head.row > 0) {                                 // Move to end of previous line (phantom newline position)
-            head.row--;
-            maxCol = head.col = Model.lines[head.row].length;
+            maxCol = head.col = Model.lines[--head.row].length;
             // Scroll viewport if cursor went above visible area
             if (head.row < Viewport.start) {
               Viewport.start = head.row;
@@ -854,10 +850,14 @@ function Buffee($parent, config = {}) {
   const Viewport = this.Viewport = {
     /** @type {number} Index of the first visible line (0-indexed) */
     start: 0,
+    /** @type {0|1} Whether viewport auto-fits to container height */
+    autoFit: viewportRows ? 0 : 1,
     /** @type {number} Number of visible lines */
-    size: autoFitViewport ? 0 : viewportRows,
+    size: viewportRows ? viewportRows : 0,
     /** @type {number} Pending container delta (0 = up to date) */
-    delta: autoFitViewport ? 1 : viewportRows,
+    delta: viewportRows ? viewportRows : 1,
+    /** @type {number} Number of DOM line containers */
+    get displayLines() { return this.size + this.autoFit; },
 
     /**
      * Index of the last visible line.
@@ -930,13 +930,11 @@ function Buffee($parent, config = {}) {
 
     // Use viewport's largest visible line number for gutter width
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
-    const displayLines = Viewport.size + +autoFitViewport;
-
-    const digits = Math.max(2, (Viewport.start + displayLines).toString().length);
+    const digits = Math.max(2, (Viewport.start + Viewport.displayLines).toString().length);
     if (digits !== gutterSize)
       $gutter.style.width = (gutterSize = digits) + gutterPadding + 'ch';
     $gutter.textContent = null;
-    for (let i = 0; i < displayLines; i++)
+    for (let i = 0; i < Viewport.displayLines; i++)
       fragmentGutters.appendChild(document.createElement("div")).textContent = Viewport.start + i + 1;
     $gutter.appendChild(fragmentGutters);
 
@@ -972,7 +970,7 @@ function Buffee($parent, config = {}) {
     }
 
     // Update contents of line containers
-    for(let i = 0; i < displayLines; i++) {
+    for(let i = 0; i < Viewport.displayLines; i++) {
       $textLayer.children[i].textContent = Model.lines[Viewport.start + i] ?? null;
       $selections[i].style.width = '0ch';
     }
@@ -1139,7 +1137,7 @@ function Buffee($parent, config = {}) {
   };
 
   // Auto-fit viewport to container height
-  if (autoFitViewport) {
+  if (Viewport.autoFit) {
     const fitViewport = () => {
       // .wb-elements is flex: 1, so it fills remaining space after status line
       const newSize = Math.floor($e.clientHeight / lineHeight);
