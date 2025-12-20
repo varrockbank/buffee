@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.6-alpha.1";
+  this.version = "8.7.7-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -1368,10 +1368,8 @@ function Buffee(parentNode, config = {}) {
       }
     } else if (event.key.length > 1) {
       logger.warn('Ignoring unknown key: ', event.code, event.key);
-    } else if (event.key === " ") {
-      event.preventDefault();
-      Selection.insert(" ");
     } else {
+      event.key === " " && event.preventDefault();
       Selection.insert(event.key);
     }
   });
