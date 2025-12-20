@@ -558,12 +558,12 @@ EXPECT selection at 0,5-4,8
 # Deleting selections
 
 ## should delete partial text from line
-### Delete 'Hello ' from 'Hello World'
+### Delete 'Hello' from 'Hello World'
 TYPE "Hello World"
 left with meta
 right 5 times with shift
 backspace
-expect(fixture).toHaveLines('World');
+expect(fixture).toHaveLines(' World');
 EXPECT cursor at 0,0
 
 ## should delete entire line
@@ -585,7 +585,7 @@ up 2 times
 left with meta
 down 2 times with shift
 backspace
-expect(fixture).toHaveLines('hird line');
+expect(fixture).toHaveLines('Third line');
 EXPECT cursor at 0,0
 
 ## should delete partial multi-line selection
@@ -600,7 +600,7 @@ left with meta
 right 6 times
 down 2 times with shift
 backspace
-expect(fixture).toHaveLines('First ine here');
+expect(fixture).toHaveLines('First line here');
 EXPECT cursor at 0,6
 
 ## should delete from middle to end across lines
@@ -629,21 +629,21 @@ EXPECT cursor at 0,6
 # Replacing selections
 
 ## should replace partial text with single character
-### Replace 'Hello ' with 'X'
+### Replace 'Hello' with 'X'
 TYPE "Hello World"
 left with meta
 right 5 times with shift
 TYPE "X"
-expect(fixture).toHaveLines('XWorld');
+expect(fixture).toHaveLines('X World');
 EXPECT cursor at 0,1
 
 ## should replace partial text with word
-### Replace 'Hello ' with 'Goodbye'
+### Replace 'Hello' with 'Goodbye'
 TYPE "Hello World"
 left with meta
 right 5 times with shift
 TYPE "Goodbye"
-expect(fixture).toHaveLines('GoodbyeWorld');
+expect(fixture).toHaveLines('Goodbye World');
 EXPECT cursor at 0,7
 
 ## should replace entire line
@@ -666,7 +666,7 @@ up 2 times
 left with meta
 down 2 times with shift
 TYPE "X"
-expect(fixture).toHaveLines('Xhird line');
+expect(fixture).toHaveLines('XThird line');
 EXPECT cursor at 0,1
 
 ## should replace partial multi-line with text
@@ -681,7 +681,7 @@ left with meta
 right 6 times
 down 2 times with shift
 TYPE "REPLACED"
-expect(fixture).toHaveLines('First REPLACEDine');
+expect(fixture).toHaveLines('First REPLACEDline');
 EXPECT cursor at 0,14
 
 ## should replace backward selection
@@ -978,12 +978,12 @@ customNode.remove();
 # NewLine with selection
 
 ## should replace selection with newline
-### NewLine with selection deletes selection and inserts newline (vim-style: cursor on char, shift+left selects current + previous)
+### NewLine with selection deletes selection and inserts newline
 TYPE "ABC"
 left 2 times
 left with shift
 enter
-expect(fixture).toHaveLines("", "C");
+expect(fixture).toHaveLines("", "BC");
 EXPECT cursor at 1,0
 
 
@@ -1067,7 +1067,7 @@ TYPE "Hello World"
 left with meta
 right 5 times with shift
 backspace
-expect(fixture).toHaveLines("World");
+expect(fixture).toHaveLines(" World");
 EXPECT cursor at 0,0
 fixture.wb.History.undo();
 expect(fixture).toHaveLines("Hello World");
@@ -1079,7 +1079,7 @@ TYPE "Hello World"
 left with meta
 right 5 times with shift
 TYPE "X"
-expect(fixture).toHaveLines("XWorld");
+expect(fixture).toHaveLines("X World");
 EXPECT cursor at 0,1
 fixture.wb.History.undo();
 expect(fixture).toHaveLines("Hello World");
@@ -1089,31 +1089,29 @@ EXPECT cursor at 0,0
 # Selection rendering
 
 ## should show cursor on empty line
-### Regression: Cursor visible on empty line (width=1ch)
-// Empty editor, cursor at 0,0 should render with width 1ch
-const $sel = fixture.node.querySelectorAll(".wb-selection")[0];
-expect($sel.style.width).toBe("1ch");
-expect($sel.style.visibility).toBe("visible");
+### Regression: Cursor visible on empty line via .wb-cursor
+// Empty editor, cursor at 0,0 should render via .wb-cursor (selection width=0)
+const $cursor = fixture.node.querySelector(".wb-cursor");
+expect($cursor.style.visibility).toBe("visible");
 
 ## should show cursor after typing
-### Regression: Cursor visible after typing text
+### Regression: Cursor visible after typing text via .wb-cursor
 TYPE "Hello"
-const $sel = fixture.node.querySelectorAll(".wb-selection")[0];
-expect($sel.style.width).toBe("1ch");
-expect($sel.style.visibility).toBe("visible");
+const $cursor = fixture.node.querySelector(".wb-cursor");
+expect($cursor.style.visibility).toBe("visible");
 
 ## should not show phantom newline when no newline exists
-### Regression: Single line with no newline shows exact text length
+### Regression: Single line with no newline shows selection excluding cursor
 TYPE "Hello"
 left with meta
 right 5 times with shift
 // Selection from col 0 to col 5 on "Hello" (len 5), no second line
-// Should show 5ch (no phantom - there's no newline character)
+// Should show 5ch (selection excludes cursor head position)
 const $sel = fixture.node.querySelectorAll(".wb-selection")[0];
 expect($sel.style.width).toBe("5ch");
 
-## should show phantom newline when selecting forward to EOL with newline
-### Regression: Forward selection to EOL includes phantom newline when newline exists
+## should show selection excluding cursor when selecting forward to EOL with newline
+### Regression: Forward selection to EOL excludes cursor head position
 TYPE "Hello"
 enter
 TYPE "World"
@@ -1121,9 +1119,9 @@ up
 left with meta
 right 5 times with shift
 // Selection from col 0 to col 5 on "Hello" (len 5), with newline after
-// Forward selection to EOL should show 6ch (5 chars + phantom newline)
+// Selection excludes cursor head, shows 5ch
 const $sel = fixture.node.querySelectorAll(".wb-selection")[0];
-expect($sel.style.width).toBe("6ch");
+expect($sel.style.width).toBe("5ch");
 
 ## should not show phantom newline when selecting backward from EOL (no newline)
 ### Regression: Backward selection from EOL excludes phantom (single line)
@@ -1180,16 +1178,16 @@ enter
 TYPE "a"
 up
 left with meta
-// Select "Hello" (5 chars): 4 shift+rights from col 0 to col 4
+// Select "Hell" (4 chars): 4 shift+rights from col 0 to col 4
 right 4 times with shift
 EXPECT selection at 0,0-0,4
 const $sel4 = fixture.node.querySelectorAll(".wb-selection")[0];
-expect($sel4.style.width).toBe("5ch");
-// Select one more to include newline (col 5, still on row 0)
+expect($sel4.style.width).toBe("4ch");
+// Select one more (col 5, still on row 0)
 right with shift
 EXPECT selection at 0,0-0,5
 const $sel5 = fixture.node.querySelectorAll(".wb-selection")[0];
-expect($sel5.style.width).toBe("6ch");
+expect($sel5.style.width).toBe("5ch");
 // Select one more to wrap to next line (row 1, col 0)
 right with shift
 EXPECT selection at 0,0-1,0
@@ -1197,8 +1195,8 @@ EXPECT selection at 0,0-1,0
 right with shift
 EXPECT selection at 0,0-1,1
 
-## should show phantom on last line of multi-line selection
-### Regression: Multi-line selection last line shows phantom when at newline position
+## should show last line of multi-line selection excluding cursor
+### Regression: Multi-line selection last line excludes cursor head position
 TYPE "a"
 enter
 TYPE "b"
@@ -1213,14 +1211,14 @@ EXPECT selection at 0,1-1,0
 const $r0a = fixture.node.querySelectorAll(".wb-selection")[0];
 expect($r0a.style.width).toBe("1ch");
 const $r1a = fixture.node.querySelectorAll(".wb-selection")[1];
-expect($r1a.style.width).toBe("1ch");
+expect($r1a.style.width).toBe("0ch");
 // Select right again: row 1 col 1 (phantom position of "b")
 right with shift
 EXPECT selection at 0,1-1,1
 const $r0b = fixture.node.querySelectorAll(".wb-selection")[0];
 expect($r0b.style.width).toBe("1ch");
 const $r1b = fixture.node.querySelectorAll(".wb-selection")[1];
-expect($r1b.style.width).toBe("2ch");
+expect($r1b.style.width).toBe("1ch");
 // Select right again: wrap to row 2
 right with shift
 EXPECT selection at 0,1-2,0
@@ -1345,9 +1343,9 @@ expect(fixture.wb.Viewport.start).toBe(4);
 const $vp0 = fixture.node.querySelectorAll(".wb-selection")[0];
 expect($vp0.style.left).toBe("0px");
 expect($vp0.style.visibility).toBe("visible");
-// Row 13 is viewport row 9 (last line of selection, partial width)
+// Row 13 is viewport row 9 (last line of selection, excludes cursor head)
 const $vp9 = fixture.node.querySelectorAll(".wb-selection")[9];
 expect($vp9.style.left).toBe("0px");
-expect($vp9.style.width).toBe("5ch");
+expect($vp9.style.width).toBe("4ch");
 expect($vp9.style.visibility).toBe("visible");
 
