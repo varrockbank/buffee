@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.2.2-alpha.1";
+  this.version = "8.2.3-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
@@ -71,6 +71,7 @@ function Buffee(parentNode, config = {}) {
   const expandTabs = s => expandtab ? s.replace(/\t/g, ' '.repeat(expandtab)) : s;
 
   // Cursor layer - shows head position distinctly within a selection
+  const $content = node.querySelector('.wb-content');
   const $e = node.querySelector('.wb-lines');
   const $cursor = node.querySelector(".wb-cursor");
   const $textLayer = node.querySelector(".wb-layer-text");
@@ -88,7 +89,9 @@ function Buffee(parentNode, config = {}) {
   }
   // Set container height if viewportRows specified (don't use flex: 1)
   if (viewportRows) {
-    node.style.height = (viewportRows * lineHeight + editorPaddingPX * 2) + 'px';
+    const $statusInside = node.querySelector('.wb-status');
+    const statusHeight = $statusInside ? $statusInside.offsetHeight : 0;
+    node.style.height = (viewportRows * lineHeight + editorPaddingPX * 2 + statusHeight) + 'px';
     node.style.flex = 'none';
   }
 
@@ -1251,7 +1254,8 @@ function Buffee(parentNode, config = {}) {
   // Auto-fit viewport to container height
   if (autoFitViewport) {
     const fitViewport = () => {
-      const availableHeight = node.clientHeight - (editorPaddingPX * 2);
+      // $content is flex: 1, so it fills remaining space after status line (if inside blockquote)
+      const availableHeight = $content.clientHeight;
       const exactLines = availableHeight / lineHeight;
       const newSize = Math.floor(exactLines);
       const hasPartialSpace = exactLines > newSize;

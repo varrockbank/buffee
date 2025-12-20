@@ -24,7 +24,7 @@
   <h1>Editor Sizing</h1>
   <p>By default, the editor auto-fits to its container. Use <code>viewportRows</code> and <code>viewportCols</code> to fix dimensions.</p>
 
-  <h2>1. Auto-rows, auto-cols</h2>
+  <h2>1. Auto-rows, auto-cols (recommended)</h2>
   <p><code>.wb { width: 960px; height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, {})</code></p>
   <p>Default behavior: auto-fit rows and cols. Drag bottom-right to resize.</p>
@@ -46,7 +46,7 @@
     </div>
   </div>
 
-  <h2>2. Fixed-rows, fixed-cols</h2>
+  <h2>2. Fixed-rows, fixed-cols (but status line is decoupled from fixed width)</h2>
   <p><code>.wb { padding: 20px; }</code></p>
   <p><code>new Buffee(el, { viewportRows: 10, viewportCols: 50 })</code></p>
   <p>Size auto-calculated to fit exactly 10 rows and 50 columns.</p>
@@ -68,7 +68,29 @@
     </div>
   </div>
 
-  <h2>3. Auto-rows, fixed-cols</h2>
+  <h2>2b. Fixed-rows, fixed-cols (if status line is inside, it will inherit)</h2>
+  <p><code>.wb { padding: 20px; }</code></p>
+  <p><code>new Buffee(el, { viewportRows: 10, viewportCols: 50 })</code></p>
+  <p>Size auto-calculated to fit exactly 10 rows and 50 columns.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-status-inside" style="padding: 20px; border: 2px solid #666; overflow: hidden;">
+    <blockquote class="no-select" tabindex="0">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      </div>
+      <div class="wb-status">
+        <div class="wb-status-left"><span class="wb-linecount"></span></div>
+        <div class="wb-status-right">
+          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+          <span class="wb-status-divider">|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
+  </div>
+
+  <h2>3. Auto-rows, fixed-cols (status line width is decoupled)</h2>
   <p><code>.wb { height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { viewportCols: 40 })</code></p>
   <p>Fixed 40 columns, rows auto-calculated from height. Drag to resize height.</p>
@@ -88,6 +110,28 @@
         <span class="wb-indentation"></span>
       </div>
     </div>
+  </div>
+
+  <h2>3b. Auto-rows, fixed-cols (status line inside)</h2>
+  <p><code>.wb { height: 300px; padding: 20px; }</code></p>
+  <p><code>new Buffee(el, { viewportCols: 50 })</code></p>
+  <p>Status line inside blockquote inherits fixed width. Auto-rows calculated from remaining height.</p>
+  <div class="wb buffee-themepack1 boring" id="editor-fixed-cols-status-inside" style="height: 300px; padding: 20px; border: 2px solid #666;">
+    <blockquote class="no-select" tabindex="0">
+      <textarea class="wb-clipboard-bridge"></textarea>
+      <div class="wb-content">
+        <div class="wb-gutter"></div>
+        <div class="wb-lines"><div class="wb-layer-text"></div><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      </div>
+      <div class="wb-status">
+        <div class="wb-status-left"><span class="wb-linecount"></span></div>
+        <div class="wb-status-right">
+          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
+          <span class="wb-status-divider">|</span>
+          <span class="wb-indentation"></span>
+        </div>
+      </div>
+    </blockquote>
   </div>
 
   <h2>4. Fixed-rows, auto-cols</h2>
@@ -181,6 +225,15 @@
     });
     edFixed.Model.text = ruler(40) + '\n' + Array.from({length: 15}, (_, i) => `Line ${i + 2}: This line is longer than 20 chars`).join('\n');
 
+    // 2b. Fixed-rows, fixed-cols (status line inside blockquote)
+    const elFixedStatusInside = document.getElementById('editor-fixed-status-inside');
+    const edFixedStatusInside = new Buffee(elFixedStatusInside, {
+      viewportRows: 10,
+      viewportCols: 50,
+      callbacks: BuffeeStatusLine(elFixedStatusInside)
+    });
+    edFixedStatusInside.Model.text = ruler(40) + '\n' + Array.from({length: 15}, (_, i) => `Line ${i + 2}: Status inside blockquote`).join('\n');
+
     // 3. Auto-rows, fixed cols
     const elAutoRowsFixedCols = document.getElementById('editor-auto-rows-fixed-cols');
     const edAutoRowsFixedCols = new Buffee(elAutoRowsFixedCols, {
@@ -189,6 +242,15 @@
     });
     edAutoRowsFixedCols.Model.text = ruler(60) + '\n// Auto-rows, fixed 40 cols\n// Drag to resize height\n' +
       Array.from({length: 30}, (_, i) => `Line ${i + 4}`).join('\n');
+
+    // 3b. Auto-rows, fixed-cols (status line inside blockquote)
+    const elFixedColsStatusInside = document.getElementById('editor-fixed-cols-status-inside');
+    const edFixedColsStatusInside = new Buffee(elFixedColsStatusInside, {
+      viewportCols: 50,
+      callbacks: BuffeeStatusLine(elFixedColsStatusInside)
+    });
+    edFixedColsStatusInside.Model.text = ruler(60) + '\n// Auto-rows, fixed 50 cols\n// Status line inside blockquote\n' +
+      Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 4. Fixed-rows, auto-cols
     const elFixedRowsAutoCols = document.getElementById('editor-fixed-rows-auto-cols');
