@@ -39,13 +39,13 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(parentNode, config = {}) {
-  this.version = "8.7.9-alpha.1";
+  this.version = "8.8.0-alpha.1";
 
   // TODO: make everything mutable, and observed.
   // Extract configuration with defaults
   const {
     viewportRows,
-    indentation: initialIndentation = 4,
+    indentation = 4,
     expandtab: initialExpandtab = 4,
     showGutter = true,
     viewportCols,
@@ -64,11 +64,16 @@ function Buffee(parentNode, config = {}) {
   const gutterPadding = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-padding"));
   let gutterSize = 0;  // Will be set on first render
 
-  let indentation = initialIndentation;
+  // TODO: revisit expandtab - consider moving to Mode object
   let expandtab = initialExpandtab;
 
   /** Replaces tabs with spaces (expandtab = number of spaces, 0 = keep tabs) */
   const expandTabs = s => expandtab ? s.replace(/\t/g, ' '.repeat(expandtab)) : s;
+
+  /** Editor mode settings (shared between internal and external code) */
+  const Mode = {
+    indentation,
+  };
 
   // Cursor layer - shows head position distinctly within a selection
   const $e = node.querySelector('.wb-lines');
@@ -465,12 +470,16 @@ function Buffee(parentNode, config = {}) {
      * No-op if there is no selection.
      */
     indent() {
-      if(this.isSelection) {
-        const [first, second] = this.ordered, s = ' '.repeat(indentation);
-        for(let i = first.row; i <= second.row; Model.lines[i] = s + Model.lines[i++]);
-        first.col += indentation, second.col += indentation;
-        render(true);
-      }
+      if(!this.isSelection) return;
+      const [first, second] = this.ordered;
+
+      for(let i = first.row; i <= second.row; i++)
+        Model.lines[i] = " ".repeat(Mode.indentation) + Model.lines[i];
+
+      first.col += Mode.indentation;
+      second.col += Mode.indentation;
+
+      render(true);
     },
 
     /**
@@ -498,7 +507,7 @@ function Buffee(parentNode, config = {}) {
           indentableSpacesFromCursor = j - cursor.col ;
           j = 0; while (j < cursor.col && s.charAt(j) === ' ') j++;
           indentableSpacesLeftOfCursor = j;
-          const unindentationsFirstLine = Math.min(indentation,
+          const unindentationsFirstLine = Math.min(Mode.indentation,
             indentableSpacesLeftOfCursor + indentableSpacesFromCursor);
           Model.lines[cursor.row] = Model.lines[cursor.row].slice(unindentationsFirstLine);
           if(indentableSpacesFromCursor < unindentationsFirstLine)
@@ -506,7 +515,7 @@ function Buffee(parentNode, config = {}) {
         } else {
           const line = Model.lines[i];
           let maxUnindent = 0;
-          for(let k = 0; k < Math.min(indentation, line.length); k++) {
+          for(let k = 0; k < Math.min(Mode.indentation, line.length); k++) {
             if (line.charAt(k) === " ") {
               maxUnindent++;
             } else {
@@ -938,6 +947,7 @@ function Buffee(parentNode, config = {}) {
     frame.lineCount = Model.lastIndex + 1;
     frame.row = head.row;
     frame.col = head.col;
+    frame.indentation = Mode.indentation;
     frame.frameCount = lastFrame.frameCount + 1;
     // TODO: consider caching Object.entries once.
     for (const [key, callback] of Object.entries(frameCallbacks)) {
@@ -1150,19 +1160,10 @@ function Buffee(parentNode, config = {}) {
   this.lineHeight = lineHeight;
 
   /**
-   * Number of spaces per indentation level.
-   * @type {number}
+   * Editor mode settings (indentation, etc.)
+   * @type {Object}
    */
-  Object.defineProperty(this, 'indentation', {
-    get: () => indentation,
-    set: (value) => {
-      indentation = value;
-      const e = parentNode.querySelector('.wb-indentation');
-      if (e) e.innerHTML = `Spaces: ${indentation}`;
-    },
-    enumerable: true
-  });
-  this.indentation = indentation; // trigger setter to initialize display
+  this.Mode = Mode;
 
   Object.defineProperty(this, 'expandtab', {
     get: () => expandtab,
