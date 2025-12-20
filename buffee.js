@@ -39,7 +39,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee(node, config = {}) {
-  this.version = "7.7.9-alpha.1";
+  this.version = "7.8.1-alpha.1";
 
   // Extract configuration with defaults
   const {
@@ -57,7 +57,7 @@ function Buffee(node, config = {}) {
   const lineHeight = parseFloat(getComputedStyle(node).getPropertyValue("--wb-cell"));
   const editorPaddingPX = parseFloat(getComputedStyle(node).getPropertyValue("--wb-padding"));
   const gutterPadding = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-padding"));
-  let gutterSize = parseFloat(getComputedStyle(node).getPropertyValue("--wb-gutter-size-initial"));
+  let gutterSize = 0;  // Will be set on first render
 
   let indentation = initialIndentation;
   let expandtab = initialExpandtab;
