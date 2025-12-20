@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.5-alpha.1";
+  this.version = "8.8.6-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -941,21 +941,14 @@ function Buffee($parent, config = {}) {
 
     // Use viewport's largest visible line number for gutter width
     // Minimum of 2 digits to avoid resize jitter for small documents (1-99 lines)
-    const displayLines = Viewport.size + (autoFitViewport ? 1 : 0);
-    const largestVisibleLineNumber = Viewport.start + displayLines;
-    const digitsInLargestLineNumber = Math.max(2, largestVisibleLineNumber.toString().length);
-    if(digitsInLargestLineNumber !== gutterSize) {
-      gutterSize = digitsInLargestLineNumber;
-      $gutter.style.width = gutterSize + gutterPadding + 'ch';
-    }
+    const displayLines = Viewport.size + +autoFitViewport;
 
+    const digits = Math.max(2, (Viewport.start + displayLines).toString().length);
+    if (digits !== gutterSize)
+      $gutter.style.width = (gutterSize = digits) + gutterPadding + 'ch';
     $gutter.textContent = null;
-    for (let i = 0; i < displayLines; i++) {
-      const div = document.createElement("div")
-      div.textContent = Viewport.start + i + 1;
-      fragmentGutters.appendChild(div);
-    }
-
+    for (let i = 0; i < displayLines; i++)
+      fragmentGutters.appendChild(document.createElement("div")).textContent = Viewport.start + i + 1;
     $gutter.appendChild(fragmentGutters);
 
     // Renders the containers for the viewport lines, as well as selections and highlights
