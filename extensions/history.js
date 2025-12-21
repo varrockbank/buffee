@@ -19,6 +19,9 @@ function BuffeeHistory(editor) {
   let _lastOpTime = 0;
   const coalesceTimeout = 500;
 
+  // Combined operation state (for selection replacement: delete + insert as atomic)
+  let _combinedPending = null;
+
   /** Capture current cursor/selection state */
   function captureCursor() {
     // Access via getters each time - head/tail references can change after makeSelection()
@@ -73,10 +76,18 @@ function BuffeeHistory(editor) {
     const cursorBefore = captureCursor();
     const result = _insert(row, col, text);
 
-    if (canCoalesce('insert', row, col, text)) {
+    // Check if this insert is part of a combined operation (selection replacement)
+    if (_combinedPending && _combinedPending.row === row && _combinedPending.col === col) {
+      // Combine with pending delete - add insert info to existing entry
+      const last = undoStack[undoStack.length - 1];
+      last.insertText = text;
+      last.combined = true;
+      _combinedPending = null;
+    } else if (canCoalesce('insert', row, col, text)) {
       const last = undoStack[undoStack.length - 1];
       last.text += text;
     } else {
+      _combinedPending = null; // Clear any stale pending
       undoStack.push({ type: 'insert', row, col, text, cursorBefore });
     }
     _lastOpTime = Date.now();
@@ -92,12 +103,23 @@ function BuffeeHistory(editor) {
     const cursorBefore = captureCursor();
     _delete(row, col, text);
 
+    // Check if this might be the start of a combined operation
+    // (selection delete followed by insert at same position)
+    const isSelectionDelete = text.includes('\n') || text.length > 1;
+
     if (canCoalesce('delete', row, col, text)) {
       const last = undoStack[undoStack.length - 1];
       last.text = text + last.text;
       last.col = col;
+      _combinedPending = null;
     } else {
       undoStack.push({ type: 'delete', row, col, text, cursorBefore });
+      // Mark as potentially combined if it looks like a selection delete
+      if (isSelectionDelete) {
+        _combinedPending = { row, col };
+      } else {
+        _combinedPending = null;
+      }
     }
     _lastOpTime = Date.now();
     redoStack.length = 0;
@@ -105,7 +127,12 @@ function BuffeeHistory(editor) {
 
   function undoOp(op) {
     const cursorBefore = captureCursor();
-    if (op.type === 'insert') {
+
+    if (op.combined) {
+      // Combined operation: undo insert first, then restore deleted text
+      _delete(op.row, op.col, op.insertText);
+      _insert(op.row, op.col, op.text);
+    } else if (op.type === 'insert') {
       _delete(op.row, op.col, op.text);
     } else {
       _insert(op.row, op.col, op.text);
@@ -114,7 +141,11 @@ function BuffeeHistory(editor) {
   }
 
   function redoOp(op) {
-    if (op.type === 'insert') {
+    if (op.combined) {
+      // Combined operation: delete original text, then insert replacement
+      _delete(op.row, op.col, op.text);
+      _insert(op.row, op.col, op.insertText);
+    } else if (op.type === 'insert') {
       _insert(op.row, op.col, op.text);
     } else {
       _delete(op.row, op.col, op.text);

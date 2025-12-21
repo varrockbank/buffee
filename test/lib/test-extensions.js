@@ -539,6 +539,32 @@ function defineExtensionTests() {
             }
         });
 
+        // Selection replacement should be atomic (single undo)
+        extRunner.it('undoes selection replacement atomically', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                // Type "Hello World"
+                editor.Selection.insert('Hello World');
+                editor.History._lastOpTime = 0;
+
+                // Select "Hello" (first 5 chars)
+                editor.Selection.makeSelection();
+                editor._internals.head.col = 0;
+                editor._internals.tail.col = 5;
+
+                // Replace selection with "Hi"
+                editor.Selection.insert('Hi');
+                assertEqual(editor.Model.lines[0], 'Hi World', 'Should have replaced "Hello" with "Hi"');
+
+                // Single undo should restore "Hello World"
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], 'Hello World', 'Single undo should restore original text');
+            } finally {
+                cleanup();
+            }
+        });
+
         // Regression: head/tail references can change after makeSelection()
         extRunner.it('captures correct cursor after selection operations', () => {
             const { editor, cleanup } = createTestEditor();
