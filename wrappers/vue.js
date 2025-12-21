@@ -36,8 +36,12 @@ const BuffeeEditor = defineComponent({
     theme: { type: String, default: '' },
     /** Show line numbers */
     showGutter: { type: Boolean, default: true },
+    /** Position gutter on right side */
+    gutterRight: { type: Boolean, default: false },
     /** Show status bar */
     showStatus: { type: Boolean, default: true },
+    /** Position status bar at top */
+    statusTop: { type: Boolean, default: false },
     /** Initial editor content */
     initialText: { type: String, default: '' }
   },
@@ -87,32 +91,38 @@ const BuffeeEditor = defineComponent({
   render() {
     const themeClass = this.theme ? `buffee-themepack1-${this.theme}` : '';
 
+    const statusBar = this.showStatus ? h('div', { class: 'buffee-status' }, [
+      h('div', { class: 'buffee-status-left' }, [
+        h('span', { class: 'buffee-linecount' })
+      ]),
+      h('div', { class: 'buffee-status-right' }, [
+        'Ln ',
+        h('span', { class: 'buffee-head-row' }),
+        ', Col ',
+        h('span', { class: 'buffee-head-col' }),
+        h('span', { class: 'buffee-status-divider' }, '|'),
+        h('span', { class: 'buffee-spaces' })
+      ])
+    ]) : null;
+
+    const gutter = this.showGutter ? h('div', { class: 'buffee-gutter' }) : null;
+
     return h('div', {
       ref: 'container',
       class: `buffee ${themeClass}`.trim()
     }, [
       h('textarea', { class: 'buffee-clipboard-bridge', 'aria-hidden': 'true' }),
+      this.statusTop ? statusBar : null,
       h('div', { class: 'no-select buffee-elements' }, [
-        this.showGutter ? h('div', { class: 'buffee-gutter' }) : null,
+        !this.gutterRight ? gutter : null,
         h('div', { class: 'buffee-lines', tabindex: 0 }, [
           h('blockquote', { class: 'buffee-layer-text' }),
           h('div', { class: 'buffee-layer-elements' }),
           h('div', { class: 'buffee-cursor' })
-        ])
-      ]),
-      this.showStatus ? h('div', { class: 'buffee-status' }, [
-        h('div', { class: 'buffee-status-left' }, [
-          h('span', { class: 'buffee-linecount' })
         ]),
-        h('div', { class: 'buffee-status-right' }, [
-          'Ln ',
-          h('span', { class: 'buffee-head-row' }),
-          ', Col ',
-          h('span', { class: 'buffee-head-col' }),
-          h('span', { class: 'buffee-status-divider' }, '|'),
-          h('span', { class: 'buffee-spaces' })
-        ])
-      ]) : null
+        this.gutterRight ? gutter : null
+      ]),
+      !this.statusTop ? statusBar : null
     ]);
   }
 });

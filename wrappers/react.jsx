@@ -39,7 +39,9 @@ const BuffeeEditor = forwardRef(function BuffeeEditor(props, ref) {
     theme,
     className = '',
     showGutter = true,
+    gutterRight = false,
     showStatus = true,
+    statusTop = false,
     initialText = '',
     onReady
   } = props;
@@ -83,32 +85,38 @@ const BuffeeEditor = forwardRef(function BuffeeEditor(props, ref) {
 
   const themeClass = theme ? `buffee-themepack1-${theme}` : '';
 
+  const statusBar = showStatus && (
+    <div className="buffee-status">
+      <div className="buffee-status-left">
+        <span className="buffee-linecount" />
+      </div>
+      <div className="buffee-status-right">
+        Ln <span className="buffee-head-row" />, Col <span className="buffee-head-col" />
+        <span className="buffee-status-divider">|</span>
+        <span className="buffee-spaces" />
+      </div>
+    </div>
+  );
+
+  const gutter = showGutter && <div className="buffee-gutter" />;
+
   return (
     <div
       ref={containerRef}
       className={`buffee ${themeClass} ${className}`.trim()}
     >
       <textarea className="buffee-clipboard-bridge" aria-hidden="true" />
+      {statusTop && statusBar}
       <div className="no-select buffee-elements">
-        {showGutter && <div className="buffee-gutter" />}
+        {!gutterRight && gutter}
         <div className="buffee-lines" tabIndex={0}>
           <blockquote className="buffee-layer-text" />
           <div className="buffee-layer-elements" />
           <div className="buffee-cursor" />
         </div>
+        {gutterRight && gutter}
       </div>
-      {showStatus && (
-        <div className="buffee-status">
-          <div className="buffee-status-left">
-            <span className="buffee-linecount" />
-          </div>
-          <div className="buffee-status-right">
-            Ln <span className="buffee-head-row" />, Col <span className="buffee-head-col" />
-            <span className="buffee-status-divider">|</span>
-            <span className="buffee-spaces" />
-          </div>
-        </div>
-      )}
+      {!statusTop && statusBar}
     </div>
   );
 });

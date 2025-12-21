@@ -43,9 +43,19 @@
   export let showGutter = true;
 
   /**
+   * @type {boolean} Position gutter on right side
+   */
+  export let gutterRight = false;
+
+  /**
    * @type {boolean} Show status bar
    */
   export let showStatus = true;
+
+  /**
+   * @type {boolean} Position status bar at top
+   */
+  export let statusTop = false;
 
   /**
    * @type {string} Initial editor content
@@ -100,13 +110,27 @@
   $: themeClass = theme ? `buffee-themepack1-${theme}` : '';
 </script>
 
+{#snippet statusBar()}
+  <div class="buffee-status">
+    <div class="buffee-status-left">
+      <span class="buffee-linecount"></span>
+    </div>
+    <div class="buffee-status-right">
+      Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+      <span class="buffee-status-divider">|</span>
+      <span class="buffee-spaces"></span>
+    </div>
+  </div>
+{/snippet}
+
 <div
   bind:this={container}
   class="buffee {themeClass} {className}"
 >
   <textarea class="buffee-clipboard-bridge" aria-hidden="true"></textarea>
+  {#if showStatus && statusTop}{@render statusBar()}{/if}
   <div class="no-select buffee-elements">
-    {#if showGutter}
+    {#if showGutter && !gutterRight}
       <div class="buffee-gutter"></div>
     {/if}
     <div class="buffee-lines" tabindex="0">
@@ -114,17 +138,9 @@
       <div class="buffee-layer-elements"></div>
       <div class="buffee-cursor"></div>
     </div>
+    {#if showGutter && gutterRight}
+      <div class="buffee-gutter"></div>
+    {/if}
   </div>
-  {#if showStatus}
-    <div class="buffee-status">
-      <div class="buffee-status-left">
-        <span class="buffee-linecount"></span>
-      </div>
-      <div class="buffee-status-right">
-        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
-        <span class="buffee-status-divider">|</span>
-        <span class="buffee-spaces"></span>
-      </div>
-    </div>
-  {/if}
+  {#if showStatus && !statusTop}{@render statusBar()}{/if}
 </div>
