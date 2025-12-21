@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 10.0.1-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.58 KB (0)
+*** refactor
+- remove redundant visibility:visible from selection CSS
+
 ** 10.0.0-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.58 KB (+0.04)
 *** breaking
 - rename all CSS classes from wb-* to buffee-*
