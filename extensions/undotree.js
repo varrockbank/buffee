@@ -17,7 +17,7 @@
  */
 
 function BuffeeUndoTree(editor) {
-  const { _insert, _delete, head, tail } = editor._internals;
+  const { _insert, _delete } = editor._internals;
   const { Selection, Model } = editor;
 
   // Node ID counter
@@ -40,7 +40,10 @@ function BuffeeUndoTree(editor) {
   const coalesceTimeout = 500;
 
   // Capture cursor position
+  // Access via getters each time - head/tail references can change
   function captureCursor() {
+    const head = editor._internals.head;
+    const tail = editor._internals.tail;
     return {
       headRow: head.row, headCol: head.col,
       tailRow: tail.row, tailCol: tail.col
@@ -48,13 +51,26 @@ function BuffeeUndoTree(editor) {
   }
 
   // Restore cursor position
+  // Access via getters each time - head/tail references can change
   function restoreCursor(pos) {
-    if (pos) {
-      head.row = pos.headRow;
-      head.col = pos.headCol;
-      tail.row = pos.tailRow;
-      tail.col = pos.tailCol;
+    if (!pos) return;
+
+    const isSelection = pos.headRow !== pos.tailRow || pos.headCol !== pos.tailCol;
+
+    // If restoring a selection but currently have cursor (head === tail), need to detach
+    if (isSelection) {
+      Selection.makeSelection();
+    } else {
+      Selection.makeCursor();
     }
+
+    // Access via getters AFTER makeSelection/makeCursor - references change
+    const head = editor._internals.head;
+    const tail = editor._internals.tail;
+    head.row = pos.headRow;
+    head.col = pos.headCol;
+    tail.row = pos.tailRow;
+    tail.col = pos.tailCol;
   }
 
   // Check if operation can be coalesced with current node

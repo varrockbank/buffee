@@ -538,6 +538,34 @@ function defineExtensionTests() {
                 cleanup();
             }
         });
+
+        // Regression: head/tail references can change after makeSelection()
+        extRunner.it('captures correct cursor after selection operations', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                // Type some text
+                editor.Selection.insert('Hello World');
+                editor.History._lastOpTime = 0;
+
+                // Make a selection (this changes head to detachedHead internally)
+                editor.Selection.makeSelection();
+                // Move cursor to create selection
+                editor._internals.head.col = 5;
+
+                // Delete the selection - this should capture correct cursor state
+                editor.Selection.delete();
+                assertEqual(editor.Model.lines[0], 'Hello', 'Should have deleted " World"');
+
+                // Undo should restore both the text AND correct cursor position
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], 'Hello World', 'Text should be restored');
+                // Verify cursor is at correct position (start of selection, col 5)
+                assertEqual(editor._internals.head.col, 5, 'Cursor should be restored to selection start');
+            } finally {
+                cleanup();
+            }
+        });
     });
 
     // ===== UNDO TREE TESTS =====

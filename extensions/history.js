@@ -11,7 +11,7 @@
  * @returns {Object} The History API object
  */
 function BuffeeHistory(editor) {
-  const { render, head, tail, _insert, _delete } = editor._internals;
+  const { render, _insert, _delete } = editor._internals;
 
   // State
   const undoStack = [];
@@ -21,6 +21,9 @@ function BuffeeHistory(editor) {
 
   /** Capture current cursor/selection state */
   function captureCursor() {
+    // Access via getters each time - head/tail references can change after makeSelection()
+    const head = editor._internals.head;
+    const tail = editor._internals.tail;
     return {
       headRow: head.row, headCol: head.col,
       tailRow: tail.row, tailCol: tail.col
@@ -29,6 +32,18 @@ function BuffeeHistory(editor) {
 
   /** Restore cursor/selection state */
   function restoreCursor(cursor) {
+    const isSelection = cursor.headRow !== cursor.tailRow || cursor.headCol !== cursor.tailCol;
+
+    // If restoring a selection but currently have cursor (head === tail), need to detach
+    if (isSelection) {
+      editor.Selection.makeSelection();
+    } else {
+      editor.Selection.makeCursor();
+    }
+
+    // Access via getters AFTER makeSelection/makeCursor - references change
+    const head = editor._internals.head;
+    const tail = editor._internals.tail;
     head.row = cursor.headRow;
     head.col = cursor.headCol;
     tail.row = cursor.tailRow;
