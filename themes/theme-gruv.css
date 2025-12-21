@@ -1,17 +1,17 @@
 /* Gruv Theme */
-.buffee-themepack1-gruv > .wb-elements {
+.buffee-themepack1-gruv > .buffee-elements {
   background-color: #282828;
   color: #ebdbb2;
 }
-.buffee-themepack1-gruv .wb-selection {
+.buffee-themepack1-gruv .buffee-selection {
   background-color: #83a598;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-gruv .wb-cursor {
+.buffee-themepack1-gruv .buffee-cursor {
   background-color: #fe8019;
 }
-.buffee-themepack1-gruv .wb-gutter,
-.buffee-themepack1-gruv .wb-status {
+.buffee-themepack1-gruv .buffee-gutter,
+.buffee-themepack1-gruv .buffee-status {
   background-color: #3c3836;
   color: #fe8019;
 }

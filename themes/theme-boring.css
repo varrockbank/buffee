@@ -1,17 +1,17 @@
 /* Boring Theme */
-.buffee-themepack1-boring > .wb-elements {
+.buffee-themepack1-boring > .buffee-elements {
   background-color: #282c34;
   color: #B2B2B2;
 }
-.buffee-themepack1-boring .wb-selection {
+.buffee-themepack1-boring .buffee-selection {
   background-color: #3e4451;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-boring .wb-cursor {
+.buffee-themepack1-boring .buffee-cursor {
   background-color: #B2B2B2;
 }
-.buffee-themepack1-boring .wb-gutter,
-.buffee-themepack1-boring .wb-status {
+.buffee-themepack1-boring .buffee-gutter,
+.buffee-themepack1-boring .buffee-status {
   background-color: #212026;
   color: #B2B2B2;
 }

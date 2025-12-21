@@ -15,7 +15,7 @@ function BuffeeHighlights(editor) {
 
   // Create fixed layer for highlights (doesn't scroll with content)
   const $layer = document.createElement('div');
-  $layer.className = 'wb-layer-highlights';
+  $layer.className = 'buffee-layer-highlights';
   Object.assign($layer.style, {
     position: 'absolute',
     top: contentOffset.top + 'px',
@@ -46,7 +46,7 @@ function BuffeeHighlights(editor) {
      */
     create(row, col, width, style = {}) {
       const hl = document.createElement('div');
-      hl.className = 'wb-highlight';
+      hl.className = 'buffee-highlight';
       Object.assign(hl.style, {
         position: 'absolute',
         top: row * lineHeight + 'px',

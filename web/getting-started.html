@@ -20,18 +20,18 @@
   <p>Include the css found in <a href="../style.css">style.css</a> for structural styles, then define your colors:</p>
   <pre>&lt;link rel="stylesheet" href="style.css"&gt;
 &lt;style&gt;
-.wb {
+.buffee {
   background-color: #282C34;
   color: #B2B2B2;
 }
-.wb .wb-selection {
+.buffee .buffee-selection {
   background-color: #EDAD10;
 }
-.wb .wb-cursor {
+.buffee .buffee-cursor {
   background-color: #FF6B6B;
 }
-.wb .wb-gutter,
-.wb .wb-status {
+.buffee .buffee-gutter,
+.buffee .buffee-status {
   background-color: #21252B;
   color: #636D83;
 }
@@ -39,21 +39,21 @@
 
   <h2>2. Required HTML Structure</h2>
   <p>Add HTML outlined in <a href="template.html">template.html</a>.</p>
-  <pre>&lt;div class="wb" id="editor"&gt;
-  &lt;textarea class="wb-clipboard-bridge" aria-hidden="true"&gt;&lt;/textarea&gt;
-  &lt;div class="no-select wb-elements"&gt;
-    &lt;div class="wb-gutter"&gt;&lt;/div&gt;
-    &lt;div class="wb-lines" tabindex="0"&gt;
-      &lt;blockquote class="wb-layer-text"&gt;&lt;/blockquote&gt;
-      &lt;div class="wb-layer-elements"&gt;&lt;/div&gt;
-      &lt;div class="wb-cursor"&gt;&lt;/div&gt;
+  <pre>&lt;div class="buffee" id="editor"&gt;
+  &lt;textarea class="buffee-clipboard-bridge" aria-hidden="true"&gt;&lt;/textarea&gt;
+  &lt;div class="no-select buffee-elements"&gt;
+    &lt;div class="buffee-gutter"&gt;&lt;/div&gt;
+    &lt;div class="buffee-lines" tabindex="0"&gt;
+      &lt;blockquote class="buffee-layer-text"&gt;&lt;/blockquote&gt;
+      &lt;div class="buffee-layer-elements"&gt;&lt;/div&gt;
+      &lt;div class="buffee-cursor"&gt;&lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div class="wb-status"&gt;
-    &lt;div class="wb-status-left"&gt;&lt;span class="wb-linecount"&gt;&lt;/span&gt;&lt;/div&gt;
-    &lt;div class="wb-status-right"&gt;
-      Ln &lt;span class="wb-head-row"&gt;&lt;/span&gt;, Col &lt;span class="wb-head-col"&gt;&lt;/span&gt;
-      &lt;span class="wb-status-divider"&gt;|&lt;/span&gt;
+  &lt;div class="buffee-status"&gt;
+    &lt;div class="buffee-status-left"&gt;&lt;span class="buffee-linecount"&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="buffee-status-right"&gt;
+      Ln &lt;span class="buffee-head-row"&gt;&lt;/span&gt;, Col &lt;span class="buffee-head-col"&gt;&lt;/span&gt;
+      &lt;span class="buffee-status-divider"&gt;|&lt;/span&gt;
       &lt;span class="buffee-spaces"&gt;&lt;/span&gt;
     &lt;/div&gt;
   &lt;/div&gt;

@@ -3,7 +3,7 @@
 ## should not resize gutter when typing from line 9 to line 10
 ### Regression: Gutter stays stable when crossing single to double digit line count
 // Start with empty editor
-const $gutter = fixture.node.querySelector(".wb-gutter");
+const $gutter = fixture.node.querySelector(".buffee-gutter");
 // Using tolerance because computed style can differ slightly from actual
 const gutterWidthPx = () => parseFloat(getComputedStyle($gutter).width);
 const initialWidth = gutterWidthPx();
@@ -38,25 +38,25 @@ expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 ## should resize gutter based on visible lines
 ### Gutter based on viewport position, not total lines
 // Add 15 lines (more than viewport of 10)
-fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15";
-const $gutter = fixture.node.querySelector(".wb-gutter");
+fixture.editor.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15";
+const $gutter = fixture.node.querySelector(".buffee-gutter");
 // Using tolerance because computed style can differ slightly from actual
 const gutterWidthPx = () => parseFloat(getComputedStyle($gutter).width);
 const initialWidth = gutterWidthPx();
 // Viewport shows lines 1-10, largest visible = 10, gutter = 3ch (~43px)
 expect(initialWidth).toBeCloseTo(43.35);
 // Scroll down - still 2-digit line numbers visible
-fixture.wb.Viewport.scroll(2);
+fixture.editor.Viewport.scroll(2);
 expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 // Scroll back up
-fixture.wb.Viewport.scroll(-2);
+fixture.editor.Viewport.scroll(-2);
 expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 
 ## should grow gutter when scrolling to 3-digit lines
 ### Gutter grows from 2 to 3 digits when line 100 is visible
 // Create 100 lines
-fixture.wb.Model.text = Array(100).fill("x").join("\n");
-const $gutter = fixture.node.querySelector(".wb-gutter");
+fixture.editor.Model.text = Array(100).fill("x").join("\n");
+const $gutter = fixture.node.querySelector(".buffee-gutter");
 // Using tolerance because computed style can differ slightly from actual
 const gutterWidthPx = () => parseFloat(getComputedStyle($gutter).width);
 // Viewport at top shows lines 1-10, gutter = 3ch (2 digits + 1 padding) ~43px
@@ -71,24 +71,24 @@ expect(gutterWidthPx()).toBeCloseTo(57.80);
 
 ## should have default spaces of 4
 ### Default spaces is 4 spaces
-expect(fixture.wb.Mode.spaces).toBe(4);
+expect(fixture.editor.Mode.spaces).toBe(4);
 
 ## should update spaces at runtime
 ### Setting spaces updates value and display
-fixture.wb.Mode.spaces = 2;
-expect(fixture.wb.Mode.spaces).toBe(2);
+fixture.editor.Mode.spaces = 2;
+expect(fixture.editor.Mode.spaces).toBe(2);
 
 ## should allow changing spaces multiple times
 ### spaces can be changed multiple times
-fixture.wb.Mode.spaces = 8;
-expect(fixture.wb.Mode.spaces).toBe(8);
-fixture.wb.Mode.spaces = 4;
-expect(fixture.wb.Mode.spaces).toBe(4);
+fixture.editor.Mode.spaces = 8;
+expect(fixture.editor.Mode.spaces).toBe(8);
+fixture.editor.Mode.spaces = 4;
+expect(fixture.editor.Mode.spaces).toBe(4);
 
 ## should initialize with custom spaces from config
 ### Config spaces=7 sets initial value
 const customNode = document.createElement("div");
-customNode.className = "wb no-select";
+customNode.className = "buffee no-select";
 customNode.innerHTML = fixture.node.innerHTML;
 document.body.appendChild(customNode);
 const customEditor = new Buffee(customNode, { spaces: 7 });
@@ -102,21 +102,21 @@ customNode.remove();
 ### Undo single character insert
 TYPE "A"
 expect(fixture).toHaveLines("A");
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("");
 
 ## should redo single character insert
 ### Redo single character insert
 TYPE "A"
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("");
-fixture.wb.History.redo();
+fixture.editor.History.redo();
 expect(fixture).toHaveLines("A");
 
 ## should undo coalesced characters
 ### Undo coalesced character inserts (typed quickly = one undo)
 TYPE "ABC"
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("");
 
 ## should undo backspace
@@ -124,7 +124,7 @@ expect(fixture).toHaveLines("");
 TYPE "AB"
 backspace
 expect(fixture).toHaveLines("A");
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("AB");
 
 ## should undo newline
@@ -133,9 +133,9 @@ TYPE "Hello"
 enter
 TYPE "World"
 expect(fixture).toHaveLines("Hello", "World");
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("Hello", "");
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("Hello");
 
 ## should undo delete at start of line (join lines)
@@ -144,30 +144,30 @@ TYPE "AB"
 enter
 backspace
 expect(fixture).toHaveLines("AB");
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("AB", "");
 
 ## should clear redo stack on new edit
 ### New edit clears redo stack
 TYPE "A"
-fixture.wb.History.undo();
-expect(fixture.wb.History.redoStack.length).toBe(1);
+fixture.editor.History.undo();
+expect(fixture.editor.History.redoStack.length).toBe(1);
 TYPE "B"
-expect(fixture.wb.History.redoStack.length).toBe(0);
+expect(fixture.editor.History.redoStack.length).toBe(0);
 
 ## should restore cursor position on undo
 ### Undo restores cursor to position before edit (coalesced)
 TYPE "Hello"
 EXPECT cursor at 0,5
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 EXPECT cursor at 0,0
 
 ## should restore cursor position on redo
 ### Redo restores cursor to position after edit (coalesced)
 TYPE "AB"
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 EXPECT cursor at 0,0
-fixture.wb.History.redo();
+fixture.editor.History.redo();
 EXPECT cursor at 0,2
 
 ## should restore cursor and selection on undo delete selection
@@ -178,7 +178,7 @@ right 5 times with shift
 backspace
 expect(fixture).toHaveLines(" World");
 EXPECT cursor at 0,0
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("Hello World");
 EXPECT cursor at 0,0
 
@@ -190,7 +190,7 @@ right 5 times with shift
 TYPE "X"
 expect(fixture).toHaveLines("X World");
 EXPECT cursor at 0,1
-fixture.wb.History.undo();
+fixture.editor.History.undo();
 expect(fixture).toHaveLines("Hello World");
 EXPECT cursor at 0,0
 
@@ -206,7 +206,7 @@ EXPECT cursor at 0,0
 //      → "  x".slice(3) = ""
 // Fix: charAt(k) checks each position → only 2 spaces
 //      → "  x".slice(2) = "x"
-fixture.wb.Mode.spaces = 4;
+fixture.editor.Mode.spaces = 4;
 TYPE "     a"
 enter
 TYPE "  x"
@@ -217,7 +217,7 @@ left with meta
 down 2 times with shift
 right with meta, shift
 tab with shift
-expect(fixture.wb.Model.lines[0]).toBe(" a");
-expect(fixture.wb.Model.lines[1]).toBe("x");
-expect(fixture.wb.Model.lines[2]).toBe("b");
+expect(fixture.editor.Model.lines[0]).toBe(" a");
+expect(fixture.editor.Model.lines[1]).toBe("x");
+expect(fixture.editor.Model.lines[2]).toBe("b");
 

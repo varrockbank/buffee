@@ -5,17 +5,17 @@ Copy-paste patterns for common use cases. See `_template.html` for full boilerpl
 ## Minimal Editor Container
 
 ```html
-<div class="wb buffee-themepack1-boring" id="editor">
-  <textarea class="wb-clipboard-bridge"></textarea>
-  <div class="no-select wb-elements">
-    <div class="wb-gutter"></div>
-    <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+<div class="buffee buffee-themepack1-boring" id="editor">
+  <textarea class="buffee-clipboard-bridge"></textarea>
+  <div class="no-select buffee-elements">
+    <div class="buffee-gutter"></div>
+    <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
   </div>
-  <div class="wb-status">
-    <div class="wb-status-left"><span class="wb-linecount"></span></div>
-    <div class="wb-status-right">
-      Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-      <span class="wb-status-divider">|</span>
+  <div class="buffee-status">
+    <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+    <div class="buffee-status-right">
+      Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+      <span class="buffee-status-divider">|</span>
       <span class="buffee-spaces"></span>
     </div>
   </div>

@@ -47,7 +47,7 @@ runner.describe('Feature Name', () => {
     fixture.type('Hello');
     fixture.press(Key.Enter).once();
 
-    expect(fixture.wb.Model.lines[0]).toBe('Hello');
+    expect(fixture.editor.Model.lines[0]).toBe('Hello');
   }, "Optional description");
 });
 #+end_src
@@ -71,7 +71,7 @@ The harness provides a literate, chainable DSL that reads like user actions:
 const fixture = new EditorTestHarness();
 
 // Access Buffee instance and DOM node
-fixture.wb    // Buffee instance
+fixture.editor    // Buffee instance
 fixture.node  // DOM node
 
 // Type text
@@ -119,23 +119,23 @@ expect(array).toHaveLength(3)          // Array/string length
 
 #+begin_src javascript
 // Check text content
-expect(fixture.wb.Model.lines[0]).toBe('Hello');
-expect(fixture.wb.Model.lines).toHaveLength(2);
+expect(fixture.editor.Model.lines[0]).toBe('Hello');
+expect(fixture.editor.Model.lines).toHaveLength(2);
 #+end_src
 
 ** Testing Cursor/Selection
 
 #+begin_src javascript
 // Get cursor position (firstEdge and SecondEdge are same for cursor)
-const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
+const [firstEdge, SecondEdge] = fixture.editor.Selection.ordered;
 expect(firstEdge).toEqual({ row: 0, col: 5 });
 expect(SecondEdge).toEqual({ row: 0, col: 5 });
 
 // Check if selection exists
-expect(fixture.wb.Selection.isSelection).toBe(true);
+expect(fixture.editor.Selection.isSelection).toBe(true);
 
 // Selection positions
-const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
+const [firstEdge, SecondEdge] = fixture.editor.Selection.ordered;
 expect(firstEdge).toEqual({ row: 0, col: 0 });  // Start of selection
 expect(SecondEdge).toEqual({ row: 0, col: 5 });  // End of selection
 #+end_src

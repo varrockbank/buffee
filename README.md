@@ -57,10 +57,10 @@ To test: type "A" 100+ times and move cursor to end. If misaligned, try a differ
 [style.css](style.css) contains structural styles. Bring-your-own cursor and selection color.
 
 ```css
-.wb { background-color: #282C34; color: #B2B2B2 }
-.wb .wb-selection { background-color: #EDAD10 }
-.wb .wb-cursor { background-color: #FF6B6B }
-.wb .wb-gutter, .wb .wb-status { background-color: #21252B; color: #636D83 }
+.buffee { background-color: #282C34; color: #B2B2B2 }
+.buffee .buffee-selection { background-color: #EDAD10 }
+.buffee .buffee-cursor { background-color: #FF6B6B }
+.buffee .buffee-gutter, .buffee .buffee-status { background-color: #21252B; color: #636D83 }
 ```
 
 see [themes](https://varrockbank.github.io/buffee/web/themes.html) for inspiration.
@@ -70,22 +70,22 @@ see [themes](https://varrockbank.github.io/buffee/web/themes.html) for inspirati
 Editor instances bind to DOM node with this structure:
 
 ```html
-<div class="wb" id="editor">
-  <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-  <div class="no-select wb-elements">
-    <div class="wb-gutter"></div>
-    <div class="wb-lines" tabindex="0">
-      <blockquote class="wb-layer-text"></blockquote>
-      <div class="wb-layer-elements"></div>
-      <div class="wb-cursor"></div>
+<div class="buffee" id="editor">
+  <textarea class="buffee-clipboard-bridge" aria-hidden="true"></textarea>
+  <div class="no-select buffee-elements">
+    <div class="buffee-gutter"></div>
+    <div class="buffee-lines" tabindex="0">
+      <blockquote class="buffee-layer-text"></blockquote>
+      <div class="buffee-layer-elements"></div>
+      <div class="buffee-cursor"></div>
     </div>
   </div>
-  <div class="wb-status">
-    <div class="wb-status-left">
-      <span class="wb-linecount"></span>
+  <div class="buffee-status">
+    <div class="buffee-status-left">
+      <span class="buffee-linecount"></span>
     </div>
-    <div class="wb-status-right">
-      Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
+    <div class="buffee-status-right">
+      Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>|
       <span class="buffee-spaces"></span>
     </div>
   </div>

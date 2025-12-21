@@ -113,7 +113,7 @@ expect(fixture).toHaveCursorAt(0, 3);
 // Standalone comments work
   // Indented comments also work
 TYPE "Hello"
-const text = fixture.wb.Model.lines[0];  // This inline comment will NOT work
+const text = fixture.editor.Model.lines[0];  // This inline comment will NOT work
 expect(text).toBe("Hello");
 ```
 
@@ -160,12 +160,12 @@ PRESS ';' 3 times
 ```
 TYPE "Hello"
 
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe("Hello");
 
 backspace 5 times
 
-expect(fixture.wb.Model.lines[0]).toBe("");
+expect(fixture.editor.Model.lines[0]).toBe("");
 ```
 
 ---
@@ -179,10 +179,10 @@ expect(fixture.wb.Model.lines[0]).toBe("");
 **Example:**
 ```
 TYPE "Hello"
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe("Hello");
 backspace 5 times
-expect(fixture.wb.Model.lines[0]).toBe("");
+expect(fixture.editor.Model.lines[0]).toBe("");
 ```
 
 This allows complex assertions and logic to coexist with natural language DSL commands.
@@ -467,7 +467,7 @@ down with meta, shift       →  fixture.press(Key.ArrowDown).withMetaKey().with
 Any line ending with `;` or starting with `//` is treated as JavaScript and passed through unchanged:
 
 ```
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe("Hello");
 // This is a comment
 ```
@@ -495,7 +495,7 @@ See `test/dsl/transpiler.js` for implementation details.
 ```
 PRESS a
 expect(fixture).toHaveLines('a');
-const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
+const [firstEdge, SecondEdge] = fixture.editor.Selection.ordered;
 expect(firstEdge).toEqual({ row: 0, col: 1 });
 expect(SecondEdge).toEqual({ row: 0, col: 1 });
 ```
@@ -504,7 +504,7 @@ expect(SecondEdge).toEqual({ row: 0, col: 1 });
 ```
 TYPE "Hello"
 expect(fixture).toHaveLines('Hello');
-const [firstEdge, SecondEdge] = fixture.wb.Selection.ordered;
+const [firstEdge, SecondEdge] = fixture.editor.Selection.ordered;
 expect(firstEdge).toEqual({ row: 0, col: 5 });
 expect(SecondEdge).toEqual({ row: 0, col: 5 });
 ```
@@ -530,9 +530,9 @@ left with meta
 right 5 times with shift
 TYPE "X"
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('XWorld');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 1 });
 expect(end).toEqual({ row: 0, col: 1 });
 ```
@@ -544,9 +544,9 @@ left with meta
 right 5 times with shift
 TYPE "Goodbye"
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('GoodbyeWorld');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 7 });
 expect(end).toEqual({ row: 0, col: 7 });
 ```
@@ -558,9 +558,9 @@ left with meta
 right with meta, shift
 TYPE "New"
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('New');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 3 });
 expect(end).toEqual({ row: 0, col: 3 });
 ```
@@ -578,9 +578,9 @@ left with meta
 down 2 times with shift
 TYPE "X"
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('Xhird line');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 1 });
 expect(end).toEqual({ row: 0, col: 1 });
 ```
@@ -599,9 +599,9 @@ right 6 times
 down 2 times with shift
 TYPE "REPLACED"
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('First REPLACEDine');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 14 });
 expect(end).toEqual({ row: 0, col: 14 });
 ```
@@ -612,9 +612,9 @@ TYPE "Hello World"
 left 5 times with shift
 TYPE "Everyone"
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('Hello Everyone');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 14 });
 expect(end).toEqual({ row: 0, col: 14 });
 ```
@@ -627,9 +627,9 @@ right 5 times
 right 5 times with shift
 PRESS " "
 
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('Hello ');
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 6 });
 expect(end).toEqual({ row: 0, col: 6 });
 ```
@@ -697,7 +697,7 @@ expect lines ["Hello"]
 **Current (Imperative):**
 ```javascript
 fixture.press(Key.ArrowRight).withShiftKey().times(5);
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 0 });
 expect(end).toEqual({ row: 0, col: 5 });
 ```

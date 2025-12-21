@@ -15,7 +15,7 @@ function BuffeeIOS(editor) {
   const lineHeight = editor.lineHeight;
   const { Selection } = editor;
 
-  const editingArea = $e.querySelector('.wb-lines');
+  const editingArea = $e.querySelector('.buffee-lines');
   const editorElement = $e;
 
   // Use contenteditable so tapping opens the keyboard

@@ -32,7 +32,7 @@ const dynamicSelectors = [
   '.duration',              // "Runtime: 40 ms"
   '.details',               // "(Started: 3:11:39 PM • Ended: 3:11:39 PM)"
   '#buffee-version',          // Version number on index.html
-  '#hackernews .wb-lines',  // Live HN content on index.html
+  '#hackernews .buffee-lines',  // Live HN content on index.html
 ];
 
 for (const page of pages) {

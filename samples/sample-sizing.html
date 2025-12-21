@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../themes/theme-boring.css">
   <style>
-    .wb { font-size: 24px; }
+    .buffee { font-size: 24px; }
   </style>
 </head>
 <body class="sample">
@@ -25,161 +25,161 @@
   <p>By default, the editor auto-fits to its container. Use <code>rows</code> to fix the number of visible rows.</p>
 
   <h2>1. Auto-rows, auto-cols (recommended)</h2>
-  <p><code>.wb { width: 960px; height: 300px; padding: 20px; }</code></p>
+  <p><code>.buffee { width: 960px; height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, {})</code></p>
   <p>Default behavior: auto-fit rows and cols. Drag bottom-right to resize.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-auto-both" style="width: 960px; height: 300px; padding: 20px; border: 2px dashed #666; resize: both; overflow: hidden;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-auto-both" style="width: 960px; height: 300px; padding: 20px; border: 2px dashed #666; resize: both; overflow: hidden;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>2. Fixed-rows, auto-cols</h2>
-  <p><code>.wb { width: 640px; padding: 20px; }</code></p>
+  <p><code>.buffee { width: 640px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { rows: 8 })</code></p>
   <p>Fixed 8 rows, columns auto-calculated from width. Drag to resize width.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-fixed-rows-auto-cols" style="width: 640px; padding: 20px; border: 2px dashed #666; resize: horizontal; overflow: hidden;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-fixed-rows-auto-cols" style="width: 640px; padding: 20px; border: 2px dashed #666; resize: horizontal; overflow: hidden;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>3. rows smaller than container</h2>
-  <p><code>.wb { height: 400px; padding: 20px; }</code></p>
+  <p><code>.buffee { height: 400px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { rows: 5 })</code></p>
   <p>Container is 400px tall, but editor only shows 5 rows. rows takes precedence instead of autofill remaining space.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-fixed-rows-large-container" style="height: 400px; padding: 20px; border: 2px solid #666;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-fixed-rows-large-container" style="height: 400px; padding: 20px; border: 2px solid #666;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>4. rows larger than container (clipped)</h2>
-  <p><code>.wb { height: 400px; padding: 20px; overflow: hidden; }</code></p>
+  <p><code>.buffee { height: 400px; padding: 20px; overflow: hidden; }</code></p>
   <p><code>new Buffee(el, { rows: 20 })</code></p>
   <p>Container is 400px tall, but rows requests 20 rows. Use <code>overflow: hidden</code> to clip.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-fixed-rows-overflow" style="height: 400px; padding: 20px; border: 2px solid #666; overflow: hidden;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-fixed-rows-overflow" style="height: 400px; padding: 20px; border: 2px solid #666; overflow: hidden;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>5. rows larger than container (scrollable)</h2>
-  <p><code>.wb { height: 400px; padding: 20px; overflow: scroll; display: block; }</code></p>
+  <p><code>.buffee { height: 400px; padding: 20px; overflow: scroll; display: block; }</code></p>
   <p><code>new Buffee(el, { rows: 20 })</code></p>
   <p>Container is 400px tall, but rows requests 20 rows. Use <code>overflow: scroll</code> and <code>display: block</code> to scroll.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-fixed-rows-scroll" style="height: 400px; padding: 20px; border: 2px solid #666; overflow: scroll; display: block;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-fixed-rows-scroll" style="height: 400px; padding: 20px; border: 2px solid #666; overflow: scroll; display: block;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>6. Auto-rows, fixed-cols (status bar stretches)</h2>
-  <p><code>.wb { height: 300px; padding: 20px; }</code></p>
+  <p><code>.buffee { height: 300px; padding: 20px; }</code></p>
   <p><code>new Buffee(el, { cols: 40 })</code></p>
   <p>Fixed 55 columns, rows auto-calculated from height. Note: status bar stretches to container width while content is narrower.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-fixed-cols" style="height: 300px; padding: 20px; border: 2px dashed #666; resize: vertical; overflow: hidden;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>7. Auto-rows, fixed-cols (fit-content)</h2>
-  <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
+  <p><code>.buffee { height: 300px; padding: 20px; width: fit-content; }</code></p>
   <p><code>new Buffee(el, { cols: 40 })</code></p>
   <p>Same as example 6, but with <code>width: fit-content</code> so the container shrinks to match content width.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-fit-content" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content; resize: vertical; overflow: hidden;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-fit-content" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content; resize: vertical; overflow: hidden;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>8. Auto-rows, fixed-cols (contain: inline-size)</h2>
-  <p><code>.wb { height: 300px; padding: 20px; width: fit-content; }</code></p>
-  <p><code>.wb-status { contain: inline-size; }</code></p>
+  <p><code>.buffee { height: 300px; padding: 20px; width: fit-content; }</code></p>
+  <p><code>.buffee-status { contain: inline-size; }</code></p>
   <p><code>new Buffee(el, { cols: 20 })</code></p>
   <p>When <code>cols</code> is small, status line content may be wider than editor. Use <code>contain: inline-size</code> on status bar so gutter + lines determine container width.</p>
-  <div class="wb buffee-themepack1-boring" id="editor-contain" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content; resize: vertical; overflow: hidden;">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-contain" style="height: 300px; padding: 20px; border: 2px dashed #666; width: fit-content; resize: vertical; overflow: hidden;">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status" style="contain: inline-size;">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status" style="contain: inline-size;">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>

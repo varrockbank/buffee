@@ -1,17 +1,17 @@
 /* [Name] Theme */
-.buffee-themepack1-[name] > .wb-elements {
+.buffee-themepack1-[name] > .buffee-elements {
   background-color: [bg];
   color: [text];
 }
-.buffee-themepack1-[name] .wb-selection {
+.buffee-themepack1-[name] .buffee-selection {
   background-color: [selection-bg];
   mix-blend-mode: normal;
 }
-.buffee-themepack1-[name] .wb-cursor {
+.buffee-themepack1-[name] .buffee-cursor {
   background-color: [cursor];
 }
-.buffee-themepack1-[name] .wb-gutter,
-.buffee-themepack1-[name] .wb-status {
+.buffee-themepack1-[name] .buffee-gutter,
+.buffee-themepack1-[name] .buffee-status {
   background-color: [gutter-bg];
   color: [text];
 }

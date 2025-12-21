@@ -236,14 +236,14 @@ TYPE "line9"
 enter
 TYPE "line10"
 // Cursor at end of last line, viewport scrolled down
-expect(fixture.wb.Viewport.start).toBe(1);
+expect(fixture.editor.Viewport.start).toBe(1);
 // Move cursor to start of first viewport line (line1 = absolute row 1)
 up 9 times
 left with meta
 EXPECT cursor at 1,0
 // Alt+Left should scroll viewport up and move cursor to end of line0
 left with alt
-expect(fixture.wb.Viewport.start).toBe(0);
+expect(fixture.editor.Viewport.start).toBe(0);
 EXPECT cursor at 0,5
 
 ## should scroll viewport down when moveWord at last viewport line
@@ -281,7 +281,7 @@ TYPE "line14"
 // Go back to beginning
 up 14 times
 left with meta
-expect(fixture.wb.Viewport.start).toBe(0);
+expect(fixture.editor.Viewport.start).toBe(0);
 EXPECT cursor at 0,0
 // Navigate to end of line9 (last visible row, with lines 10-14 below)
 down 9 times
@@ -289,7 +289,7 @@ right with meta
 EXPECT cursor at 9,5
 // Alt+Right should scroll viewport down and move cursor to start of line10
 right with alt
-expect(fixture.wb.Viewport.start).toBe(1);
+expect(fixture.editor.Viewport.start).toBe(1);
 EXPECT cursor at 10,0
 
 ## should not move when moveWord at end of file
@@ -305,9 +305,9 @@ EXPECT cursor at 0,9
 ### Regression: Up at first line of file does not scroll viewport negative
 // Empty editor, cursor at 0,0
 EXPECT cursor at 0,0
-expect(fixture.wb.Viewport.start).toBe(0);
+expect(fixture.editor.Viewport.start).toBe(0);
 // Press up - should be no-op
 up
-expect(fixture.wb.Viewport.start).toBe(0);
+expect(fixture.editor.Viewport.start).toBe(0);
 EXPECT cursor at 0,0
 

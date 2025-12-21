@@ -1,17 +1,17 @@
 /* Chelsey Theme */
-.buffee-themepack1-chelsey > .wb-elements {
+.buffee-themepack1-chelsey > .buffee-elements {
   background-color: #ffffff;
   color: #000000;
 }
-.buffee-themepack1-chelsey .wb-selection {
+.buffee-themepack1-chelsey .buffee-selection {
   background-color: #cccccc;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-chelsey .wb-cursor {
+.buffee-themepack1-chelsey .buffee-cursor {
   background-color: #000000;
 }
-.buffee-themepack1-chelsey .wb-gutter,
-.buffee-themepack1-chelsey .wb-status {
+.buffee-themepack1-chelsey .buffee-gutter,
+.buffee-themepack1-chelsey .buffee-status {
   background-color: #f0f0f0;
   color: #000000;
 }

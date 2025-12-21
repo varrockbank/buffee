@@ -1,31 +1,36 @@
 /**
  * Buffee Editor - Required Styles
- * @version 9.0.3-alpha.1
+ * @version 10.0.3-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
  *
  * Required color properties to define:
- *   .wb { background-color, color }
- *   .wb .wb-selection { background-color }
- *   .wb .wb-cursor { background-color }
- *   .wb .wb-status { background-color, color } (optional)
+ *   .buffee { background-color, color }
+ *   .buffee .buffee-selection { background-color }
+ *   .buffee .buffee-cursor { background-color }
+ *   .buffee .buffee-status { background-color, color } (optional)
  */
 
 /* Main container */
-.wb {
+.buffee {
   position: relative;
-  font-family: 'Menlo', 'Consolas', monospace;
+  font-family: monospace;
   display: flex;
   flex-direction: column;
-  --wb-cell: 24px;
-  --wb-padding: 4px;
-  --wb-gutter-digits-padding: 1ch;
-  --wb-gutter-digits-initial: 2ch;
+  --buffee-cell: 24px;
+  --buffee-padding: 4px;
+  --buffee-gutter-digits-padding: 1ch;
+  --buffee-gutter-digits-initial: 2ch;
+  --buffee-z-selection: 100;
+  --buffee-z-text: 200;
+  --buffee-z-cursor: 300;
+  --buffee-z-elements: 400;
+  --buffee-z-status: 600;
 }
 
 /* Content area (gutter + lines) */
-.wb > .wb-elements {
+.buffee > .buffee-elements {
   display: flex;
   flex: 1;
   overflow: hidden;
@@ -42,92 +47,83 @@
 }
 
 /* Hidden clipboard bridge - must be selectable but invisible */
-.wb-clipboard-bridge {
+.buffee-clipboard-bridge {
   position: fixed;
-  left: 0;
-  top: 1px;
   width: 0;
-  height: 1px;
+  height: 0;
   opacity: 0;
   pointer-events: none;
 }
 
 /* Lines container */
-.wb .wb-lines {
+.buffee .buffee-lines {
   flex: 1;
   overflow: hidden;
-  background-color: transparent;
   position: relative;
-  margin: var(--wb-padding);
+  margin: var(--buffee-padding);
   outline: none;
 }
 
 /* Line elements */
-.wb .wb-lines pre::before {
+.buffee .buffee-lines pre::before {
   content: "\200B";
 }
-.wb .wb-lines pre {
+.buffee .buffee-lines pre {
   margin: 0;
   overflow: visible;
   white-space: pre;
-  background-color: transparent;
 }
 
 /* Selection overlay */
-.wb .wb-selection {
-  left: 0ch;
-  top: 0ch;
+.buffee .buffee-selection {
   position: absolute;
   display: block;
-  visibility: visible;
-  width: 0ch;
-  mix-blend-mode: difference;
 }
 
 /* Cursor overlay */
-.wb .wb-cursor {
+.buffee .buffee-cursor {
   mix-blend-mode: exclusion;
   width: 1ch;
   position: absolute;
-  visibility: hidden;
-  z-index: 300; /** config */
+  z-index: var(--buffee-z-cursor);
 }
 
 /* Optional: Status bar */
-.wb .wb-status {
+.buffee .buffee-status {
   display: flex;
   justify-content: space-between;
   padding: 6px 10px; /** refactor to css variable*/
-  z-index: 600;
+  z-index: var(--buffee-z-status);
   white-space: nowrap;
   overflow: hidden;
+  font-size: var(--buffee-cell);
 }
 
-.wb .wb-gutter {
+.buffee .buffee-gutter {
   text-align: right; /* config */
-  padding: var(--wb-padding); 
-  width: calc(var(--wb-gutter-digits-initial) + var(--wb-gutter-digits-padding));
+  padding: var(--buffee-padding); 
+  width: calc(var(--buffee-gutter-digits-initial) + var(--buffee-gutter-digits-padding));
 }
 
-.wb .wb-layer-text {
+.buffee .buffee-layer-text {
   position: relative;
   display: inline-block;
   min-width: 100%;
   padding-right: 2ch; /** config: right scroll buffer */
-  z-index: 200; /** config */
+  z-index: var(--buffee-z-text);
 }
 
-.wb .wb-layer-elements {
+.buffee .buffee-layer-elements {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none; /* Allow clicks to pass through to elements below*/
-  z-index: 400; /** config */
+  z-index: var(--buffee-z-elements);
 }
 
-.wb .wb-cursor, .wb .wb-selection { height: var(--wb-cell); }
-.wb .wb-cursor, .wb .wb-gutter, .wb .wb-lines, .wb .wb-selection {
-  font-size: var(--wb-cell); line-height: var(--wb-cell);
+.buffee .buffee-cursor, .buffee .buffee-selection { height: var(--buffee-cell); }
+.buffee .buffee-cursor, .buffee .buffee-gutter, .buffee .buffee-lines, .buffee .buffee-selection {
+  font-size: var(--buffee-cell); line-height: var(--buffee-cell);
 }

@@ -5,22 +5,22 @@ function expect(actual) {
   if (typeof EditorTestHarness !== 'undefined' && actual instanceof EditorTestHarness) {
     return {
       toHaveLines(...expectedLines) {
-        if (actual.wb.Model.lines.length !== expectedLines.length) {
-          throw new Error(`Expected ${expectedLines.length} lines, got ${actual.wb.Model.lines.length}`);
+        if (actual.editor.Model.lines.length !== expectedLines.length) {
+          throw new Error(`Expected ${expectedLines.length} lines, got ${actual.editor.Model.lines.length}`);
         }
         expectedLines.forEach((expected, i) => {
-          if (actual.wb.Model.lines[i] !== expected) {
-            throw new Error(`Expected line ${i} to be "${expected}", got "${actual.wb.Model.lines[i]}"`);
+          if (actual.editor.Model.lines[i] !== expected) {
+            throw new Error(`Expected line ${i} to be "${expected}", got "${actual.editor.Model.lines[i]}"`);
           }
         });
       },
       toHaveCursorAt(row, col) {
-        const [firstEdge, secondEdge] = actual.wb.Selection.ordered;
+        const [firstEdge, secondEdge] = actual.editor.Selection.ordered;
         const isSelectionByReference = firstEdge !== secondEdge;
 
         // Check consistency between reference check and isSelection property
-        if (isSelectionByReference !== actual.wb.Selection.isSelection) {
-          throw new Error(`REGRESSION: Selection.isSelection (${actual.wb.Selection.isSelection}) is inconsistent with reference check (${isSelectionByReference})`);
+        if (isSelectionByReference !== actual.editor.Selection.isSelection) {
+          throw new Error(`REGRESSION: Selection.isSelection (${actual.editor.Selection.isSelection}) is inconsistent with reference check (${isSelectionByReference})`);
         }
 
         // Check it's a cursor (firstEdge === secondEdge by reference)
@@ -35,12 +35,12 @@ function expect(actual) {
         }
       },
       toHaveSelectionAt(startRow, startCol, endRow, endCol) {
-        const [firstEdge, secondEdge] = actual.wb.Selection.ordered;
+        const [firstEdge, secondEdge] = actual.editor.Selection.ordered;
         const isSelectionByReference = firstEdge !== secondEdge;
 
         // Check consistency between reference check and isSelection property
-        if (isSelectionByReference !== actual.wb.Selection.isSelection) {
-          throw new Error(`REGRESSION: Selection.isSelection (${actual.wb.Selection.isSelection}) is inconsistent with reference check (${isSelectionByReference})`);
+        if (isSelectionByReference !== actual.editor.Selection.isSelection) {
+          throw new Error(`REGRESSION: Selection.isSelection (${actual.editor.Selection.isSelection}) is inconsistent with reference check (${isSelectionByReference})`);
         }
 
         // Check it's a selection (firstEdge !== secondEdge by reference)
