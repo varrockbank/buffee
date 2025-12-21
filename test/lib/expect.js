@@ -74,6 +74,11 @@ function expect(actual) {
       if (actual.length !== expected) {
         throw new Error(`Expected length: ${expected}\nActual length: ${actual.length}\nActual value: ${JSON.stringify(actual)}`);
       }
+    },
+    toBeCloseTo(expected, tolerance = 0.1) {
+      if (Math.abs(actual - expected) > tolerance) {
+        throw new Error(`Expected: ${expected} ± ${tolerance}\nActual: ${actual}`);
+      }
     }
   };
 }
