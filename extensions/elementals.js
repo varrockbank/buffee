@@ -13,7 +13,9 @@
  * @returns {Object} The Elementals API object
  */
 function BuffeeElementals(editor) {
-  const { $e, renderHooks } = editor._internals;
+  const $e = editor._$e;
+  const render = editor._render;
+  const renderHooks = editor._renderHooks;
   const { Viewport, lineHeight } = editor;
   const $elementLayer = $e.querySelector('.buffee-layer-elements');
 
@@ -94,8 +96,8 @@ function BuffeeElementals(editor) {
         updateFocus();
       }
       // Set read-only mode to hide cursor/selection when elementals is enabled
-      editor.interactive = enabled ? -1 : 1;
-      updatePositions();
+      editor.Mode.interactive = enabled ? -1 : 1;
+      render();
     },
 
     /**

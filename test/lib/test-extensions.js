@@ -390,6 +390,367 @@ function defineExtensionTests() {
         });
     });
 
+    // ===== HISTORY TESTS =====
+    extRunner.describe('History', () => {
+        extRunner.it('attaches History object to editor', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                assertTrue(!editor.History, 'History should not exist before extension');
+                BuffeeHistory(editor);
+                assertTrue(!!editor.History, 'History should be attached after extension');
+                assertTrue(typeof editor.History.undo === 'function', 'Should have undo method');
+                assertTrue(typeof editor.History.redo === 'function', 'Should have redo method');
+                assertTrue(typeof editor.History.clear === 'function', 'Should have clear method');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes single character insert', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A"');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after undo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('redoes single character insert', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after undo');
+                editor.History.redo();
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A" after redo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes coalesced characters', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.Selection.insert('B');
+                editor.Selection.insert('C');
+                assertEqual(editor.Model.lines[0], 'ABC', 'Should have "ABC"');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after single undo (coalesced)');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes backspace', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('AB');
+                // Wait to break coalescing
+                editor.History._lastOpTime = 0;
+                editor.Selection.delete();
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A" after backspace');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], 'AB', 'Should have "AB" after undo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes newline', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('Hello');
+                editor.History._lastOpTime = 0;
+                editor.Selection.newLine();
+                editor.History._lastOpTime = 0;
+                editor.Selection.insert('World');
+                assertEqual(editor.Model.lines.length, 2, 'Should have 2 lines');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[1], '', 'Second line should be empty after undo');
+                editor.History.undo();
+                assertEqual(editor.Model.lines.length, 1, 'Should have 1 line after undo newline');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears redo stack on new edit', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.History.undo();
+                assertEqual(editor.History.redoStack.length, 1, 'Should have 1 redo item');
+                editor.Selection.insert('B');
+                assertEqual(editor.History.redoStack.length, 0, 'Redo stack should be cleared');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('restores cursor position on undo', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('Hello');
+                assertEqual(editor._head.col, 5, 'Cursor should be at col 5');
+                editor.History.undo();
+                assertEqual(editor._head.col, 0, 'Cursor should be at col 0 after undo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('restores cursor position on redo', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('AB');
+                editor.History.undo();
+                assertEqual(editor._head.col, 0, 'Cursor should be at col 0 after undo');
+                editor.History.redo();
+                assertEqual(editor._head.col, 2, 'Cursor should be at col 2 after redo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears undo and redo stacks', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.Selection.insert('B');
+                assertTrue(editor.History.undoStack.length > 0, 'Should have undo items');
+                editor.History.clear();
+                assertEqual(editor.History.undoStack.length, 0, 'Undo stack should be empty');
+                assertEqual(editor.History.redoStack.length, 0, 'Redo stack should be empty');
+            } finally {
+                cleanup();
+            }
+        });
+
+        // Selection replacement should be atomic (single undo)
+        extRunner.it('undoes selection replacement atomically', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                // Type "Hello World"
+                editor.Selection.insert('Hello World');
+                editor.History._lastOpTime = 0;
+
+                // Select "Hello" (first 5 chars)
+                editor.Selection.makeSelection();
+                editor._head.col = 0;
+                editor._tail.col = 5;
+
+                // Replace selection with "Hi"
+                editor.Selection.insert('Hi');
+                assertEqual(editor.Model.lines[0], 'Hi World', 'Should have replaced "Hello" with "Hi"');
+
+                // Single undo should restore "Hello World"
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], 'Hello World', 'Single undo should restore original text');
+            } finally {
+                cleanup();
+            }
+        });
+
+        // Regression: head/tail references can change after makeSelection()
+        extRunner.it('captures correct cursor after selection operations', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                // Type some text
+                editor.Selection.insert('Hello World');
+                editor.History._lastOpTime = 0;
+
+                // Make a selection (this changes head to detachedHead internally)
+                editor.Selection.makeSelection();
+                // Move cursor to create selection
+                editor._head.col = 5;
+
+                // Delete the selection - this should capture correct cursor state
+                editor.Selection.delete();
+                assertEqual(editor.Model.lines[0], 'Hello', 'Should have deleted " World"');
+
+                // Undo should restore both the text AND correct cursor position
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], 'Hello World', 'Text should be restored');
+                // Verify cursor is at correct position (start of selection, col 5)
+                assertEqual(editor._head.col, 5, 'Cursor should be restored to selection start');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+
+    // ===== UNDO TREE TESTS =====
+    extRunner.describe('UndoTree', () => {
+        extRunner.it('attaches UndoTree object to editor', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                assertTrue(!editor.UndoTree, 'UndoTree should not exist before extension');
+                BuffeeUndoTree(editor);
+                assertTrue(!!editor.UndoTree, 'UndoTree should be attached after extension');
+                assertTrue(typeof editor.UndoTree.undo === 'function', 'Should have undo method');
+                assertTrue(typeof editor.UndoTree.redo === 'function', 'Should have redo method');
+                assertTrue(typeof editor.UndoTree.branches === 'function', 'Should have branches method');
+                assertTrue(typeof editor.UndoTree.goToNode === 'function', 'Should have goToNode method');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes and redoes single insert', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+                editor.Selection.insert('A');
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A"');
+                editor.UndoTree.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after undo');
+                editor.UndoTree.redo();
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A" after redo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('creates branches instead of discarding redo', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+                editor.Selection.insert('A');
+                editor.UndoTree._lastOpTime = 0; // Break coalescing
+                editor.UndoTree.undo();
+
+                // Make a new edit - should create branch, not discard
+                editor.Selection.insert('B');
+
+                // Root should have 2 children (branches)
+                const tree = editor.UndoTree.getTree();
+                assertEqual(tree.children.length, 2, 'Root should have 2 branches');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('navigates between branches', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+
+                // Create first branch
+                editor.Selection.insert('A');
+                editor.UndoTree._lastOpTime = 0;
+                editor.UndoTree.undo();
+
+                // Create second branch
+                editor.Selection.insert('B');
+                editor.UndoTree._lastOpTime = 0;
+                assertEqual(editor.Model.lines[0], 'B', 'Should be on B branch');
+
+                // Go back and take first branch
+                editor.UndoTree.undo();
+                editor.UndoTree.redo(0); // First branch (A)
+                assertEqual(editor.Model.lines[0], 'A', 'Should be on A branch');
+
+                // Go back and take second branch
+                editor.UndoTree.undo();
+                editor.UndoTree.redo(1); // Second branch (B)
+                assertEqual(editor.Model.lines[0], 'B', 'Should be on B branch again');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('reports available branches', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+
+                editor.Selection.insert('A');
+                editor.UndoTree._lastOpTime = 0;
+                editor.UndoTree.undo();
+                editor.Selection.insert('B');
+                editor.UndoTree._lastOpTime = 0;
+                editor.UndoTree.undo();
+
+                const branches = editor.UndoTree.branches();
+                assertEqual(branches.length, 2, 'Should have 2 branches');
+                assertEqual(branches[0].operation.text, 'A', 'First branch should be A');
+                assertEqual(branches[1].operation.text, 'B', 'Second branch should be B');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('jumps to any node via goToNode', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+
+                // Create: root -> A -> B -> C
+                editor.Selection.insert('A');
+                editor.UndoTree._lastOpTime = 0;
+                const nodeAId = editor.UndoTree.current.id;
+                editor.Selection.insert('B');
+                editor.UndoTree._lastOpTime = 0;
+                editor.Selection.insert('C');
+                editor.UndoTree._lastOpTime = 0;
+
+                assertEqual(editor.Model.lines[0], 'ABC', 'Should have ABC');
+
+                // Jump directly to node A
+                editor.UndoTree.goToNode(nodeAId);
+                assertEqual(editor.Model.lines[0], 'A', 'Should have just A after jump');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('returns tree structure for visualization', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+                editor.Selection.insert('X');
+
+                const tree = editor.UndoTree.getTree();
+                assertEqual(tree.id, 0, 'Root should have id 0');
+                assertTrue(tree.children.length > 0, 'Should have children');
+                assertTrue(tree.children[0].isCurrent, 'Child should be current');
+                assertEqual(tree.children[0].operation.type, 'insert', 'Should be insert operation');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears all history', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUndoTree(editor);
+                editor.Selection.insert('A');
+                editor.Selection.insert('B');
+
+                assertTrue(editor.UndoTree.canUndo, 'Should be able to undo');
+                editor.UndoTree.clear();
+                assertFalse(editor.UndoTree.canUndo, 'Should not be able to undo after clear');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+
     // ===== ULTRAHIGHCAPACITY TESTS =====
     extRunner.describe('UltraHighCapacity', () => {
         extRunner.it('initializes UltraHighCapacity extension', () => {

@@ -15,7 +15,7 @@
  * await editor.FileLoader.streamMaterializedLoad(file);
  */
 function BuffeeFileLoader(editor) {
-  const { Model, _internals } = editor;
+  const { Model } = editor;
 
   /**
    * FileLoader API.
@@ -65,7 +65,7 @@ function BuffeeFileLoader(editor) {
         if (lastNewlineIndex !== -1) {
           const completeText = fullText.substring(0, lastNewlineIndex);
           const lines = completeText.split('\n');
-          _internals.appendLines(lines);
+          editor._appendLines(lines);
           totalLines += lines.length;
           remainder = fullText.substring(lastNewlineIndex + 1);
         } else {
@@ -75,7 +75,7 @@ function BuffeeFileLoader(editor) {
       }
 
       if (remainder.length > 0) {
-        _internals.appendLines([remainder]);
+        editor._appendLines([remainder]);
         totalLines++;
       }
 
@@ -121,7 +121,7 @@ function BuffeeFileLoader(editor) {
         if (lastNewlineIndex !== -1) {
           const completeText = fullText.substring(0, lastNewlineIndex);
           const lines = completeText.split('\n');
-          _internals.appendLines(lines);
+          editor._appendLines(lines);
           totalLines += lines.length;
           remainder = fullText.substring(lastNewlineIndex + 1);
         } else {
@@ -131,7 +131,7 @@ function BuffeeFileLoader(editor) {
       }
 
       if (remainder.length > 0) {
-        _internals.appendLines([remainder]);
+        editor._appendLines([remainder]);
         totalLines++;
       }
 
@@ -173,7 +173,7 @@ function BuffeeFileLoader(editor) {
           if (lastNewlineIndex !== -1) {
             const completeText = fullText.substring(0, lastNewlineIndex);
             const lines = completeText.split('\n');
-            _internals.appendLines(lines);
+            editor._appendLines(lines);
             totalLines += lines.length;
             remainder = fullText.substring(lastNewlineIndex + 1);
           } else {
@@ -187,7 +187,7 @@ function BuffeeFileLoader(editor) {
         }
 
         if (remainder.length > 0) {
-          _internals.appendLines([remainder]);
+          editor._appendLines([remainder]);
           totalLines++;
         }
       } finally {
@@ -236,19 +236,19 @@ function BuffeeFileLoader(editor) {
 
             // Materialize strings to break V8 sliced string references
             const materializedLines = slicedLines.map(line => Array.from(line).join(''));
-            _internals.appendLines(materializedLines, true);
+            editor._appendLines(materializedLines, true);
           } else {
             remainder += text;
           }
 
           chunkCount++;
           if (chunkCount % yieldEvery === 0) {
-            _internals.appendLines([], false);
+            editor._appendLines([], false);
             await new Promise(resolve => setTimeout(resolve, 0));
           }
         }
 
-        _internals.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
+        editor._appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
       } finally {
         reader.releaseLock();
       }
@@ -298,7 +298,7 @@ function BuffeeFileLoader(editor) {
             // Materialize strings to break V8 sliced string references
             const materializedLines = slicedLines.map(line => Array.from(line).join(''));
             // Render periodically within yield cycle
-            _internals.appendLines(materializedLines, chunkCount % yieldEvery !== renderEvery);
+            editor._appendLines(materializedLines, chunkCount % yieldEvery !== renderEvery);
           } else {
             remainder += text;
           }
@@ -311,7 +311,7 @@ function BuffeeFileLoader(editor) {
           }
         }
 
-        _internals.appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
+        editor._appendLines(remainder.length > 0 ? ['' + remainder] : [], false);
       } finally {
         reader.releaseLock();
       }

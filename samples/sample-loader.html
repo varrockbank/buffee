@@ -145,7 +145,7 @@
         logs.Model.lines.push(s);
       }
       logs.Viewport.start = Math.max(0, logs.Model.lines.length - logs.Viewport.size - 1);
-      logs._internals.render(true);
+      logs._render(true);
     }
 
     const editor = new Buffee(editorEl, {
@@ -270,20 +270,20 @@
 
             const materializedLines = slicedLines.map(line => Array.from(line).join(''));
             originalSize += materializedLines.join('\n').length;
-            await editor._internals.appendLines(materializedLines, true);
+            await editor._appendLines(materializedLines, true);
           } else {
             remainder += text;
           }
 
           chunkCount++;
           if (chunkCount % 10 === 0) {
-            await editor._internals.appendLines([], false);
+            await editor._appendLines([], false);
             await new Promise(resolve => setTimeout(resolve, 0));
           }
         }
 
         if (remainder.length > 0) {
-          await editor._internals.appendLines([remainder], false);
+          await editor._appendLines([remainder], false);
         }
 
         const compressedSize = editor.UltraHighCapacity.compressedSize;

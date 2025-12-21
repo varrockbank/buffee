@@ -101,7 +101,7 @@ example();`;
     BuffeeUltraHighCapacity(edChunked);
     edChunked.UltraHighCapacity.activate();
     (async () => {
-      await edChunked._internals.appendLines(content.split('\n'));
+      await edChunked.UltraHighCapacity.appendLines(content.split('\n'));
     })();
   </script>
 </body>

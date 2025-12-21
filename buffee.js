@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "10.0.0-alpha.1";
+  this.version = "11.0.8-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -40,9 +40,20 @@ function Buffee($parent, config = {}) {
   } = config;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
-  /** Editor mode settings (shared between internal and external code) */
+  /**
+   * Editor mode settings (shared between internal and external code).
+   * @namespace Mode
+   */
   const Mode = {
     spaces,
+    /**
+     * Interactive mode: 1 (normal), 0 (navigation-only), -1 (read-only)
+     * - 1: Full editing (default)
+     * - 0: Navigation only (can move cursor, no editing) - used by UltraHighCapacity
+     * - -1: Read-only (no cursor/selection rendering, no navigation) - used by TUI
+     * @type {-1|0|1}
+     */
+    interactive: 1
   };
   const frameCallbacks = callbacks || {};
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
@@ -291,28 +302,31 @@ function Buffee($parent, config = {}) {
         // Get selected text before deleting
         const selectedText = this.lines.join('\n');
 
-        // Delete selection, then insert new text (marked as combined for atomic undo)
-        History._delete(first.row, first.col, selectedText);
-        if (s.length > 0) {
-          History._insert(first.row, first.col, s, true, true); // combined=true
-        }
+        // Delete selection, then insert new text
+        self._delete(first.row, first.col, selectedText);
+        const insertedLines = s.length > 0
+          ? self._insert(first.row, first.col, s)
+          : null;
 
         // Update cursor to end of inserted text
-        const insertedLines = s.split('\n');
-        if (insertedLines.length === 1) {
+        if (!insertedLines || insertedLines.length === 1) {
+          // Single-line insert (single char, multi-char, or empty)
           head.row = first.row;
           head.col = first.col + s.length;
         } else {
+          // Multi-line insert
           head.row = first.row + insertedLines.length - 1;
           head.col = insertedLines[insertedLines.length - 1].length;
         }
         this.makeCursor();
       } else {
-        History._insert(tail.row, tail.col, s);
+        const insertedLines = self._insert(tail.row, tail.col, s);
 
         // Update cursor
-        const insertedLines = s.split('\n');
-        if (insertedLines.length === 1) {
+        if (!insertedLines) {
+          // Single char - no newlines
+          maxCol = head.col += s.length;
+        } else if (insertedLines.length === 1) {
           maxCol = head.col += s.length;
         } else {
           head.row += insertedLines.length - 1;
@@ -331,12 +345,12 @@ function Buffee($parent, config = {}) {
       if (tail.col > 0) {
         // Delete character before cursor
         const charToDelete = Model.lines[tail.row][tail.col - 1];
-        History._delete(tail.row, tail.col - 1, charToDelete);
+        self._delete(tail.row, tail.col - 1, charToDelete);
         head.col--;
       } else if (tail.row > 0) {
         // At start of line - delete newline (join with previous line)
         const prevLineLen = Model.lines[tail.row - 1].length;
-        History._delete(tail.row - 1, prevLineLen, '\n');
+        self._delete(tail.row - 1, prevLineLen, '\n');
         head.col = prevLineLen;
         head.row--;
         // Scroll viewport if cursor went above visible area
@@ -355,7 +369,7 @@ function Buffee($parent, config = {}) {
       if (this.isSelection) Selection.insert('', true); // skipRender - we render below
 
       // Insert newline character
-      History._insert(tail.row, tail.col, '\n');
+      self._insert(tail.row, tail.col, '\n');
 
       head.col = 0, head.row++;
       if (head.row > Viewport.end) Viewport.start = head.row - Viewport.size + 1;
@@ -542,15 +556,6 @@ function Buffee($parent, config = {}) {
   };
 
   /**
-   * Interactive mode: 1 (normal), 0 (navigation-only), -1 (read-only)
-   * - 1: Full editing (default)
-   * - 0: Navigation only (can move cursor, no editing) - used by UltraHighCapacity
-   * - -1: Read-only (no cursor/selection rendering, no navigation) - used by TUI
-   * @type {-1|0|1}
-   */
-  let interactive = 1;
-
-  /**
    * Document model managing text content.
    * @namespace Model
    */
@@ -603,241 +608,70 @@ function Buffee($parent, config = {}) {
   }
 
   /**
-   * Edit history for undo/redo operations.
-   * Uses primitive insert/delete operations that can be inverted.
-   * @namespace History
+   * Primitive insert operation. Inserts text at position, handling newlines.
+   * @param {number} row - Row index (absolute, not viewport-relative)
+   * @param {number} col - Column index
+   * @param {string} text - Text to insert (may contain newlines)
    */
-  const History = this.History = {
-    /** @type {Array} Stack of operations for undo */
-    undoStack: [],
-    /** @type {Array} Stack of undone operations for redo */
-    redoStack: [],
-    /** @type {number} Timestamp of last operation for coalescing */
-    _lastOpTime: 0,
-    /** @type {number} Max ms between ops to coalesce */
-    coalesceTimeout: 500,
+  function _insert(row, col, text) {
+    if (text.length === 0) return null;
 
-    /** Capture current cursor/selection state */
-    _captureCursor() {
-      return {
-        headRow: head.row, headCol: head.col,
-        tailRow: tail.row, tailCol: tail.col
-      };
-    },
+    // Fast path: single character (no newline)
+    if (text.length === 1 && text !== '\n') {
+      Model.lines[row] = Model.lines[row].slice(0, col) + text + Model.lines[row].slice(col);
+      return null; // Caller knows it's single char
+    }
 
-    /** Restore cursor/selection state */
-    _restoreCursor(cursor) {
-      head.row = cursor.headRow;
-      head.col = cursor.headCol;
-      tail.row = cursor.tailRow;
-      tail.col = cursor.tailCol;
-    },
+    const lines = text.split('\n');
 
-    /** Check if we can coalesce with the last operation */
-    _canCoalesce(type, row, col, text) {
-      if (this.undoStack.length === 0) return false;
-      if (Date.now() - this._lastOpTime > this.coalesceTimeout) return false;
+    if (lines.length === 1) {
+      // Single line insert
+      Model.lines[row] = Model.lines[row].slice(0, col) + text + Model.lines[row].slice(col);
+    } else {
+      // Multi-line insert
+      const before = Model.lines[row].slice(0, col);
+      const after = Model.lines[row].slice(col);
 
-      const last = this.undoStack[this.undoStack.length - 1];
-      if (last.type !== type) return false;
-      if (text.includes('\n') || last.text.includes('\n')) return false;
+      // First line: before + first segment
+      Model.lines[row] = before + lines[0];
 
-      if (type === 'insert') {
-        // Can coalesce if inserting right after the last insert
-        return last.row === row && last.col + last.text.length === col;
-      } else {
-        // Can coalesce backspace if deleting right before the last delete
-        return last.row === row && col + text.length === last.col;
-      }
-    },
+      // Middle lines: insert as new lines
+      const middleLines = lines.slice(1, -1);
 
-    /**
-     * Primitive insert operation. Inserts text at position, handling newlines.
-     * @param {number} row - Row index (absolute, not viewport-relative)
-     * @param {number} col - Column index
-     * @param {string} text - Text to insert (may contain newlines)
-     * @param {boolean} [recordHistory=true] - Whether to record in undo stack
-     * @param {boolean} [combined=false] - Mark as combined with previous operation (undo/redo together)
-     */
-    _insert(row, col, text, recordHistory = true, combined = false) {
-      if (text.length === 0) return;
+      // Last line: last segment + after
+      const lastLine = lines[lines.length - 1] + after;
 
-      const cursorBefore = recordHistory ? this._captureCursor() : null;
+      Model.lines.splice(row + 1, 0, ...middleLines, lastLine);
+    }
 
-      const lines = text.split('\n');
+    return lines; // Return split result for caller reuse
+  }
 
-      if (lines.length === 1) {
-        // Single line insert
-        Model.lines[row] = Model.lines[row].slice(0, col) + text + Model.lines[row].slice(col);
-      } else {
-        // Multi-line insert
-        const before = Model.lines[row].slice(0, col);
-        const after = Model.lines[row].slice(col);
+  /**
+   * Primitive delete operation. Deletes text at position, handling newlines.
+   * @param {number} row - Row index (absolute, not viewport-relative)
+   * @param {number} col - Column index
+   * @param {string} text - Text to delete (must match what's at position, may contain newlines)
+   */
+  function _delete(row, col, text) {
+    if (text.length === 0) return;
 
-        // First line: before + first segment
-        Model.lines[row] = before + lines[0];
+    const lines = text.split('\n');
 
-        // Middle lines: insert as new lines
-        const middleLines = lines.slice(1, -1);
+    if (lines.length === 1) {
+      // Single line delete
+      Model.lines[row] = Model.lines[row].slice(0, col) + Model.lines[row].slice(col + text.length);
+    } else {
+      // Multi-line delete
+      const before = Model.lines[row].slice(0, col);
+      const afterRow = row + lines.length - 1;
+      const afterCol = lines[lines.length - 1].length;
+      const after = Model.lines[afterRow].slice(afterCol);
 
-        // Last line: last segment + after
-        const lastLine = lines[lines.length - 1] + after;
-
-        Model.lines.splice(row + 1, 0, ...middleLines, lastLine);
-      }
-
-      if (recordHistory) {
-        if (this._canCoalesce('insert', row, col, text)) {
-          // Merge with last operation
-          const last = this.undoStack[this.undoStack.length - 1];
-          last.text += text;
-        } else {
-          this.undoStack.push({ type: 'insert', row, col, text, cursorBefore, combined });
-        }
-        this._lastOpTime = Date.now();
-        this.redoStack = [];
-      }
-    },
-
-    /**
-     * Primitive delete operation. Deletes text at position, handling newlines.
-     * @param {number} row - Row index (absolute, not viewport-relative)
-     * @param {number} col - Column index
-     * @param {string} text - Text to delete (must match what's at position, may contain newlines)
-     * @param {boolean} [recordHistory=true] - Whether to record in undo stack
-     * @param {boolean} [combined=false] - Mark as combined with previous operation (undo/redo together)
-     */
-    _delete(row, col, text, recordHistory = true, combined = false) {
-      if (text.length === 0) return;
-
-      const cursorBefore = recordHistory ? this._captureCursor() : null;
-
-      const lines = text.split('\n');
-
-      if (lines.length === 1) {
-        // Single line delete
-        Model.lines[row] = Model.lines[row].slice(0, col) + Model.lines[row].slice(col + text.length);
-      } else {
-        // Multi-line delete
-        const before = Model.lines[row].slice(0, col);
-        const afterRow = row + lines.length - 1;
-        const afterCol = lines[lines.length - 1].length;
-        const after = Model.lines[afterRow].slice(afterCol);
-
-        // Join first and last line portions, remove middle lines
-        Model.lines[row] = before + after;
-        Model.lines.splice(row + 1, lines.length - 1);
-      }
-
-      if (recordHistory) {
-        if (this._canCoalesce('delete', row, col, text)) {
-          // Merge with last operation (prepend since backspace goes backwards)
-          const last = this.undoStack[this.undoStack.length - 1];
-          last.text = text + last.text;
-          last.col = col;
-        } else {
-          this.undoStack.push({ type: 'delete', row, col, text, cursorBefore, combined });
-        }
-        this._lastOpTime = Date.now();
-        this.redoStack = [];
-      }
-    },
-
-    /**
-     * Undo a single operation (internal helper).
-     * @param {Object} op - Operation to undo
-     * @returns {Object} Operation with cursorAfter for redo
-     */
-    _undoOp(op) {
-      const cursorBefore = this._captureCursor();
-
-      // Apply inverse operation without recording to history
-      if (op.type === 'insert') {
-        this._delete(op.row, op.col, op.text, false);
-      } else if (op.type === 'delete') {
-        this._insert(op.row, op.col, op.text, false);
-      }
-
-      return { ...op, cursorAfter: cursorBefore };
-    },
-
-    /**
-     * Undo the last operation.
-     * @returns {boolean} True if an operation was undone
-     */
-    undo() {
-      if (this.undoStack.length === 0) return false;
-
-      const op = this.undoStack.pop();
-      const undoneOp = this._undoOp(op);
-      this.redoStack.push(undoneOp);
-
-      // If this operation was combined with the previous, undo that too
-      if (op.combined && this.undoStack.length > 0) {
-        const prevOp = this.undoStack.pop();
-        const undonePrevOp = this._undoOp(prevOp);
-        this.redoStack.push(undonePrevOp);
-        // Restore cursor to before the first (delete) operation
-        this._restoreCursor(prevOp.cursorBefore);
-      } else {
-        // Restore cursor to before the original operation
-        this._restoreCursor(op.cursorBefore);
-      }
-
-      render();
-      return true;
-    },
-
-    /**
-     * Redo a single operation (internal helper).
-     * @param {Object} op - Operation to redo
-     */
-    _redoOp(op) {
-      // Re-apply operation without recording to history
-      if (op.type === 'insert') {
-        this._insert(op.row, op.col, op.text, false);
-      } else if (op.type === 'delete') {
-        this._delete(op.row, op.col, op.text, false);
-      }
-      this.undoStack.push(op);
-    },
-
-    /**
-     * Redo the last undone operation.
-     * @returns {boolean} True if an operation was redone
-     */
-    redo() {
-      if (this.redoStack.length === 0) return false;
-
-      const op = this.redoStack.pop();
-      this._redoOp(op);
-
-      // If next operation is combined, redo that too
-      if (this.redoStack.length > 0 && this.redoStack[this.redoStack.length - 1].combined) {
-        const nextOp = this.redoStack.pop();
-        this._redoOp(nextOp);
-        // Restore cursor to after the second (insert) operation
-        if (nextOp.cursorAfter) {
-          this._restoreCursor(nextOp.cursorAfter);
-        }
-      } else {
-        // Restore cursor to after the original operation
-        if (op.cursorAfter) {
-          this._restoreCursor(op.cursorAfter);
-        }
-      }
-
-      render();
-      return true;
-    },
-
-    /**
-     * Clear all history.
-     */
-    clear() {
-      this.undoStack = [];
-      this.redoStack = [];
-    },
+      // Join first and last line portions, remove middle lines
+      Model.lines[row] = before + after;
+      Model.lines.splice(row + 1, lines.length - 1);
+    }
   }
 
   /**
@@ -985,7 +819,7 @@ function Buffee($parent, config = {}) {
     }
 
     // In read-only mode (-1), hide cursor and skip selection rendering
-    if (interactive === -1) {
+    if (Mode.interactive === -1) {
       $cursor.style.visibility = 'hidden';
       // Skip to render complete hooks
       for (const hook of renderHooks.onRenderComplete) {
@@ -1085,22 +919,6 @@ function Buffee($parent, config = {}) {
   };
 
   /**
-   * Interactive mode controlling input behavior.
-   * - 1: Full editing (default)
-   * - 0: Navigation only (can move cursor, no editing)
-   * - -1: Read-only (no cursor/selection, no navigation)
-   * @type {-1|0|1}
-   */
-  Object.defineProperty(this, 'interactive', {
-    get: () => interactive,
-    set: (value) => {
-      interactive = value;
-      render();
-    },
-    enumerable: true
-  });
-
-  /**
    * Line height in pixels. Used for positioning elements and calculating viewport.
    * @type {number}
    * @readonly
@@ -1116,28 +934,27 @@ function Buffee($parent, config = {}) {
 
   /**
    * Internal API for extensions.
-   * Extensions can use renderHooks to register callbacks.
    * @private
    */
-  this._internals = {
-    get head() { return head; },
-    /** Content area offset from .buffee-content: { ch, px, top } */
-    get contentOffset() {
-      return { 
-        ch: $gutter ? gutterCols() : 0, 
-        px: $gutter ? (editorPaddingPX * 3) : editorPaddingPX,
-        top: editorPaddingPX
-      };
-    },
-    $e,
-    $l,
-    $textLayer,
-    render,
-    renderHooks,
-    appendLines(newLines, skipRender = false) {
-      Model.lines.push(...newLines.map(expandTabs));
-      if (!skipRender) render();
-    }
+  Object.defineProperty(this, '_head', { get: () => head });
+  Object.defineProperty(this, '_tail', { get: () => tail });
+  this._insert = _insert;
+  this._delete = _delete;
+  Object.defineProperty(this, '_contentOffset', {
+    get: () => ({
+      ch: $gutter ? gutterCols() : 0,
+      px: $gutter ? (editorPaddingPX * 3) : editorPaddingPX,
+      top: editorPaddingPX
+    })
+  });
+  this._$e = $e;
+  this._$l = $l;
+  this._$textLayer = $textLayer;
+  this._render = render;
+  this._renderHooks = renderHooks;
+  this._appendLines = function(newLines, skipRender = false) {
+    Model.lines.push(...newLines.map(expandTabs));
+    if (!skipRender) render();
   };
 
   // Auto-fit viewport to container height
@@ -1197,23 +1014,23 @@ function Buffee($parent, config = {}) {
       return;
     }
 
-    // Undo: Ctrl/⌘+Z
+    // Undo: Ctrl/⌘+Z (requires BuffeeHistory extension)
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z' && !event.shiftKey) {
       event.preventDefault();
-      History.undo();
+      if (self.History) self.History.undo();
       return;
     }
 
-    // Redo: Ctrl/⌘+Shift+Z
+    // Redo: Ctrl/⌘+Shift+Z (requires BuffeeHistory extension)
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'z' && event.shiftKey) {
       event.preventDefault();
-      History.redo();
+      if (self.History) self.History.redo();
       return;
     }
 
     if(event.key.startsWith("Arrow")) {
       event.preventDefault(); // prevents page scroll
-      if (interactive === -1) return; // read-only mode: no navigation
+      if (Mode.interactive === -1) return; // read-only mode: no navigation
 
       if(event.metaKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
@@ -1277,7 +1094,7 @@ function Buffee($parent, config = {}) {
           Selection.moveCol(1);
         }
       }
-    } else if (interactive !== 1) { // navigation-only or read-only mode: no editing
+    } else if (Mode.interactive !== 1) { // navigation-only or read-only mode: no editing
     } else if (event.key === "Backspace") {
       Selection.delete();
     } else if (event.key === "Enter") {

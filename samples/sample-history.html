@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - History Extension</title>
+  <script src="../buffee.js"></script>
+  <script src="../extensions/statusline.js"></script>
+  <script src="../extensions/history.js"></script>
+  <link rel="stylesheet" href="../assets/reset.css">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../themes/theme-boring.css">
+  <link rel="stylesheet" href="../themes/theme-eva.css">
+</head>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../web/navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / History Extension</p>
+
+  <h1>History Extension (Undo/Redo)</h1>
+  <p>History tracking is opt-in. By default, editors have no undo/redo.</p>
+
+  <h2>Without History</h2>
+  <p>Type something, then try <kbd>Cmd+Z</kbd> (Mac) or <kbd>Ctrl+Z</kbd> (Windows). Nothing happens.</p>
+  <p><code>new Buffee(el, {})</code></p>
+
+  <div style="width: 600px; height: 200px; border: 1px solid #444; margin-bottom: 30px;">
+    <div class="buffee buffee-themepack1-boring" id="editor-no-history" style="width: 100%; height: 100%;">
+      <textarea class="buffee-clipboard-bridge"></textarea>
+      <div class="no-select buffee-elements">
+        <div class="buffee-gutter"></div>
+        <div class="buffee-lines" tabindex="0">
+          <blockquote class="buffee-layer-text"></blockquote>
+          <div class="buffee-layer-elements"></div>
+          <div class="buffee-cursor"></div>
+        </div>
+      </div>
+      <div class="buffee-status">
+        <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+        <div class="buffee-status-right">
+          Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>With History</h2>
+  <p>Type something, then try <kbd>Cmd+Z</kbd> / <kbd>Ctrl+Z</kbd> to undo, <kbd>Cmd+Shift+Z</kbd> / <kbd>Ctrl+Y</kbd> to redo.</p>
+  <p><code>const editor = new Buffee(el, {}); BuffeeHistory(editor);</code></p>
+
+  <div style="width: 600px; height: 200px; border: 1px solid #444;">
+    <div class="buffee buffee-themepack1-eva" id="editor-with-history" style="width: 100%; height: 100%;">
+      <textarea class="buffee-clipboard-bridge"></textarea>
+      <div class="no-select buffee-elements">
+        <div class="buffee-gutter"></div>
+        <div class="buffee-lines" tabindex="0">
+          <blockquote class="buffee-layer-text"></blockquote>
+          <div class="buffee-layer-elements"></div>
+          <div class="buffee-cursor"></div>
+        </div>
+      </div>
+      <div class="buffee-status">
+        <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+        <div class="buffee-status-right">
+          Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Editor WITHOUT history - undo/redo will be no-ops
+    const el1 = document.getElementById('editor-no-history');
+    const editorNoHistory = new Buffee(el1, {
+      callbacks: BuffeeStatusLine(el1)
+    });
+    editorNoHistory.Model.text = `// No history - Cmd+Z won't work
+// Try typing and undoing...`;
+
+    // Editor WITH history - full undo/redo support
+    const el2 = document.getElementById('editor-with-history');
+    const editorWithHistory = new Buffee(el2, {
+      callbacks: BuffeeStatusLine(el2)
+    });
+    BuffeeHistory(editorWithHistory);  // Enable history extension
+    editorWithHistory.Model.text = `// With history - Cmd+Z works!
+// Try typing and undoing...`;
+  </script>
+</body>
+</html>

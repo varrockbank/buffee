@@ -17,6 +17,27 @@
   <h1>Extensions</h1>
   <p>Optional modules for buffee. Load independently.</p>
 
+  <h2>History</h2>
+  <p><code>history.js</code></p>
+  <p>Undo/redo support with operation coalescing. Without this extension, editors have no history.</p>
+  <pre>BuffeeHistory(editor)
+editor.History.undo()
+editor.History.redo()
+editor.History.clear()</pre>
+  <p><a href="../samples/sample-history.html">Demo →</a></p>
+
+  <h2>UndoTree</h2>
+  <p><code>undotree.js</code></p>
+  <p>Tree-based undo/redo that preserves all branches. When you undo and make a new edit, you create a new branch instead of losing history.</p>
+  <pre>BuffeeUndoTree(editor)
+editor.UndoTree.undo()
+editor.UndoTree.redo()         // Follow most recent branch
+editor.UndoTree.redo(0)        // Follow specific branch
+editor.UndoTree.branches()     // Get available branches
+editor.UndoTree.goToNode(id)   // Jump to any node
+editor.UndoTree.getTree()      // Get tree for visualization</pre>
+  <p><a href="../samples/sample-undotree.html">Demo →</a></p>
+
   <h2>Syntax</h2>
   <p><code>syntax.js</code></p>
   <p>Regex-based syntax highlighting with incremental state caching. Ships with JavaScript, HTML, CSS, JSON, and Python.</p>

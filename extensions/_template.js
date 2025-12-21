@@ -11,10 +11,12 @@
 function Buffee__NAME__(editor) {
   // === INTERNALS ===
   // Available: $e, $textLayer, render, renderHooks, contentOffset, appendLines
-  const { $e, render, renderHooks } = editor._internals;
+  const $e = editor._$e;
+  const render = editor._render;
+  const renderHooks = editor._renderHooks;
 
   // === EDITOR PROPERTIES ===
-  // Available: Model, Selection, Viewport, History, lineHeight, editMode, interactive
+  // Available: Model, Selection, Viewport, Mode, lineHeight
   const { Model, Viewport, lineHeight } = editor;
 
   // === STATE ===

@@ -11,7 +11,7 @@
  * @returns {Object} The iOS API object
  */
 function BuffeeIOS(editor) {
-  const { $e } = editor._internals;
+  const $e = editor._$e;
   const lineHeight = editor.lineHeight;
   const { Selection } = editor;
 

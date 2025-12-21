@@ -18,6 +18,14 @@ expect(5).toBe(5);
 
 # DSL regression tests
 
+## should position cursor correctly after multi-char selection replacement
+### Replacing selection with multi-char text should position cursor correctly
+TYPE "Hello world"
+left 5 times with shift
+fixture.editor.Selection.insert('REPLACED');
+expect(fixture).toHaveLines('Hello REPLACED');
+EXPECT cursor at 0,14
+
 ## should handle pressing semicolon
 ### PRESS ';' should produce ';'
 PRESS ';'

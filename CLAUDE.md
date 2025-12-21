@@ -86,8 +86,13 @@ EXPECT cursor at 0,5
 
 Located in `extensions/`, tested in "Extensions" tab of `test/index.html`.
 
+**When adding an extension, also update:**
+- `web/extensions.html` (documentation)
+- `samples/index.html` (if adding a sample)
+
 | File | Function | Description |
 |------|----------|-------------|
+| `history.js` | `BuffeeHistory(editor)` | Undo/redo support (opt-in) |
 | `statusline.js` | `BuffeeStatusLine(node)` | Status bar callbacks |
 | `syntax.js` | `BuffeeSyntax(editor)` | Regex-based syntax highlighting |
 | `elementals.js` | `BuffeeElementals(editor)` | DOM-based UI elements in overlay |

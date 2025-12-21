@@ -18,7 +18,9 @@ function BuffeeTUI(editor) {
   }
   const Highlights = editor.Highlights;
 
-  const { $textLayer, render, renderHooks } = editor._internals;
+  const $textLayer = editor._$textLayer;
+  const render = editor._render;
+  const renderHooks = editor._renderHooks;
   const { Viewport, Model } = editor;
 
   let enabled = false;
@@ -104,7 +106,7 @@ function BuffeeTUI(editor) {
     set enabled(v) {
       const wasEnabled = enabled;
       enabled = !!v;
-      editor.interactive = enabled ? -1 : 1;  // -1 = read-only (no cursor/selection)
+      editor.Mode.interactive = enabled ? -1 : 1;  // -1 = read-only (no cursor/selection)
       // Only reset currentIndex when transitioning from disabled to enabled
       if (enabled && !wasEnabled && elements.length > 0) {
         currentIndex = 0;

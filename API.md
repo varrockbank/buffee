@@ -430,20 +430,20 @@ editor.UltraHighCapacity.deactivate();
 
 ---
 
-## Extension API (`editor._internals`)
+## Extension API
 
-The `_internals` object exposes internal state for building extensions. Extensions can hook into the render cycle without buffee needing to know about them.
+Internal state is exposed directly on the editor instance for building extensions. Extensions can hook into the render cycle without buffee needing to know about them.
 
 ```javascript
-const {
-  head,           // Cursor position { row, col } (viewport-relative)
-  $e,             // Lines container DOM element
-  render,         // render(rebuildContainers?) function
-  renderHooks     // Hook registration object
-} = editor._internals;
+// Internal API (for extensions)
+const render = editor._render;           // render(rebuildContainers?) function
+const renderHooks = editor._renderHooks; // Hook registration object
+const $e = editor._$e;                   // Lines container DOM element
+const head = editor._head;               // Cursor head position { row, col }
+const tail = editor._tail;               // Cursor tail position { row, col }
 
-// Public properties (use these instead of _internals)
-const { Viewport, Selection, Model, lineHeight } = editor;
+// Public properties
+const { Viewport, Selection, Model, Mode, lineHeight } = editor;
 ```
 
 ### Render Hooks
@@ -471,7 +471,8 @@ renderHooks.onRenderComplete.push(($container, viewport) => {
 
 ```javascript
 function MyExtension(editor) {
-  const { renderHooks, render } = editor._internals;
+  const render = editor._render;
+  const renderHooks = editor._renderHooks;
 
   // Register render hook
   renderHooks.onRenderComplete.push(($e, viewport) => {
@@ -480,8 +481,8 @@ function MyExtension(editor) {
 
   // Expose API on editor instance
   editor.MyExtension = {
-    enable() { editor.editMode = 'navigate'; render(true); },
-    disable() { editor.editMode = 'write'; render(true); }
+    enable() { editor.Mode.interactive = 0; render(true); },
+    disable() { editor.Mode.interactive = 1; render(true); }
   };
 }
 

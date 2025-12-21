@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>buffee - Undo Tree Extension</title>
+  <script src="../buffee.js"></script>
+  <script src="../extensions/statusline.js"></script>
+  <script src="../extensions/undotree.js"></script>
+  <link rel="stylesheet" href="../assets/reset.css">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../themes/theme-eva.css">
+  <style>
+    .container { display: flex; gap: 20px; margin-top: 20px; }
+    .editor-pane { flex: 1; }
+    .tree-pane { width: 350px; }
+    .tree-container {
+      background: #1e1e1e;
+      border: 1px solid #444;
+      padding: 15px;
+      min-height: 300px;
+      font-family: monospace;
+      font-size: 13px;
+      overflow: auto;
+    }
+    .tree-node {
+      margin-left: 20px;
+      position: relative;
+    }
+    .tree-node::before {
+      content: '';
+      position: absolute;
+      left: -15px;
+      top: 0;
+      height: 100%;
+      border-left: 1px solid #555;
+    }
+    .tree-node:last-child::before { height: 10px; }
+    .tree-node::after {
+      content: '';
+      position: absolute;
+      left: -15px;
+      top: 10px;
+      width: 10px;
+      border-top: 1px solid #555;
+    }
+    .tree-root { margin-left: 0; }
+    .tree-root::before, .tree-root::after { display: none; }
+    .node-content {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 2px 0;
+    }
+    .node-content:hover { background: #333; }
+    .node-content.current { background: #264f78; border: 1px solid #3794ff; }
+    .node-content.on-path { background: #2d4a3e; }
+    .node-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #888;
+      flex-shrink: 0;
+    }
+    .node-content.current .node-dot { background: #3794ff; }
+    .node-content.on-path .node-dot { background: #4ec9b0; }
+    .node-label { color: #ccc; }
+    .node-op { color: #ce9178; font-size: 11px; }
+    .branch-indicator {
+      background: #6a4c93;
+      color: white;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 10px;
+      margin-left: 5px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    .controls button {
+      padding: 8px 16px;
+      background: #0e639c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .controls button:hover { background: #1177bb; }
+    .controls button:disabled { background: #444; color: #888; cursor: not-allowed; }
+    .branch-buttons { margin-top: 10px; }
+    .branch-buttons button {
+      background: #6a4c93;
+      margin-right: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    .branch-buttons button:hover { background: #8b5fbf; }
+    .info-box {
+      background: #252526;
+      border: 1px solid #444;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #aaa;
+    }
+    .info-box code { color: #4ec9b0; }
+    kbd {
+      background: #333;
+      border: 1px solid #555;
+      border-radius: 3px;
+      padding: 2px 6px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body class="sample">
+  <nav id="nav"></nav>
+  <script>
+    fetch('../web/navigation.html')
+      .then(r => r.text())
+      .then(html => document.getElementById('nav').innerHTML = html);
+  </script>
+  <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Undo Tree Extension</p>
+
+  <h1>Undo Tree Extension</h1>
+  <p>Unlike linear history, undo tree preserves <strong>all branches</strong>. When you undo and make a new edit, you create a new branch instead of losing history.</p>
+
+  <div class="controls">
+    <button id="btn-undo" disabled>Undo</button>
+    <button id="btn-redo" disabled>Redo</button>
+    <button id="btn-clear">Clear History</button>
+  </div>
+  <div id="branch-controls" class="branch-buttons" style="display: none;">
+    <strong style="color: #aaa; margin-right: 10px;">Branches:</strong>
+  </div>
+
+  <div class="container">
+    <div class="editor-pane">
+      <div style="height: 300px; border: 1px solid #444;">
+        <div class="buffee buffee-themepack1-eva" id="editor" style="width: 100%; height: 100%;">
+          <textarea class="buffee-clipboard-bridge"></textarea>
+          <div class="no-select buffee-elements">
+            <div class="buffee-gutter"></div>
+            <div class="buffee-lines" tabindex="0">
+              <blockquote class="buffee-layer-text"></blockquote>
+              <div class="buffee-layer-elements"></div>
+              <div class="buffee-cursor"></div>
+            </div>
+          </div>
+          <div class="buffee-status">
+            <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+            <div class="buffee-status-right">
+              Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <strong>Try this:</strong><br>
+        1. Type "Hello"<br>
+        2. Press <kbd>Cmd+Z</kbd> to undo<br>
+        3. Type "World" - this creates a <strong>branch</strong><br>
+        4. Use the tree to navigate between branches
+      </div>
+    </div>
+    <div class="tree-pane">
+      <h3 style="margin: 0 0 10px 0; color: #ccc;">History Tree</h3>
+      <div class="tree-container" id="tree-view"></div>
+    </div>
+  </div>
+
+  <script>
+    const el = document.getElementById('editor');
+    const editor = new Buffee(el, { callbacks: BuffeeStatusLine(el) });
+    BuffeeUndoTree(editor);
+
+    const btnUndo = document.getElementById('btn-undo');
+    const btnRedo = document.getElementById('btn-redo');
+    const btnClear = document.getElementById('btn-clear');
+    const branchControls = document.getElementById('branch-controls');
+    const treeView = document.getElementById('tree-view');
+
+    // Update tree visualization
+    function updateTree() {
+      const tree = editor.UndoTree.getTree();
+      treeView.innerHTML = renderNode(tree, true);
+      updateButtons();
+      updateBranchControls();
+    }
+
+    function renderNode(node, isRoot = false) {
+      const opText = node.operation
+        ? `${node.operation.type === 'insert' ? '+' : '-'}"${node.operation.text}"`
+        : 'start';
+
+      const classes = ['node-content'];
+      if (node.isCurrent) classes.push('current');
+
+      const hasBranches = node.children.length > 1;
+
+      let html = `
+        <div class="tree-node ${isRoot ? 'tree-root' : ''}">
+          <div class="${classes.join(' ')}" onclick="goToNode(${node.id})">
+            <span class="node-dot"></span>
+            <span class="node-label">${node.id}</span>
+            <span class="node-op">${escapeHtml(opText)}</span>
+            ${hasBranches ? `<span class="branch-indicator">${node.children.length} branches</span>` : ''}
+          </div>
+      `;
+
+      for (const child of node.children) {
+        html += renderNode(child);
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function updateButtons() {
+      btnUndo.disabled = !editor.UndoTree.canUndo;
+      btnRedo.disabled = !editor.UndoTree.canRedo;
+    }
+
+    function updateBranchControls() {
+      const branches = editor.UndoTree.branches();
+      if (branches.length <= 1) {
+        branchControls.style.display = 'none';
+        return;
+      }
+
+      branchControls.style.display = 'block';
+      branchControls.innerHTML = '<strong style="color: #aaa; margin-right: 10px;">Branches:</strong>';
+
+      branches.forEach((branch, i) => {
+        const btn = document.createElement('button');
+        const label = branch.operation
+          ? `${branch.operation.type === 'insert' ? '+' : '-'}"${branch.operation.text.slice(0, 10)}"`
+          : `Branch ${i}`;
+        btn.textContent = label + (branch.isActive ? ' *' : '');
+        btn.onclick = () => {
+          editor.UndoTree.redo(i);
+          updateTree();
+        };
+        branchControls.appendChild(btn);
+      });
+    }
+
+    // Navigate to specific node
+    window.goToNode = function(id) {
+      editor.UndoTree.goToNode(id);
+      updateTree();
+    };
+
+    // Button handlers
+    btnUndo.onclick = () => {
+      editor.UndoTree.undo();
+      updateTree();
+    };
+
+    btnRedo.onclick = () => {
+      editor.UndoTree.redo();
+      updateTree();
+    };
+
+    btnClear.onclick = () => {
+      editor.UndoTree.clear();
+      editor.Model.text = '';
+      updateTree();
+    };
+
+    // Keyboard shortcuts
+    el.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        editor.UndoTree.undo();
+        updateTree();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        editor.UndoTree.redo();
+        updateTree();
+      } else if ((e.ctrlKey) && e.key === 'y') {
+        e.preventDefault();
+        editor.UndoTree.redo();
+        updateTree();
+      }
+    });
+
+    // Update tree on any edit
+    const originalInsert = editor._insert;
+    const originalDelete = editor._delete;
+
+    editor._insert = function(...args) {
+      const result = originalInsert.apply(this, args);
+      setTimeout(updateTree, 0);
+      return result;
+    };
+
+    editor._delete = function(...args) {
+      const result = originalDelete.apply(this, args);
+      setTimeout(updateTree, 0);
+      return result;
+    };
+
+    // Initial render
+    updateTree();
+  </script>
+</body>
+</html>

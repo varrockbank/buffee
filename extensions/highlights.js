@@ -10,7 +10,8 @@
  * @returns {Object} The Highlights API object
  */
 function BuffeeHighlights(editor) {
-  const { $e, contentOffset } = editor._internals;
+  const $e = editor._$e;
+  const contentOffset = editor._contentOffset;
   const { lineHeight } = editor;
 
   // Create fixed layer for highlights (doesn't scroll with content)
