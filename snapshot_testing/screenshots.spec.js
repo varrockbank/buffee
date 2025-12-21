@@ -4,9 +4,9 @@ const { test, expect } = require('@playwright/test');
 const pages = [
   // Root pages
   { name: 'index', path: '/' },
-  { name: 'getting-started', path: '/getting-started.html' },
-  { name: 'extensions', path: '/extensions.html' },
-  { name: 'themes', path: '/themes.html' },
+  { name: 'getting-started', path: '/web/getting-started.html' },
+  { name: 'extensions', path: '/web/extensions.html' },
+  { name: 'themes', path: '/web/themes.html' },
 
   // Samples
   { name: 'samples-index', path: '/samples/' },

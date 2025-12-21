@@ -2,14 +2,14 @@
 
 ## Required HTML Structure
 
-See `template.html` for the required HTML structure. Missing any element will cause `Cannot set properties of null` errors.
+See `web/template.html` for the required HTML structure. Missing any element will cause `Cannot set properties of null` errors.
 
-**When updating `template.html`, also update:**
-- `getting-started.html` (HTML-escaped version in `<pre>`)
+**When updating `web/template.html`, also update:**
+- `web/getting-started.html` (HTML-escaped version in `<pre>`)
 - `test/lib/test-runner.js` (createEditorNode function)
 - `index.html` (all editor instances)
 - `samples/*.html` (all sample files)
-- `themes.html`
+- `web/themes.html`
 
 ## Cursor Model (Vim-style)
 

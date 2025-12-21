@@ -10,7 +10,7 @@ Include the JavaScript function `Buffee`
 
 ## Required HTML Structure
 
-See `template.html`
+See `web/template.html`
 
 ## Include the referenced CSSS
 
