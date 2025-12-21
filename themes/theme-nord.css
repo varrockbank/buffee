@@ -1,17 +1,17 @@
 /* Nord Theme */
-.buffee-themepack1-nord > .wb-elements {
+.buffee-themepack1-nord > .buffee-elements {
   background-color: #2e3440;
   color: #d8dee9;
 }
-.buffee-themepack1-nord .wb-selection {
+.buffee-themepack1-nord .buffee-selection {
   background-color: #5e81ac;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-nord .wb-cursor {
+.buffee-themepack1-nord .buffee-cursor {
   background-color: #88c0d0;
 }
-.buffee-themepack1-nord .wb-gutter,
-.buffee-themepack1-nord .wb-status {
+.buffee-themepack1-nord .buffee-gutter,
+.buffee-themepack1-nord .buffee-status {
   background-color: #3b4252;
   color: #88c0d0;
 }

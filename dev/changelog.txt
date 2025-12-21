@@ -1,5 +1,11 @@
 * Project Devlog
 
+** 10.0.0-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.58 KB (+0.04)
+*** breaking
+- rename all CSS classes from wb-* to buffee-*
+- rename root class from .wb to .buffee
+- rename CSS variables from --wb-* to --buffee-*
+
 ** 9.0.4-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.54 KB (0)
 *** docs
 - clarify required/optional elements in template.html

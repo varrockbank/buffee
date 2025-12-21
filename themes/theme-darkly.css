@@ -1,17 +1,17 @@
 /* Darkly Theme */
-.buffee-themepack1-darkly > .wb-elements {
+.buffee-themepack1-darkly > .buffee-elements {
   background-color: #002b36;
   color: #839496;
 }
-.buffee-themepack1-darkly .wb-selection {
+.buffee-themepack1-darkly .buffee-selection {
   background-color: #268bd2;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-darkly .wb-cursor {
+.buffee-themepack1-darkly .buffee-cursor {
   background-color: #cb4b16;
 }
-.buffee-themepack1-darkly .wb-gutter,
-.buffee-themepack1-darkly .wb-status {
+.buffee-themepack1-darkly .buffee-gutter,
+.buffee-themepack1-darkly .buffee-status {
   background-color: #073642;
   color: #cb4b16;
 }

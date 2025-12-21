@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "9.0.3-alpha.1";
+  this.version = "10.0.0-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -46,18 +46,18 @@ function Buffee($parent, config = {}) {
   };
   const frameCallbacks = callbacks || {};
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
-  const lineHeight = prop("--wb-cell");
-  const editorPaddingPX = prop("--wb-padding");
-  const gutterDigitsMinimum = prop("--wb-gutter-digits-initial");
+  const lineHeight = prop("--buffee-cell");
+  const editorPaddingPX = prop("--buffee-padding");
+  const gutterDigitsMinimum = prop("--buffee-gutter-digits-initial");
   let gutterDigits = gutterDigitsMinimum;
-  const gutterCols = () => gutterDigits + prop("--wb-gutter-digits-padding");
+  const gutterCols = () => gutterDigits + prop("--buffee-gutter-digits-padding");
   const $ = (n, q) => n.querySelector(q); 
-  const $e = $($parent, '.wb-elements');
-  const $l = $($e, '.wb-lines');
-  const $cursor = $($e, '.wb-cursor');
-  const $textLayer = $($e, '.wb-layer-text');
-  const $clipboardBridge = $($parent, '.wb-clipboard-bridge');
-  const $gutter = $($e, '.wb-gutter');
+  const $e = $($parent, '.buffee-elements');
+  const $l = $($e, '.buffee-lines');
+  const $cursor = $($e, '.buffee-cursor');
+  const $textLayer = $($e, '.buffee-layer-text');
+  const $clipboardBridge = $($parent, '.buffee-clipboard-bridge');
+  const $gutter = $($e, '.buffee-gutter');
 
   // Set container width if cols specified
   // Width = gutter(ch) + lines(ch) + margins(px): gutter has margin*2, lines has margin*2
@@ -950,7 +950,7 @@ function Buffee($parent, config = {}) {
           fragmentGutters.appendChild(document.createElement("div"));
 
           const sel = $selections[base + i] = fragmentSelections.appendChild(document.createElement("div"));
-          sel.className = "wb-selection";
+          sel.className = "buffee-selection";
           sel.style.top = (base + i) * lineHeight + 'px';
         }
         $textLayer.appendChild(fragmentLines);
@@ -1121,7 +1121,7 @@ function Buffee($parent, config = {}) {
    */
   this._internals = {
     get head() { return head; },
-    /** Content area offset from .wb-content: { ch, px, top } */
+    /** Content area offset from .buffee-content: { ch, px, top } */
     get contentOffset() {
       return { 
         ch: $gutter ? gutterCols() : 0, 
@@ -1143,7 +1143,7 @@ function Buffee($parent, config = {}) {
   // Auto-fit viewport to container height
   if (Viewport.autoFit) {
     const fitViewport = () => {
-      // .wb-elements is flex: 1, so it fills remaining space after status line
+      // .buffee-elements is flex: 1, so it fills remaining space after status line
       const newSize = Math.floor($e.clientHeight / lineHeight);
       if (newSize > 0 && newSize !== Viewport.size) {
         Viewport.delta += newSize - Viewport.size;

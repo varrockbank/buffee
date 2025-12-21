@@ -19,21 +19,21 @@
   <p><a href="../index.html">home</a> / <a href="index.html">samples</a> / Gutter and Status Bar</p>
 
   <h1>Gutter and Status Bar</h1>
-  <p>Gutter visibility: include/omit <code>.wb-gutter</code> element. Status bar: include/omit <code>.wb-status</code> element.</p>
+  <p>Gutter visibility: include/omit <code>.buffee-gutter</code> element. Status bar: include/omit <code>.buffee-status</code> element.</p>
 
   <h2>1. Default (gutter + status bar)</h2>
   <p><code>new Buffee(el)</code></p>
-  <div class="wb buffee-themepack1-boring" id="editor-default">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-default">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
@@ -42,96 +42,96 @@
   <h2>2. No gutter</h2>
   <!-- TODO(claude): add HTML snippet with gutter crossed out-->
   <p><code>new Buffee(e);</code></p>
-  <div class="wb buffee-themepack1-boring" id="editor-no-gutter">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-no-gutter">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
   </div>
 
   <h2>3. No status line</h2>
-  <p>Omit the <code>.wb-status</code> element from the template:</p>
+  <p>Omit the <code>.buffee-status</code> element from the template:</p>
   <details>
     <summary>View template</summary>
-    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="wb"&gt;
-  &lt;textarea class="wb-clipboard-bridge"&gt;&lt;/textarea&gt;
-  &lt;div class="no-select wb-elements"&gt;
-    &lt;div class="wb-gutter"&gt;&lt;/div&gt;
-    &lt;div class="wb-lines" tabindex="0"&gt;...&lt;/div&gt;
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="buffee"&gt;
+  &lt;textarea class="buffee-clipboard-bridge"&gt;&lt;/textarea&gt;
+  &lt;div class="no-select buffee-elements"&gt;
+    &lt;div class="buffee-gutter"&gt;&lt;/div&gt;
+    &lt;div class="buffee-lines" tabindex="0"&gt;...&lt;/div&gt;
   &lt;/div&gt;
-  <span style="color: #c00; text-decoration: line-through;">&lt;div class="wb-status"&gt;...&lt;/div&gt;</span>
+  <span style="color: #c00; text-decoration: line-through;">&lt;div class="buffee-status"&gt;...&lt;/div&gt;</span>
 &lt;/div&gt;</pre>
   </details>
-  <div class="wb buffee-themepack1-boring" id="editor-no-status">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-no-status">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
   </div>
 
   <h2>4. Status line on top</h2>
-  <p>Place <code>.wb-status</code> before <code>.wb-elements</code> in the template:</p>
+  <p>Place <code>.buffee-status</code> before <code>.buffee-elements</code> in the template:</p>
   <details>
     <summary>View template</summary>
-    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="wb"&gt;
-  &lt;textarea class="wb-clipboard-bridge"&gt;&lt;/textarea&gt;
-  <span style="color: #0a0;">&lt;div class="wb-status"&gt;...&lt;/div&gt;</span>
-  &lt;div class="no-select wb-elements"&gt;
-    &lt;div class="wb-gutter"&gt;&lt;/div&gt;
-    &lt;div class="wb-lines" tabindex="0"&gt;...&lt;/div&gt;
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="buffee"&gt;
+  &lt;textarea class="buffee-clipboard-bridge"&gt;&lt;/textarea&gt;
+  <span style="color: #0a0;">&lt;div class="buffee-status"&gt;...&lt;/div&gt;</span>
+  &lt;div class="no-select buffee-elements"&gt;
+    &lt;div class="buffee-gutter"&gt;&lt;/div&gt;
+    &lt;div class="buffee-lines" tabindex="0"&gt;...&lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre>
   </details>
-  <div class="wb buffee-themepack1-boring" id="editor-status-top">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+  <div class="buffee buffee-themepack1-boring" id="editor-status-top">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>
-    <div class="no-select wb-elements">
-      <div class="wb-gutter"></div>
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+    <div class="no-select buffee-elements">
+      <div class="buffee-gutter"></div>
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
   </div>
 
   <h2>6. Gutter on right</h2>
-  <p>Place <code>.wb-gutter</code> after <code>.wb-lines</code> in the template:</p>
+  <p>Place <code>.buffee-gutter</code> after <code>.buffee-lines</code> in the template:</p>
   <details>
     <summary>View template</summary>
-    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="wb"&gt;
-  &lt;textarea class="wb-clipboard-bridge"&gt;&lt;/textarea&gt;
-  &lt;div class="no-select wb-elements"&gt;
-    &lt;div class="wb-lines" tabindex="0"&gt;...&lt;/div&gt;
-    <span style="color: #0a0;">&lt;div class="wb-gutter"&gt;&lt;/div&gt;</span>
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="buffee"&gt;
+  &lt;textarea class="buffee-clipboard-bridge"&gt;&lt;/textarea&gt;
+  &lt;div class="no-select buffee-elements"&gt;
+    &lt;div class="buffee-lines" tabindex="0"&gt;...&lt;/div&gt;
+    <span style="color: #0a0;">&lt;div class="buffee-gutter"&gt;&lt;/div&gt;</span>
   &lt;/div&gt;
-  &lt;div class="wb-status"&gt;...&lt;/div&gt;
+  &lt;div class="buffee-status"&gt;...&lt;/div&gt;
 &lt;/div&gt;</pre>
   </details>
-  <div class="wb buffee-themepack1-boring" id="editor-gutter-right">
-    <textarea class="wb-clipboard-bridge"></textarea>
-    <div class="no-select wb-elements">
-      <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
-      <div class="wb-gutter"></div>
+  <div class="buffee buffee-themepack1-boring" id="editor-gutter-right">
+    <textarea class="buffee-clipboard-bridge"></textarea>
+    <div class="no-select buffee-elements">
+      <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
+      <div class="buffee-gutter"></div>
     </div>
-    <div class="wb-status">
-      <div class="wb-status-left"><span class="wb-linecount"></span></div>
-      <div class="wb-status-right">
-        Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>
-        <span class="wb-status-divider">|</span>
+    <div class="buffee-status">
+      <div class="buffee-status-left"><span class="buffee-linecount"></span></div>
+      <div class="buffee-status-right">
+        Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>
+        <span class="buffee-status-divider">|</span>
         <span class="buffee-spaces"></span>
       </div>
     </div>

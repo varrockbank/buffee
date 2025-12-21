@@ -1,17 +1,17 @@
 /* Eva Theme - Inspired by Evangelion */
-.buffee-themepack1-eva > .wb-elements {
+.buffee-themepack1-eva > .buffee-elements {
   background-color: #1e1e28;
   color: #d4d4d4;
 }
-.buffee-themepack1-eva .wb-selection {
+.buffee-themepack1-eva .buffee-selection {
   background-color: #9c6bce;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-eva .wb-cursor {
+.buffee-themepack1-eva .buffee-cursor {
   background-color: #00d9e9;
 }
-.buffee-themepack1-eva .wb-gutter,
-.buffee-themepack1-eva .wb-status {
+.buffee-themepack1-eva .buffee-gutter,
+.buffee-themepack1-eva .buffee-status {
   background-color: #38274D;
   color: #87FF5F;
 }

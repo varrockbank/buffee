@@ -15,7 +15,7 @@
 function BuffeeElementals(editor) {
   const { $e, renderHooks } = editor._internals;
   const { Viewport, lineHeight } = editor;
-  const $elementLayer = $e.querySelector('.wb-layer-elements');
+  const $elementLayer = $e.querySelector('.buffee-layer-elements');
 
   let enabled = false;
   let clickable = false;
@@ -29,7 +29,7 @@ function BuffeeElementals(editor) {
    */
   function createContainer(row, col, opts = {}) {
     const container = document.createElement("div");
-    container.className = "wb-elemental";
+    container.className = "buffee-elemental";
     Object.assign(container.style, {
       position: 'absolute',
       top: row * lineHeight + 'px',
@@ -67,9 +67,9 @@ function BuffeeElementals(editor) {
   function updateFocus() {
     elements.forEach((el, i) => {
       if (i === focusedIndex) {
-        el.$container.classList.add('wb-elemental-focused');
+        el.$container.classList.add('buffee-elemental-focused');
       } else {
-        el.$container.classList.remove('wb-elemental-focused');
+        el.$container.classList.remove('buffee-elemental-focused');
       }
     });
   }
@@ -119,7 +119,7 @@ function BuffeeElementals(editor) {
       const $container = createContainer(row, col);
 
       const $button = document.createElement("span");
-      $button.className = "wb-elemental-button";
+      $button.className = "buffee-elemental-button";
       $button.textContent = label;
       if (clickable) $button.style.cursor = 'pointer';
 
@@ -162,7 +162,7 @@ function BuffeeElementals(editor) {
       $container.style.pointerEvents = 'none';
 
       const $label = document.createElement("span");
-      $label.className = "wb-elemental-label";
+      $label.className = "buffee-elemental-label";
       $label.textContent = text;
 
       $container.appendChild($label);
@@ -199,7 +199,7 @@ function BuffeeElementals(editor) {
 
       const $input = document.createElement("input");
       $input.type = "text";
-      $input.className = "wb-elemental-input";
+      $input.className = "buffee-elemental-input";
       $input.placeholder = placeholder || '';
       Object.assign($input.style, {
         width: width + 'ch',
