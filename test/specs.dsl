@@ -926,8 +926,11 @@ EXPECT cursor at 0,0
 ### Regression: Gutter stays stable when crossing single to double digit line count
 // Start with empty editor
 const $gutter = fixture.node.querySelector(".wb-gutter");
-// Initial gutter is 2 digits minimum (3ch with padding)
-expect($gutter.style.width).toBe("3ch");
+// Using tolerance because computed style can differ slightly from actual
+const gutterWidthPx = () => parseFloat(getComputedStyle($gutter).width);
+const initialWidth = gutterWidthPx();
+// Initial gutter is 2 digits minimum (3ch with padding) - approximately 43px
+expect(initialWidth).toBeCloseTo(43.35);
 // Type 9 lines
 TYPE "1"
 enter
@@ -946,39 +949,44 @@ enter
 TYPE "8"
 enter
 TYPE "9"
-// Still 9 lines, gutter should still be 3ch (2 digit minimum)
-expect($gutter.style.width).toBe("3ch");
+// Still 9 lines, gutter width should be unchanged
+expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 // Add line 10
 enter
 TYPE "10"
-// Now 10 lines, gutter should still be 3ch (2 digits fits 10)
-expect($gutter.style.width).toBe("3ch");
+// Now 10 lines, gutter should still be same (2 digits fits 10)
+expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 
 ## should resize gutter based on visible lines
 ### Gutter based on viewport position, not total lines
 // Add 15 lines (more than viewport of 10)
 fixture.wb.Model.text = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15";
 const $gutter = fixture.node.querySelector(".wb-gutter");
-// Viewport shows lines 1-10, largest visible = 10, gutter = 3ch
-expect($gutter.style.width).toBe("3ch");
+// Using tolerance because computed style can differ slightly from actual
+const gutterWidthPx = () => parseFloat(getComputedStyle($gutter).width);
+const initialWidth = gutterWidthPx();
+// Viewport shows lines 1-10, largest visible = 10, gutter = 3ch (~43px)
+expect(initialWidth).toBeCloseTo(43.35);
 // Scroll down - still 2-digit line numbers visible
 fixture.wb.Viewport.scroll(2);
-expect($gutter.style.width).toBe("3ch");
+expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 // Scroll back up
 fixture.wb.Viewport.scroll(-2);
-expect($gutter.style.width).toBe("3ch");
+expect(gutterWidthPx()).toBeCloseTo(initialWidth);
 
 ## should grow gutter when scrolling to 3-digit lines
 ### Gutter grows from 2 to 3 digits when line 100 is visible
 // Create 100 lines
 fixture.wb.Model.text = Array(100).fill("x").join("\n");
 const $gutter = fixture.node.querySelector(".wb-gutter");
-// Viewport at top shows lines 1-10, gutter = 3ch (2 digits + 1 padding)
-expect($gutter.style.width).toBe("3ch");
+// Using tolerance because computed style can differ slightly from actual
+const gutterWidthPx = () => parseFloat(getComputedStyle($gutter).width);
+// Viewport at top shows lines 1-10, gutter = 3ch (2 digits + 1 padding) ~43px
+expect(gutterWidthPx()).toBeCloseTo(43.35);
 // Navigate to line 100
 down 99 times
-// Now largest visible = 100 (3 digits), gutter = 4ch
-expect($gutter.style.width).toBe("4ch");
+// Now largest visible = 100 (3 digits), gutter = 4ch ~58px
+expect(gutterWidthPx()).toBeCloseTo(57.80);
 
 
 # Indentation property
