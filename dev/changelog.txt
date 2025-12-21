@@ -1,5 +1,10 @@
 * Project Devlog
 
+** 11.0.7-alpha.1 [2025-12-21]  gz+min: 3.75 KB (-0.03), min: 10.75 KB (-0.05)
+*** breaking
+- move `interactive` property to `Mode.interactive`
+- add `Mode` namespace for mode-related settings
+
 ** 11.0.6-alpha.1 [2025-12-21]  gz+min: 3.78 KB (+0.00), min: 10.79 KB (+0.05)
 *** breaking
 - remove _internals object, expose internal API directly on editor

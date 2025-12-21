@@ -95,7 +95,7 @@ function BuffeeElementals(editor) {
         updateFocus();
       }
       // Set read-only mode to hide cursor/selection when elementals is enabled
-      editor.interactive = enabled ? -1 : 1;
+      editor.Mode.interactive = enabled ? -1 : 1;
       updatePositions();
     },
 

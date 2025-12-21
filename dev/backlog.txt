@@ -1,7 +1,7 @@
 Website
-15. audit things in _internals that are used elsewhere 
 16. everywhere in web page should use buffee 
 
+Wrappers
 17. wrappers in React, etc.
 
 Extensions 

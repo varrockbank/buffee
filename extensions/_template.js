@@ -16,7 +16,7 @@ function Buffee__NAME__(editor) {
   const renderHooks = editor._renderHooks;
 
   // === EDITOR PROPERTIES ===
-  // Available: Model, Selection, Viewport, History, lineHeight, editMode, interactive
+  // Available: Model, Selection, Viewport, Mode, lineHeight
   const { Model, Viewport, lineHeight } = editor;
 
   // === STATE ===

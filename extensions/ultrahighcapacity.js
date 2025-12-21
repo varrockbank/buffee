@@ -307,7 +307,7 @@ function BuffeeUltraHighCapacity(editor) {
       Model.lines = createLinesProxy();
 
       // Set navigation-only mode (can move cursor, no editing)
-      editor.interactive = 0;
+      editor.Mode.interactive = 0;
 
       // Override Model.lastIndex
       Object.defineProperty(Model, 'lastIndex', {
@@ -340,7 +340,7 @@ function BuffeeUltraHighCapacity(editor) {
       editor._appendLines = originalAppendLines;
 
       // Restore normal mode (full editing)
-      editor.interactive = 1;
+      editor.Mode.interactive = 1;
 
       // Clear chunk data
       chunks = [];

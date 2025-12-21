@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "11.0.6-alpha.1";
+  this.version = "11.0.7-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -40,9 +40,20 @@ function Buffee($parent, config = {}) {
   } = config;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
-  /** Editor mode settings (shared between internal and external code) */
+  /**
+   * Editor mode settings (shared between internal and external code).
+   * @namespace Mode
+   */
   const Mode = {
     spaces,
+    /**
+     * Interactive mode: 1 (normal), 0 (navigation-only), -1 (read-only)
+     * - 1: Full editing (default)
+     * - 0: Navigation only (can move cursor, no editing) - used by UltraHighCapacity
+     * - -1: Read-only (no cursor/selection rendering, no navigation) - used by TUI
+     * @type {-1|0|1}
+     */
+    interactive: 1
   };
   const frameCallbacks = callbacks || {};
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
@@ -544,15 +555,6 @@ function Buffee($parent, config = {}) {
   };
 
   /**
-   * Interactive mode: 1 (normal), 0 (navigation-only), -1 (read-only)
-   * - 1: Full editing (default)
-   * - 0: Navigation only (can move cursor, no editing) - used by UltraHighCapacity
-   * - -1: Read-only (no cursor/selection rendering, no navigation) - used by TUI
-   * @type {-1|0|1}
-   */
-  let interactive = 1;
-
-  /**
    * Document model managing text content.
    * @namespace Model
    */
@@ -816,7 +818,7 @@ function Buffee($parent, config = {}) {
     }
 
     // In read-only mode (-1), hide cursor and skip selection rendering
-    if (interactive === -1) {
+    if (Mode.interactive === -1) {
       $cursor.style.visibility = 'hidden';
       // Skip to render complete hooks
       for (const hook of renderHooks.onRenderComplete) {
@@ -914,22 +916,6 @@ function Buffee($parent, config = {}) {
     extension(this, options);
     return this;
   };
-
-  /**
-   * Interactive mode controlling input behavior.
-   * - 1: Full editing (default)
-   * - 0: Navigation only (can move cursor, no editing)
-   * - -1: Read-only (no cursor/selection, no navigation)
-   * @type {-1|0|1}
-   */
-  Object.defineProperty(this, 'interactive', {
-    get: () => interactive,
-    set: (value) => {
-      interactive = value;
-      render();
-    },
-    enumerable: true
-  });
 
   /**
    * Line height in pixels. Used for positioning elements and calculating viewport.
@@ -1043,7 +1029,7 @@ function Buffee($parent, config = {}) {
 
     if(event.key.startsWith("Arrow")) {
       event.preventDefault(); // prevents page scroll
-      if (interactive === -1) return; // read-only mode: no navigation
+      if (Mode.interactive === -1) return; // read-only mode: no navigation
 
       if(event.metaKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
@@ -1107,7 +1093,7 @@ function Buffee($parent, config = {}) {
           Selection.moveCol(1);
         }
       }
-    } else if (interactive !== 1) { // navigation-only or read-only mode: no editing
+    } else if (Mode.interactive !== 1) { // navigation-only or read-only mode: no editing
     } else if (event.key === "Backspace") {
       Selection.delete();
     } else if (event.key === "Enter") {

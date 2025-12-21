@@ -106,7 +106,7 @@ function BuffeeTUI(editor) {
     set enabled(v) {
       const wasEnabled = enabled;
       enabled = !!v;
-      editor.interactive = enabled ? -1 : 1;  // -1 = read-only (no cursor/selection)
+      editor.Mode.interactive = enabled ? -1 : 1;  // -1 = read-only (no cursor/selection)
       // Only reset currentIndex when transitioning from disabled to enabled
       if (enabled && !wasEnabled && elements.length > 0) {
         currentIndex = 0;
