@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "9.0.0-alpha.1";
+  this.version = "9.0.1-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -52,7 +52,8 @@ function Buffee($parent, config = {}) {
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
   const lineHeight = prop("--wb-cell");
   const editorPaddingPX = prop("--wb-padding");
-  let gutterDigits = prop("--wb-gutter-digits-initial");
+  const gutterDigitsMinimum = prop("--wb-gutter-digits-initial");
+  let gutterDigits = gutterDigitsMinimum;
   const gutterCols = () => gutterDigits + prop("--wb-gutter-digits-padding");
   const $ = (n, q) => n.querySelector(q); 
   const $e = $($parent, '.wb-elements');
@@ -933,10 +934,11 @@ function Buffee($parent, config = {}) {
     // Minimum width from CSS variable to avoid jitter for small documents
     if ($gutter) {
       // TODO: move into viewport
-      const digits = Math.max(gutterDigits, (Viewport.start + Viewport.displayLines).toString().length);
+      const digits = Math.max(gutterDigitsMinimum, (Viewport.start + Viewport.displayLines).toString().length);
       if (digits !== gutterDigits) {
         gutterDigits = digits;
         $gutter.style.width = gutterCols() + 'ch';
+        // TODO: refactor into function
         if (viewportCols) $e.style.width = `calc(${gutterCols() + viewportCols}ch + ${editorPaddingPX * 4}px)`;
       }
     }

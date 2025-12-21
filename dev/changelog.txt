@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 9.0.1-alpha.1 [2025-12-20]  gz+min: 4.28 KB (+0.00), min: 12.56 KB (+0.00)
+*** refactor
+- user terminology of "digits" to refer to min digits, digit spaces, digit padding in gutter
+
 ** 9.0.0-alpha.1 [2025-12-20]  gz+min: 4.27 KB (+0.00), min: 12.55 KB (+0.08)
 *** refactor
 - make gutter optional, depending on user template
