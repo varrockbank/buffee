@@ -25,19 +25,9 @@
  * const editor = new Buffee(document.getElementById('editor'), { rows: 25 });
  * editor.Model.text = 'Hello, World!';
  */
-function Buffee($parent, config = {}) {
-  this.version = "11.0.8-alpha.1";
+function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
+  this.version = "11.1.0-alpha.1";
   const self = this;
-
-  // TODO: make everything mutable, and observed.
-  // Extract configuration with defaults
-  const {
-    rows,
-    cols,
-    spaces = 4,
-    logger,
-    callbacks
-  } = config;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
   /**

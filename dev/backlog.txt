@@ -17,3 +17,6 @@ does not snap to the nearest 4th tab stop
 
 Webs
 Theme should just link to theme 
+
+Samples 
+Samples page should be broken into by extensions
