@@ -11,8 +11,8 @@
  * @returns {Object} The Syntax API object
  */
 function BuffeeSyntax(editor) {
-  const { $e, $textLayer, renderHooks } = editor._internals;
-  const { Viewport, Model, History } = editor;
+  const { $e, $textLayer, renderHooks, _insert, _delete } = editor._internals;
+  const { Viewport, Model } = editor;
 
   // State cache: stateCache[lineIndex] = startState for that line
   // State 0 = NORMAL, other states defined by language
@@ -23,22 +23,21 @@ function BuffeeSyntax(editor) {
   let enabled = false;
 
   // ============================================================================
-  // Hook into History and Model to detect edits and invalidate state cache
+  // Hook into _insert/_delete to detect edits and invalidate state cache
   // ============================================================================
 
-  // Hook History._insert
-  const originalInsert = History._insert.bind(History);
-  History._insert = function(row, col, text, recordHistory, combined) {
-    originalInsert(row, col, text, recordHistory, combined);
+  // Hook _insert
+  editor._internals._insert = function(row, col, text) {
+    const result = _insert(row, col, text);
     if (enabled) {
       invalidateFrom(row);
     }
+    return result;
   };
 
-  // Hook History._delete
-  const originalDelete = History._delete.bind(History);
-  History._delete = function(row, col, text, recordHistory, combined) {
-    originalDelete(row, col, text, recordHistory, combined);
+  // Hook _delete
+  editor._internals._delete = function(row, col, text) {
+    _delete(row, col, text);
     if (enabled) {
       invalidateFrom(row);
     }
