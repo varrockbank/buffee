@@ -40,12 +40,21 @@
   </div>
 
   <h2>2. No gutter</h2>
-  <!-- TODO(claude): add HTML snippet with gutter crossed out-->
-  <p><code>new Buffee(e);</code></p>
+  <p>Omit the <code>.buffee-gutter</code> element from the template:</p>
+  <details>
+    <summary>View template</summary>
+    <pre style="padding: 10px; overflow-x: auto; font-size: 12px;">&lt;div class="buffee"&gt;
+  &lt;textarea class="buffee-clipboard-bridge"&gt;&lt;/textarea&gt;
+  &lt;div class="no-select buffee-elements"&gt;
+    <span style="color: #c00; text-decoration: line-through;">&lt;div class="buffee-gutter"&gt;&lt;/div&gt;</span>
+    &lt;div class="buffee-lines" tabindex="0"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="buffee-status"&gt;...&lt;/div&gt;
+&lt;/div&gt;</pre>
+  </details>
   <div class="buffee buffee-themepack1-boring" id="editor-no-gutter">
     <textarea class="buffee-clipboard-bridge"></textarea>
     <div class="no-select buffee-elements">
-      <div class="buffee-gutter"></div>
       <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
     </div>
     <div class="buffee-status">
@@ -157,7 +166,6 @@ hello();`;
     const elNoGutter = document.getElementById('editor-no-gutter');
     const edNoGutter = new Buffee(elNoGutter, {
       rows: 10,
-      showGutter: false,
       callbacks: BuffeeStatusLine(elNoGutter)
     });
     edNoGutter.Model.text = content;
@@ -165,8 +173,7 @@ hello();`;
     // No status bar
     const elNoStatus = document.getElementById('editor-no-status');
     const edNoStatus = new Buffee(elNoStatus, {
-      rows: 10,
-      showGutter: true
+      rows: 10
     });
     edNoStatus.Model.text = content;
 
