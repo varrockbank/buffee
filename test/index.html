@@ -215,6 +215,7 @@
         <button class="tab" data-tab="extensions">Extensions</button>
         <button class="tab" data-tab="source">Source</button>
         <button class="tab" data-tab="grammar">Grammar</button>
+        <button class="tab" data-tab="diagnostics">AI Diagnostics</button>
         <span id="test-stale-warning" class="status-message warning" style="display: none;"><span class="warning-icon">⚠</span> source spec changed, recompile</span>
     </div>
     <div id="tab-tests" class="tab-content active">
@@ -366,6 +367,13 @@ Examples in Normalized Form        <span class="g-arr">→</span>  Transpilation
 expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).toBe(8);
 // This is a comment               <span class="g-arr">→</span>  // This is a comment
 (empty line)                       <span class="g-arr">→</span>  (empty line)</main>
+    </div>
+    <div id="tab-diagnostics" class="tab-content">
+        <main>
+            <p style="margin-bottom: 1rem;">Copy all test failures to paste into Claude for debugging:</p>
+            <button id="copy-diagnostics-btn" onclick="copyDiagnosticsText()">Copy to Clipboard</button>
+            <pre id="diagnostics-output" style="margin-top: 1rem; padding: 1rem; background: #f4f4f4; border: 1px solid #ccc; white-space: pre-wrap; max-height: 600px; overflow: auto;">Loading...</pre>
+        </main>
     </div>
 
     <!-- Compile Errors Modal -->
@@ -1671,6 +1679,59 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(runExtensionTests, 500);
         });
+
+        // ===========================================
+        // AI Diagnostics
+        // ===========================================
+
+        const knownFailures = new Set([
+            'should demonstrate interleaved success and failure expects'
+        ]);
+
+        function updateDiagnostics() {
+            const output = document.getElementById('diagnostics-output');
+            if (!output) return;
+
+            const failures = [];
+
+            // Collect DSL test failures
+            if (typeof runner !== 'undefined' && runner.suites) {
+                runner.suites.forEach(suite => {
+                    suite.results.forEach(test => {
+                        if (test.status === 'fail' && test.error && !knownFailures.has(test.name)) {
+                            failures.push(`${test.name}\n${test.description || ''}\n${test.error.message}`);
+                        }
+                    });
+                });
+            }
+
+            // Collect extension test failures
+            if (typeof extRunner !== 'undefined' && extRunner.suites) {
+                extRunner.suites.forEach(suite => {
+                    suite.results.forEach(test => {
+                        if (test.status === 'fail' && test.error) {
+                            failures.push(`[Extension] ${suite.name}: ${test.name}\n${test.error.message}`);
+                        }
+                    });
+                });
+            }
+
+            output.textContent = failures.length > 0
+                ? failures.join('\n\n---\n\n')
+                : 'No failures detected.';
+        }
+
+        function copyDiagnosticsText() {
+            const output = document.getElementById('diagnostics-output');
+            const btn = document.getElementById('copy-diagnostics-btn');
+            navigator.clipboard.writeText(output.textContent).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 1000);
+            });
+        }
+
+        // Update diagnostics when switching to that tab
+        document.querySelector('.tab[data-tab="diagnostics"]').addEventListener('click', updateDiagnostics);
     </script>
 </body>
 </html>
