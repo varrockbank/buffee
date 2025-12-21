@@ -17,7 +17,23 @@ See `template.html` for the required HTML structure. Missing any element will ca
 - After typing "ABC", cursor is at col 3 (past the last character)
 - **Shift+Arrow selects inclusively**: includes current character AND character(s) moved over
 
-## Writing Tests (specs.dsl)
+## Test Directory Structure
+
+Spec files (in `test/specs/`):
+- `core.dsl` - Basic typing, backspace, enter, complex sequences
+- `navigation.dsl` - Cursor movement, meta+arrow, word movement
+- `selection.dsl` - Selection, multi-line, deleting/replacing selections
+- `features.dsl` - Gutter, indentation, undo/redo, unindent
+- `regression.dsl` - Walkthrough feature, DSL regression tests
+
+Test infrastructure:
+- `test/lib/expect.js` - Assertions (`toBe`, `toEqual`, `toBeCloseTo`)
+- `test/lib/harness.js` - Test fixture and key simulation
+- `test/lib/test-ui.js` - Test runner UI (SPEC_FILES array defines load order)
+
+**AI Diagnostics tab**: Copy all test failures at once for pasting to Claude.
+
+## Writing Tests (specs/*.dsl)
 
 - Default viewport is **10 lines**
 - Use DSL commands (`TYPE`, `enter`, `left`, `up`) not direct API calls

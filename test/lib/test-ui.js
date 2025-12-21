@@ -379,15 +379,28 @@
             }
         });
 
+        // Spec files to load (in order)
+        const SPEC_FILES = [
+            './specs/core.dsl',
+            './specs/navigation.dsl',
+            './specs/selection.dsl',
+            './specs/features.dsl',
+            './specs/regression.dsl'
+        ];
+
         async function loadDSL() {
             try {
-                const response = await fetch('./specs.dsl');
+                const contents = await Promise.all(
+                    SPEC_FILES.map(async (file) => {
+                        const response = await fetch(file);
+                        if (!response.ok) {
+                            throw new Error(`Failed to load ${file}: ${response.status} ${response.statusText}`);
+                        }
+                        return response.text();
+                    })
+                );
 
-                if (!response.ok) {
-                    throw new Error(`Failed to load: ${response.status} ${response.statusText}`);
-                }
-
-                const content = await response.text();
+                const content = contents.join('\n\n');
                 setEditorContent(content);
                 transpileDSL();
 
