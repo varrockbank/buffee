@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 9.0.4-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.54 KB (0)
+*** docs
+- clarify required/optional elements in template.html
+
 ** 9.0.3-alpha.1 [2025-12-21]  gz+min: 4.28 KB (+0.00), min: 12.56 KB (+0.00)
 *** breaking
 - rename config options: viewportRows → rows, viewportCols → cols
