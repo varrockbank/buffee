@@ -396,11 +396,20 @@
                         if (!response.ok) {
                             throw new Error(`Failed to load ${file}: ${response.status} ${response.statusText}`);
                         }
-                        return response.text();
+                        return { file, content: await response.text() };
                     })
                 );
 
-                const content = contents.join('\n\n');
+                // Build file/line map for diagnostics
+                window.dslFileMap = [];
+                let globalLine = 1;
+                contents.forEach(({ file, content }) => {
+                    const lineCount = content.split('\n').length;
+                    window.dslFileMap.push({ file: file.replace('./specs/', ''), start: globalLine, end: globalLine + lineCount - 1 });
+                    globalLine += lineCount + 2; // +2 for the \n\n between files
+                });
+
+                const content = contents.map(c => c.content).join('\n\n');
                 setEditorContent(content);
                 transpileDSL();
 
@@ -1250,10 +1259,22 @@
                             const key = `${suite.name}:${test.name}`;
                             const sourceData = window.dslSourceMap?.[key];
                             const source = sourceData?.source?.replace(/\\n/g, '\n') || '';
+                            const startLine = sourceData?.startLine || 0;
+
+                            // Find which file contains this line
+                            let fileInfo = '';
+                            if (startLine && window.dslFileMap) {
+                                const fileEntry = window.dslFileMap.find(f => startLine >= f.start && startLine <= f.end);
+                                if (fileEntry) {
+                                    const localLine = startLine - fileEntry.start + 1;
+                                    fileInfo = `File: ${fileEntry.file}:${localLine}`;
+                                }
+                            }
 
                             failures.push(
                                 `## ${test.name}\n` +
                                 `Suite: ${suite.name}\n` +
+                                (fileInfo ? `${fileInfo}\n` : '') +
                                 `Error: ${test.error.message}\n` +
                                 (source ? `\nDSL Source:\n${source}` : '')
                             );

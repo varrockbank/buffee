@@ -58,6 +58,7 @@ class SpecGenerator {
     let currentTestDslLines = [];
     let currentTestJsLineCount = 0;
     let dslToJsLineMap = []; // Maps DSL line index to JS line index
+    let currentTestStartLine = 0; // Track where current test starts
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -73,7 +74,7 @@ class SpecGenerator {
           // Store DSL source and mapping in map
           const dslSource = currentTestDslLines.join('\\n');
           const lineMap = JSON.stringify(dslToJsLineMap);
-          output.push(`  window.dslSourceMap['${this.escapeString(currentSuite)}:${this.escapeString(currentTest)}'] = { source: \`${dslSource}\`, lineMap: ${lineMap} };`);
+          output.push(`  window.dslSourceMap['${this.escapeString(currentSuite)}:${this.escapeString(currentTest)}'] = { source: \`${dslSource}\`, lineMap: ${lineMap}, startLine: ${currentTestStartLine} };`);
           output.push('');
           currentTest = null;
           currentTestDescription = null;
@@ -105,11 +106,12 @@ class SpecGenerator {
           // Store DSL source and mapping in map
           const dslSource = currentTestDslLines.join('\\n');
           const lineMap = JSON.stringify(dslToJsLineMap);
-          output.push(`  window.dslSourceMap['${this.escapeString(currentSuite)}:${this.escapeString(currentTest)}'] = { source: \`${dslSource}\`, lineMap: ${lineMap} };`);
+          output.push(`  window.dslSourceMap['${this.escapeString(currentSuite)}:${this.escapeString(currentTest)}'] = { source: \`${dslSource}\`, lineMap: ${lineMap}, startLine: ${currentTestStartLine} };`);
           output.push('');
         }
 
         currentTest = trimmed.substring(3).trim();
+        currentTestStartLine = i + 1; // 1-indexed line number
 
         // Check for duplicate test name
         const testKey = `${currentSuite}:${currentTest}`;
@@ -118,10 +120,10 @@ class SpecGenerator {
             suite: currentSuite,
             test: currentTest,
             firstLine: testNames.get(testKey),
-            secondLine: i + 1
+            secondLine: currentTestStartLine
           });
         } else {
-          testNames.set(testKey, i + 1);
+          testNames.set(testKey, currentTestStartLine);
         }
 
         currentTestDescription = null;
