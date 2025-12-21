@@ -144,22 +144,22 @@ expect(fixture).toHaveLines('Hello');`
       {
         name: 'JavaScript interweaving: variable declaration',
         input: `TYPE "Test"
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe('Test');`,
         expected: `fixture.type('Test');
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe('Test');`
       },
       {
         name: 'JavaScript interweaving: selection check',
         input: `TYPE "Hello"
 left 3 times with shift
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 2 });
 expect(end).toEqual({ row: 0, col: 5 });`,
         expected: `fixture.type('Hello');
 fixture.press(Key.ArrowLeft).withShiftKey().times(3);
-const [start, end] = fixture.wb.Selection.ordered;
+const [start, end] = fixture.editor.Selection.ordered;
 expect(start).toEqual({ row: 0, col: 2 });
 expect(end).toEqual({ row: 0, col: 5 });`
       },
@@ -167,7 +167,7 @@ expect(end).toEqual({ row: 0, col: 5 });`
         name: 'JavaScript interweaving: with empty lines',
         input: `TYPE "Hello"
 
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe('Hello');
 
 backspace 5 times
@@ -175,7 +175,7 @@ backspace 5 times
 expect(fixture).toHaveLines('');`,
         expected: `fixture.type('Hello');
 
-const text = fixture.wb.Model.lines[0];
+const text = fixture.editor.Model.lines[0];
 expect(text).toBe('Hello');
 
 fixture.press(Key.Backspace).times(5);
@@ -204,16 +204,16 @@ expect(fixture).toHaveLines('First Line', 'Second');`
         input: `TYPE "Hello World"
 left with meta
 right 5 times with shift
-expect(fixture.wb.Selection.isSelection).toBe(true);
+expect(fixture.editor.Selection.isSelection).toBe(true);
 TYPE "X"
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('XWorld');`,
         expected: `fixture.type('Hello World');
 fixture.press(Key.ArrowLeft).withMetaKey().once();
 fixture.press(Key.ArrowRight).withShiftKey().times(5);
-expect(fixture.wb.Selection.isSelection).toBe(true);
+expect(fixture.editor.Selection.isSelection).toBe(true);
 fixture.type('X');
-expect(fixture.wb.Selection.isSelection).toBe(false);
+expect(fixture.editor.Selection.isSelection).toBe(false);
 expect(fixture).toHaveLines('XWorld');`
       },
       {

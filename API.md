@@ -63,7 +63,7 @@ Auto-fit is enabled by default. The editor will:
 
 ```html
 <div style="height: 400px; overflow: hidden;">
-  <blockquote class="wb no-select" tabindex="0" id="editor" style="height: 100%;">
+  <blockquote class="buffee no-select" tabindex="0" id="editor" style="height: 100%;">
     ...
   </blockquote>
 </div>
@@ -107,13 +107,13 @@ editor.Mode.spaces = 0;  // Hard tabs (not recommended - cursor positioning may 
 ## Line Height (`editor.lineHeight`)
 
 ```javascript
-editor.lineHeight;  // 24 (default, from CSS --wb-cell)
+editor.lineHeight;  // 24 (default, from CSS --buffee-cell)
 ```
 
-Read-only. Returns the line height in pixels, derived from CSS variable `--wb-cell`. To customize, override in CSS:
+Read-only. Returns the line height in pixels, derived from CSS variable `--buffee-cell`. To customize, override in CSS:
 
 ```css
-.wb { --wb-cell: 20px; }
+.buffee { --buffee-cell: 20px; }
 ```
 
 **Warning:** Do not modify this value - changing it will cause rendering issues.

@@ -1,17 +1,17 @@
 /* Kai Theme */
-.buffee-themepack1-kai > .wb-elements {
+.buffee-themepack1-kai > .buffee-elements {
   background-color: #272822;
   color: #f8f8f2;
 }
-.buffee-themepack1-kai .wb-selection {
+.buffee-themepack1-kai .buffee-selection {
   background-color: #75715e;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-kai .wb-cursor {
+.buffee-themepack1-kai .buffee-cursor {
   background-color: #f92672;
 }
-.buffee-themepack1-kai .wb-gutter,
-.buffee-themepack1-kai .wb-status {
+.buffee-themepack1-kai .buffee-gutter,
+.buffee-themepack1-kai .buffee-status {
   background-color: #3e3d32;
   color: #a6e22e;
 }

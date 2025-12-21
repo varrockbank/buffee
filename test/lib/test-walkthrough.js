@@ -57,7 +57,7 @@ class Walkthrough {
   replayStep(harness, stepIndex) {
     const step = this.steps[stepIndex];
     const meta = step.metadata;
-    const target = harness.blockquote;  // .wb-lines where Buffee listens
+    const target = harness.blockquote;  // .buffee-lines where Buffee listens
 
     if (meta.type === 'type') {
       for (const char of meta.text) {
@@ -268,19 +268,19 @@ class Walkthrough {
 
     // Create editor instance
     const editorNode = document.getElementById('walkthrough-editor');
-    editorNode.className = 'wb';
+    editorNode.className = 'buffee';
     editorNode.innerHTML = `
-      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="no-select wb-elements">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <textarea class="buffee-clipboard-bridge" aria-hidden="true"></textarea>
+      <div class="no-select buffee-elements">
+        <div class="buffee-gutter"></div>
+        <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
       </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between;">
-        <div class="wb-status-left" style="display: flex;">
-          <span class="wb-linecount"></span>
+      <div class="buffee-status" style="display: flex; justify-content: space-between;">
+        <div class="buffee-status-left" style="display: flex;">
+          <span class="buffee-linecount"></span>
         </div>
-        <div class="wb-status-right" style="display: flex;">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
+        <div class="buffee-status-right" style="display: flex;">
+          Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>|
           <span class="buffee-spaces"></span>
         </div>
       </div>
@@ -472,19 +472,19 @@ class Walkthrough {
 
     // Reset editor and replay up to previous step
     const editorNode = document.getElementById('walkthrough-editor');
-    editorNode.className = 'wb';
+    editorNode.className = 'buffee';
     editorNode.innerHTML = `
-      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="no-select wb-elements">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <textarea class="buffee-clipboard-bridge" aria-hidden="true"></textarea>
+      <div class="no-select buffee-elements">
+        <div class="buffee-gutter"></div>
+        <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
       </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between;">
-        <div class="wb-status-left" style="display: flex;">
-          <span class="wb-linecount"></span>
+      <div class="buffee-status" style="display: flex; justify-content: space-between;">
+        <div class="buffee-status-left" style="display: flex;">
+          <span class="buffee-linecount"></span>
         </div>
-        <div class="wb-status-right" style="display: flex;">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
+        <div class="buffee-status-right" style="display: flex;">
+          Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>|
           <span class="buffee-spaces"></span>
         </div>
       </div>
@@ -537,19 +537,19 @@ class Walkthrough {
     if (!this.currentTest) return;
 
     const editorNode = document.getElementById('walkthrough-editor');
-    editorNode.className = 'wb';
+    editorNode.className = 'buffee';
     editorNode.innerHTML = `
-      <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
-      <div class="no-select wb-elements">
-        <div class="wb-gutter"></div>
-        <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+      <textarea class="buffee-clipboard-bridge" aria-hidden="true"></textarea>
+      <div class="no-select buffee-elements">
+        <div class="buffee-gutter"></div>
+        <div class="buffee-lines" tabindex="0"><blockquote class="buffee-layer-text"></blockquote><div class="buffee-layer-elements"></div><div class="buffee-cursor"></div></div>
       </div>
-      <div class="wb-status" style="display: flex; justify-content: space-between;">
-        <div class="wb-status-left" style="display: flex;">
-          <span class="wb-linecount"></span>
+      <div class="buffee-status" style="display: flex; justify-content: space-between;">
+        <div class="buffee-status-left" style="display: flex;">
+          <span class="buffee-linecount"></span>
         </div>
-        <div class="wb-status-right" style="display: flex;">
-          Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
+        <div class="buffee-status-right" style="display: flex;">
+          Ln <span class="buffee-head-row"></span>, Col <span class="buffee-head-col"></span>|
           <span class="buffee-spaces"></span>
         </div>
       </div>

@@ -4,9 +4,9 @@
  * @returns {Object} Callbacks object to pass to Buffee config
  */
 function BuffeeStatusLine(node) {
-  const $headRow = node.querySelector('.wb-head-row');
-  const $headCol = node.querySelector('.wb-head-col');
-  const $lineCounter = node.querySelector('.wb-linecount');
+  const $headRow = node.querySelector('.buffee-head-row');
+  const $headCol = node.querySelector('.buffee-head-col');
+  const $lineCounter = node.querySelector('.buffee-linecount');
   const $spaces = node.querySelector('.buffee-spaces');
 
   const callbacks = {};

@@ -1,17 +1,17 @@
 /* Star Theme */
-.buffee-themepack1-star > .wb-elements {
+.buffee-themepack1-star > .buffee-elements {
   background-color: #000000;
   color: #FFD700;
 }
-.buffee-themepack1-star .wb-selection {
+.buffee-themepack1-star .buffee-selection {
   background-color: #333333;
   mix-blend-mode: normal;
 }
-.buffee-themepack1-star .wb-cursor {
+.buffee-themepack1-star .buffee-cursor {
   background-color: #FFD700;
 }
-.buffee-themepack1-star .wb-gutter,
-.buffee-themepack1-star .wb-status {
+.buffee-themepack1-star .buffee-gutter,
+.buffee-themepack1-star .buffee-status {
   background-color: #000000;
   color: #FFD700;
 }

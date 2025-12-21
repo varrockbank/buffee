@@ -146,16 +146,16 @@ Templates: `extensions/_template.js`, `samples/_template.html`, `themes/_templat
 
 | Class | Element | Purpose |
 |-------|---------|---------|
-| `.wb` | Container | Root editor element, add theme class here |
-| `.wb-elements` | Inner wrapper | Contains gutter + lines |
-| `.wb-gutter` | Gutter | Line numbers |
-| `.wb-lines` | Text area | Focus target (tabindex=0) |
-| `.wb-layer-text` | `<blockquote>` | Text content layer |
-| `.wb-layer-elements` | Overlay | TUI/Elementals overlay |
-| `.wb-cursor` | Cursor | Blinking cursor |
-| `.wb-selection` | Selection spans | Highlighted selection |
-| `.wb-status` | Status bar | Bottom bar container |
-| `.wb-clipboard-bridge` | `<textarea>` | Hidden, for clipboard |
+| `.buffee` | Container | Root editor element, add theme class here |
+| `.buffee-elements` | Inner wrapper | Contains gutter + lines |
+| `.buffee-gutter` | Gutter | Line numbers |
+| `.buffee-lines` | Text area | Focus target (tabindex=0) |
+| `.buffee-layer-text` | `<blockquote>` | Text content layer |
+| `.buffee-layer-elements` | Overlay | TUI/Elementals overlay |
+| `.buffee-cursor` | Cursor | Blinking cursor |
+| `.buffee-selection` | Selection spans | Highlighted selection |
+| `.buffee-status` | Status bar | Bottom bar container |
+| `.buffee-clipboard-bridge` | `<textarea>` | Hidden, for clipboard |
 
 ## Keybindings Reference
 
