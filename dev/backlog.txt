@@ -11,6 +11,3 @@ Status Line
 Indent 
 indents lines by exactly 4 characters (or whatever is indentation amount) or less.
 does not snap to the nearest 4th tab stop
-
-Webs
-Theme should just link to theme 
