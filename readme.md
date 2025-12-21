@@ -25,7 +25,7 @@ microlibrary and efficient plaintext rendering engine for the web. Fixed-width t
 
 This trifecta uniquely positions buffee as a building block for rich editing experience, IDEs and apps. In fact, this guides what features to scope and omit.
 
-See [comparison](https://varrockbank.github.io/buffee/comparison.html) and [performance](https://varrockbank.github.io/buffee/web/performance.html) for more on Buffee's niche.
+See [comparison](https://varrockbank.github.io/buffee/web/comparison.html) and [performance](https://varrockbank.github.io/buffee/web/performance.html) for more on Buffee's niche.
 
 ## The Magic Trick
 
