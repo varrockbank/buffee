@@ -20,11 +20,14 @@ See `template.html` for the required HTML structure. Missing any element will ca
 ## Test Directory Structure
 
 Spec files (in `test/specs/`):
-- `spec-core.dsl` - Basic typing, backspace, enter, complex sequences
-- `spec-navigation.dsl` - Cursor movement, meta+arrow, word movement
-- `spec-selection.dsl` - Selection, multi-line, deleting/replacing selections
-- `spec-features.dsl` - Gutter, indentation, undo/redo, unindent
-- `spec-regression.dsl` - Walkthrough feature, DSL regression tests
+
+| File | Tests | Look here for |
+|------|-------|---------------|
+| `spec-core.dsl` | Basic Typing, Backspace, Enter, Complex Sequences | Character input, line breaks, deletions |
+| `spec-navigation.dsl` | Cursor Movement, Meta+Arrow, Word Movement | Arrow keys, Home/End, word jumps |
+| `spec-selection.dsl` | Selection, Multi-line, Delete/Replace Selection | Shift+arrows, selection rendering |
+| `spec-features.dsl` | Gutter, Indentation, Undo/Redo, Unindent | Line numbers, tabs, history |
+| `spec-regression.dsl` | Walkthrough, DSL Regression | Edge cases, bug fixes |
 
 Test infrastructure:
 - `test/lib/test-expect.js` - Assertions (`toBe`, `toEqual`, `toBeCloseTo`)
