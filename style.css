@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 10.0.3-alpha.1
+ * @version 10.0.4-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -92,7 +92,7 @@
 .buffee .buffee-status {
   display: flex;
   justify-content: space-between;
-  padding: 6px 10px; /** refactor to css variable*/
+  padding: var(--buffee-padding) var(--buffee-padding); /** refactor to css variable*/
   z-index: var(--buffee-z-status);
   white-space: nowrap;
   overflow: hidden;
