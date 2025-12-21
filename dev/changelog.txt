@@ -1,5 +1,11 @@
 * Project Devlog
 
+** 10.0.2-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.58 KB (0)
+*** refactor
+- extract z-index values to --buffee-z-* CSS variables
+- remove redundant properties (background-color, visibility, etc.)
+- simplify font-family to monospace
+
 ** 10.0.1-alpha.1 [2025-12-21]  gz+min: 4.27 KB (0), min: 12.58 KB (0)
 *** refactor
 - remove redundant visibility:visible from selection CSS

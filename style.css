@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 10.0.1-alpha.1
+ * @version 10.0.2-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -15,13 +15,18 @@
 /* Main container */
 .buffee {
   position: relative;
-  font-family: 'Menlo', 'Consolas', monospace;
+  font-family: monospace;
   display: flex;
   flex-direction: column;
   --buffee-cell: 24px;
   --buffee-padding: 4px;
   --buffee-gutter-digits-padding: 1ch;
   --buffee-gutter-digits-initial: 2ch;
+  --buffee-z-selection: 100;
+  --buffee-z-text: 200;
+  --buffee-z-cursor: 300;
+  --buffee-z-elements: 400;
+  --buffee-z-status: 600;
 }
 
 /* Content area (gutter + lines) */
@@ -44,10 +49,8 @@
 /* Hidden clipboard bridge - must be selectable but invisible */
 .buffee-clipboard-bridge {
   position: fixed;
-  left: 0;
-  top: 1px;
   width: 0;
-  height: 1px;
+  height: 0;
   opacity: 0;
   pointer-events: none;
 }
@@ -56,7 +59,6 @@
 .buffee .buffee-lines {
   flex: 1;
   overflow: hidden;
-  background-color: transparent;
   position: relative;
   margin: var(--buffee-padding);
   outline: none;
@@ -70,17 +72,12 @@
   margin: 0;
   overflow: visible;
   white-space: pre;
-  background-color: transparent;
 }
 
 /* Selection overlay */
 .buffee .buffee-selection {
-  left: 0ch;
-  top: 0ch;
   position: absolute;
   display: block;
-  width: 0ch;
-  mix-blend-mode: difference;
 }
 
 /* Cursor overlay */
@@ -88,8 +85,7 @@
   mix-blend-mode: exclusion;
   width: 1ch;
   position: absolute;
-  visibility: hidden;
-  z-index: 300; /** config */
+  z-index: var(--buffee-z-cursor);
 }
 
 /* Optional: Status bar */
@@ -97,7 +93,7 @@
   display: flex;
   justify-content: space-between;
   padding: 6px 10px; /** refactor to css variable*/
-  z-index: 600;
+  z-index: var(--buffee-z-status);
   white-space: nowrap;
   overflow: hidden;
 }
@@ -113,7 +109,7 @@
   display: inline-block;
   min-width: 100%;
   padding-right: 2ch; /** config: right scroll buffer */
-  z-index: 200; /** config */
+  z-index: var(--buffee-z-text);
 }
 
 .buffee .buffee-layer-elements {
@@ -123,7 +119,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none; /* Allow clicks to pass through to elements below*/
-  z-index: 400; /** config */
+  z-index: var(--buffee-z-elements);
 }
 
 .buffee .buffee-cursor, .buffee .buffee-selection { height: var(--buffee-cell); }
