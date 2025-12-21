@@ -3,7 +3,7 @@
 
 # Get current versions
 BUFFEE_VERSION=$(grep 'this.version' buffee.js | sed 's/.*"\(.*\)".*/\1/')
-STYLE_VERSION=$(grep '@version' style.css | sed 's/.*@version \(.*\)/\1/' | tr -d ' ')
+STYLE_VERSION=$(grep '@version' web/style.css | sed 's/.*@version \(.*\)/\1/' | tr -d ' ')
 
 # Check if buffee.js is staged and needs version bump
 if git diff --cached --name-only | grep -q "^buffee.js$"; then
@@ -21,9 +21,9 @@ if git diff --cached --name-only | grep -q "^buffee.js$"; then
 fi
 
 # Check if style.css is staged and needs version bump
-if git diff --cached --name-only | grep -q "^style.css$"; then
-    OLD_STYLE_VERSION=$(git show HEAD:style.css 2>/dev/null | grep '@version' | sed 's/.*@version \(.*\)/\1/' | tr -d ' ')
-    NEW_STYLE_VERSION=$(git show :style.css | grep '@version' | sed 's/.*@version \(.*\)/\1/' | tr -d ' ')
+if git diff --cached --name-only | grep -q "^web/style.css$"; then
+    OLD_STYLE_VERSION=$(git show HEAD:web/style.css 2>/dev/null | grep '@version' | sed 's/.*@version \(.*\)/\1/' | tr -d ' ')
+    NEW_STYLE_VERSION=$(git show :web/style.css | grep '@version' | sed 's/.*@version \(.*\)/\1/' | tr -d ' ')
 
     if [ "$OLD_STYLE_VERSION" = "$NEW_STYLE_VERSION" ] && [ -n "$OLD_STYLE_VERSION" ]; then
         echo "✗ Error: style.css changed but version was not bumped"
