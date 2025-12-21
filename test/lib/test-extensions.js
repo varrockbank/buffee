@@ -390,6 +390,156 @@ function defineExtensionTests() {
         });
     });
 
+    // ===== HISTORY TESTS =====
+    extRunner.describe('History', () => {
+        extRunner.it('attaches History object to editor', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                assertTrue(!editor.History, 'History should not exist before extension');
+                BuffeeHistory(editor);
+                assertTrue(!!editor.History, 'History should be attached after extension');
+                assertTrue(typeof editor.History.undo === 'function', 'Should have undo method');
+                assertTrue(typeof editor.History.redo === 'function', 'Should have redo method');
+                assertTrue(typeof editor.History.clear === 'function', 'Should have clear method');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes single character insert', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A"');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after undo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('redoes single character insert', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after undo');
+                editor.History.redo();
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A" after redo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes coalesced characters', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.Selection.insert('B');
+                editor.Selection.insert('C');
+                assertEqual(editor.Model.lines[0], 'ABC', 'Should have "ABC"');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], '', 'Should be empty after single undo (coalesced)');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes backspace', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('AB');
+                // Wait to break coalescing
+                editor.History._lastOpTime = 0;
+                editor.Selection.delete();
+                assertEqual(editor.Model.lines[0], 'A', 'Should have "A" after backspace');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[0], 'AB', 'Should have "AB" after undo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('undoes newline', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('Hello');
+                editor.History._lastOpTime = 0;
+                editor.Selection.newLine();
+                editor.History._lastOpTime = 0;
+                editor.Selection.insert('World');
+                assertEqual(editor.Model.lines.length, 2, 'Should have 2 lines');
+                editor.History.undo();
+                assertEqual(editor.Model.lines[1], '', 'Second line should be empty after undo');
+                editor.History.undo();
+                assertEqual(editor.Model.lines.length, 1, 'Should have 1 line after undo newline');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears redo stack on new edit', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.History.undo();
+                assertEqual(editor.History.redoStack.length, 1, 'Should have 1 redo item');
+                editor.Selection.insert('B');
+                assertEqual(editor.History.redoStack.length, 0, 'Redo stack should be cleared');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('restores cursor position on undo', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('Hello');
+                assertEqual(editor.Cursor.col, 5, 'Cursor should be at col 5');
+                editor.History.undo();
+                assertEqual(editor.Cursor.col, 0, 'Cursor should be at col 0 after undo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('restores cursor position on redo', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('AB');
+                editor.History.undo();
+                assertEqual(editor.Cursor.col, 0, 'Cursor should be at col 0 after undo');
+                editor.History.redo();
+                assertEqual(editor.Cursor.col, 2, 'Cursor should be at col 2 after redo');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears undo and redo stacks', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeHistory(editor);
+                editor.Selection.insert('A');
+                editor.Selection.insert('B');
+                assertTrue(editor.History.undoStack.length > 0, 'Should have undo items');
+                editor.History.clear();
+                assertEqual(editor.History.undoStack.length, 0, 'Undo stack should be empty');
+                assertEqual(editor.History.redoStack.length, 0, 'Redo stack should be empty');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+
     // ===== ULTRAHIGHCAPACITY TESTS =====
     extRunner.describe('UltraHighCapacity', () => {
         extRunner.it('initializes UltraHighCapacity extension', () => {
