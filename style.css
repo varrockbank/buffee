@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 10.0.2-alpha.1
+ * @version 10.0.3-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -96,6 +96,7 @@
   z-index: var(--buffee-z-status);
   white-space: nowrap;
   overflow: hidden;
+  font-size: var(--buffee-cell);
 }
 
 .buffee .buffee-gutter {
