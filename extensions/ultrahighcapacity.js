@@ -18,7 +18,10 @@
  * await editor.UltraHighCapacity.appendLines(largeArrayOfLines);
  */
 function BuffeeUltraHighCapacity(editor) {
-  const { $e, render, renderHooks, appendLines } = editor._internals;
+  const $e = editor._$e;
+  const render = editor._render;
+  const renderHooks = editor._renderHooks;
+  const appendLines = editor._appendLines;
   const { Viewport, Model } = editor;
 
   // Store original methods/getters
@@ -312,8 +315,8 @@ function BuffeeUltraHighCapacity(editor) {
         configurable: true
       });
 
-      // Override _internals.appendLines
-      editor._internals.appendLines = appendChunkedLines;
+      // Override _appendLines
+      editor._appendLines = appendChunkedLines;
 
       render(true);
     },
@@ -334,7 +337,7 @@ function BuffeeUltraHighCapacity(editor) {
       Model.lines = [];
 
       // Restore original appendLines
-      editor._internals.appendLines = originalAppendLines;
+      editor._appendLines = originalAppendLines;
 
       // Restore normal mode (full editing)
       editor.interactive = 1;

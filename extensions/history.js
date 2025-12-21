@@ -11,7 +11,9 @@
  * @returns {Object} The History API object
  */
 function BuffeeHistory(editor) {
-  const { render, _insert, _delete } = editor._internals;
+  const render = editor._render;
+  const _insert = editor._insert;
+  const _delete = editor._delete;
 
   // State
   const undoStack = [];
@@ -25,8 +27,8 @@ function BuffeeHistory(editor) {
   /** Capture current cursor/selection state */
   function captureCursor() {
     // Access via getters each time - head/tail references can change after makeSelection()
-    const head = editor._internals.head;
-    const tail = editor._internals.tail;
+    const head = editor._head;
+    const tail = editor._tail;
     return {
       headRow: head.row, headCol: head.col,
       tailRow: tail.row, tailCol: tail.col
@@ -45,8 +47,8 @@ function BuffeeHistory(editor) {
     }
 
     // Access via getters AFTER makeSelection/makeCursor - references change
-    const head = editor._internals.head;
-    const tail = editor._internals.tail;
+    const head = editor._head;
+    const tail = editor._tail;
     head.row = cursor.headRow;
     head.col = cursor.headCol;
     tail.row = cursor.tailRow;
@@ -70,7 +72,7 @@ function BuffeeHistory(editor) {
   }
 
   // Wrap _insert to record history
-  editor._internals._insert = function(row, col, text) {
+  editor._insert = function(row, col, text) {
     if (text.length === 0) return null;
 
     const cursorBefore = captureCursor();
@@ -97,7 +99,7 @@ function BuffeeHistory(editor) {
   };
 
   // Wrap _delete to record history
-  editor._internals._delete = function(row, col, text) {
+  editor._delete = function(row, col, text) {
     if (text.length === 0) return;
 
     const cursorBefore = captureCursor();

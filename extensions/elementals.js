@@ -13,7 +13,8 @@
  * @returns {Object} The Elementals API object
  */
 function BuffeeElementals(editor) {
-  const { $e, renderHooks } = editor._internals;
+  const $e = editor._$e;
+  const renderHooks = editor._renderHooks;
   const { Viewport, lineHeight } = editor;
   const $elementLayer = $e.querySelector('.buffee-layer-elements');
 

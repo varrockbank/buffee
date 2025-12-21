@@ -17,7 +17,8 @@
  */
 
 function BuffeeUndoTree(editor) {
-  const { _insert, _delete } = editor._internals;
+  const _insert = editor._insert;
+  const _delete = editor._delete;
   const { Selection, Model } = editor;
 
   // Node ID counter
@@ -42,8 +43,8 @@ function BuffeeUndoTree(editor) {
   // Capture cursor position
   // Access via getters each time - head/tail references can change
   function captureCursor() {
-    const head = editor._internals.head;
-    const tail = editor._internals.tail;
+    const head = editor._head;
+    const tail = editor._tail;
     return {
       headRow: head.row, headCol: head.col,
       tailRow: tail.row, tailCol: tail.col
@@ -65,8 +66,8 @@ function BuffeeUndoTree(editor) {
     }
 
     // Access via getters AFTER makeSelection/makeCursor - references change
-    const head = editor._internals.head;
-    const tail = editor._internals.tail;
+    const head = editor._head;
+    const tail = editor._tail;
     head.row = pos.headRow;
     head.col = pos.headCol;
     tail.row = pos.tailRow;
@@ -122,7 +123,7 @@ function BuffeeUndoTree(editor) {
   }
 
   // Wrap _insert to record history
-  editor._internals._insert = function(row, col, text) {
+  editor._insert = function(row, col, text) {
     const cursorBefore = captureCursor();
     const result = _insert(row, col, text);
     recordOperation('insert', row, col, text, cursorBefore);
@@ -130,7 +131,7 @@ function BuffeeUndoTree(editor) {
   };
 
   // Wrap _delete to record history
-  editor._internals._delete = function(row, col, text) {
+  editor._delete = function(row, col, text) {
     const cursorBefore = captureCursor();
     const result = _delete(row, col, text);
     recordOperation('delete', row, col, text, cursorBefore);

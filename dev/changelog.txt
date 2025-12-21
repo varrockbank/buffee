@@ -1,5 +1,17 @@
 * Project Devlog
 
+** 11.0.6-alpha.1 [2025-12-21]  gz+min: 0 KB (0), min: 0 KB (0)
+*** breaking
+- remove _internals object, expose internal API directly on editor
+- editor._head, editor._tail (getters for cursor state)
+- editor._insert, editor._delete (wrappable primitives)
+- editor._render, editor._renderHooks
+- editor._$e, editor._$l, editor._$textLayer
+- editor._contentOffset, editor._appendLines
+*** fix
+- fix stale cursor references in history extensions
+- fix atomic undo for selection replacement
+
 ** 11.0.5-alpha.1 [2025-12-21]  gz+min: 3.78 KB (-0.49), min: 10.74 KB (-1.85)
 *** breaking
 - extract history (undo/redo) to opt-in extension

@@ -11,7 +11,11 @@
  * @returns {Object} The Syntax API object
  */
 function BuffeeSyntax(editor) {
-  const { $e, $textLayer, renderHooks, _insert, _delete } = editor._internals;
+  const $e = editor._$e;
+  const $textLayer = editor._$textLayer;
+  const renderHooks = editor._renderHooks;
+  const _insert = editor._insert;
+  const _delete = editor._delete;
   const { Viewport, Model } = editor;
 
   // State cache: stateCache[lineIndex] = startState for that line
@@ -27,7 +31,7 @@ function BuffeeSyntax(editor) {
   // ============================================================================
 
   // Hook _insert
-  editor._internals._insert = function(row, col, text) {
+  editor._insert = function(row, col, text) {
     const result = _insert(row, col, text);
     if (enabled) {
       invalidateFrom(row);
@@ -36,7 +40,7 @@ function BuffeeSyntax(editor) {
   };
 
   // Hook _delete
-  editor._internals._delete = function(row, col, text) {
+  editor._delete = function(row, col, text) {
     _delete(row, col, text);
     if (enabled) {
       invalidateFrom(row);

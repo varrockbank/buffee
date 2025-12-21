@@ -18,7 +18,9 @@ function BuffeeTUI(editor) {
   }
   const Highlights = editor.Highlights;
 
-  const { $textLayer, render, renderHooks } = editor._internals;
+  const $textLayer = editor._$textLayer;
+  const render = editor._render;
+  const renderHooks = editor._renderHooks;
   const { Viewport, Model } = editor;
 
   let enabled = false;
