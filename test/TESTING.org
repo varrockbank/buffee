@@ -27,10 +27,9 @@ The walkthrough replays the exact same actions recorded during the test run, pro
 * Directory Structure
 
 - *test.html* - Test runner UI with results display and interactive walkthrough panel
-- *test-framework.js* - Domain-agnostic test library with ~describe~, ~it~, ~xit~, ~expect~
-- *harness.js* - Test harness providing (1) literate DSL for user actions and (2) step recording for walkthrough replay
-- *expect.js* - Assertion matchers with special support for EditorTestHarness
-- *test.spec.js* - All test definitions
+- *test-runner.js* - TestRunner class + EditorTestHarness + Key constants
+- *test-expect.js* - Assertion matchers with special support for EditorTestHarness
+- *test.spec.js* - All test definitions (generated from specs/*.dsl)
 
 * Writing Tests
 

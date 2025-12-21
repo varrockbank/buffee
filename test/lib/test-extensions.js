@@ -1,0 +1,531 @@
+/**
+ * Buffee Extension Tests
+ *
+ * Tests for Buffee extensions:
+ * - Syntax Highlighting
+ * - Elementals
+ * - TUI Legacy
+ * - UltraHighCapacity
+ */
+
+// ===========================================
+// Extension Test Runner
+// ===========================================
+
+class ExtensionTestRunner {
+    constructor() {
+        this.suites = [];
+        this.currentSuite = null;
+    }
+
+    describe(name, fn) {
+        this.currentSuite = { name, tests: [], results: [] };
+        this.suites.push(this.currentSuite);
+        fn();
+        this.currentSuite = null;
+    }
+
+    it(name, fn) {
+        if (this.currentSuite) {
+            this.currentSuite.tests.push({ name, fn });
+        }
+    }
+
+    async run() {
+        let passed = 0, failed = 0, total = 0;
+
+        for (const suite of this.suites) {
+            for (const test of suite.tests) {
+                total++;
+                try {
+                    await test.fn();
+                    suite.results.push({ name: test.name, status: 'pass' });
+                    passed++;
+                } catch (error) {
+                    suite.results.push({ name: test.name, status: 'fail', error });
+                    failed++;
+                }
+            }
+        }
+
+        return { total, passed, failed };
+    }
+
+    clear() {
+        this.suites = [];
+    }
+}
+
+const extRunner = new ExtensionTestRunner();
+
+// ===========================================
+// Assertion Helpers
+// ===========================================
+
+function assertEqual(actual, expected, msg = '') {
+    if (actual !== expected) {
+        throw new Error(`${msg}Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+}
+
+function assertDeepEqual(actual, expected, msg = '') {
+    if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+        throw new Error(`${msg}Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+    }
+}
+
+function assertTrue(value, msg = '') {
+    if (!value) {
+        throw new Error(msg || 'Expected true, got false');
+    }
+}
+
+function assertFalse(value, msg = '') {
+    if (value) {
+        throw new Error(msg || 'Expected false, got true');
+    }
+}
+
+// ===========================================
+// Test Editor Factory
+// ===========================================
+
+function createTestEditor(opts = {}) {
+    const container = document.createElement('div');
+    container.style.cssText = 'position: absolute; left: -9999px; top: -9999px; width: 600px; height: 400px; visibility: hidden;';
+    container.innerHTML = `
+        <div class="wb no-select">
+            <textarea class="wb-clipboard-bridge" aria-hidden="true"></textarea>
+            <div class="no-select wb-elements">
+                <div class="wb-gutter"></div>
+                <div class="wb-lines" tabindex="0"><blockquote class="wb-layer-text"></blockquote><div class="wb-layer-elements"></div><div class="wb-cursor"></div></div>
+            </div>
+            <div class="wb-status" style="display: flex; justify-content: space-between;">
+                <div class="wb-status-left"><span class="wb-linecount"></span></div>
+                <div class="wb-status-right">
+                    Ln <span class="wb-head-row"></span>, Col <span class="wb-head-col"></span>|
+
+                    <span class="buffee-spaces"></span>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(container);
+    const el = container.querySelector('.wb');
+    const editor = new Buffee(el, { viewportRows: 10, ...opts });
+    return { editor, container, cleanup: () => container.remove() };
+}
+
+// ===========================================
+// Extension Test Definitions
+// ===========================================
+
+function defineExtensionTests() {
+    extRunner.clear();
+
+    // ===== SYNTAX HIGHLIGHTING TESTS =====
+    extRunner.describe('Syntax Highlighting', () => {
+        extRunner.it('tokenizes JavaScript keywords', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeSyntax(editor);
+                editor.Syntax.setLanguage('javascript');
+                editor.Syntax.enabled = true;
+                editor.Model.text = 'const x = 42;';
+
+                const { tokens } = editor.Syntax.tokenizeLine('const x = 42;', 0);
+                assertTrue(tokens.length > 0, 'Should have tokens');
+                assertEqual(tokens[0].type, 'keyword', 'First token should be keyword');
+                assertEqual(tokens[0].text, 'const', 'Keyword should be "const"');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('tokenizes JavaScript strings', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeSyntax(editor);
+                editor.Syntax.setLanguage('javascript');
+                const { tokens } = editor.Syntax.tokenizeLine('"hello world"', 0);
+                const stringToken = tokens.find(t => t.type === 'string');
+                assertTrue(!!stringToken, 'Should find string token');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('handles multiline comments', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeSyntax(editor);
+                editor.Syntax.setLanguage('javascript');
+                editor.Model.text = '/* start\nmiddle\nend */';
+
+                // First line starts comment
+                const result1 = editor.Syntax.tokenizeLine('/* start', 0);
+                assertTrue(result1.endState > 0, 'Should enter multiline state');
+
+                // Middle line continues comment
+                const result2 = editor.Syntax.tokenizeLine('middle', result1.endState);
+                assertTrue(result2.endState > 0, 'Should stay in multiline state');
+
+                // Last line ends comment
+                const result3 = editor.Syntax.tokenizeLine('end */', result2.endState);
+                assertEqual(result3.endState, 0, 'Should return to normal state');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('invalidates state cache on edit', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeSyntax(editor);
+                editor.Syntax.setLanguage('javascript');
+                editor.Syntax.enabled = true;
+                editor.Model.text = 'line1\nline2\nline3';
+
+                // Force state cache population
+                editor.Syntax.ensureStateCache(2);
+                assertTrue(editor.Syntax.stateCache.length >= 3, 'State cache should be populated');
+
+                // Simulate edit by setting text
+                editor.Model.text = 'changed';
+                assertEqual(editor.Syntax.stateCache.length, 1, 'State cache should be reset');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('supports multiple languages', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeSyntax(editor);
+
+                // Test JavaScript
+                editor.Syntax.setLanguage('javascript');
+                let { tokens } = editor.Syntax.tokenizeLine('function test() {}', 0);
+                assertTrue(tokens.some(t => t.type === 'keyword'), 'JS should have keyword');
+
+                // Test Python
+                editor.Syntax.setLanguage('python');
+                ({ tokens } = editor.Syntax.tokenizeLine('def test():', 0));
+                assertTrue(tokens.some(t => t.type === 'keyword'), 'Python should have keyword');
+
+                // Test CSS
+                editor.Syntax.setLanguage('css');
+                ({ tokens } = editor.Syntax.tokenizeLine('.class { color: red; }', 0));
+                assertTrue(tokens.length > 0, 'CSS should have tokens');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+
+    // ===== ELEMENTALS TESTS =====
+    extRunner.describe('Elementals', () => {
+        extRunner.it('adds button elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeElementals(editor);
+                editor.Model.text = '\n\n\n';
+                const id = editor.Elementals.addButton({
+                    row: 1, col: 5, label: 'Test'
+                });
+                assertTrue(id > 0, 'Should return element ID');
+                assertEqual(editor.Elementals.elements.length, 1, 'Should have 1 element');
+                assertEqual(editor.Elementals.elements[0].type, 'button', 'Should be button type');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('adds label elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeElementals(editor);
+                editor.Model.text = '\n\n\n';
+                editor.Elementals.addLabel({ row: 1, col: 5, text: 'Label' });
+                assertEqual(editor.Elementals.elements.length, 1, 'Should have 1 element');
+                assertEqual(editor.Elementals.elements[0].type, 'label', 'Should be label type');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('adds input elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeElementals(editor);
+                editor.Model.text = '\n\n\n';
+                editor.Elementals.addInput({
+                    row: 1, col: 5, width: 20, placeholder: 'Type here'
+                });
+                assertEqual(editor.Elementals.elements.length, 1, 'Should have 1 element');
+                assertEqual(editor.Elementals.elements[0].type, 'input', 'Should be input type');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('navigates between elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeElementals(editor);
+                editor.Model.text = '\n\n\n\n\n';
+                editor.Elementals.addButton({ row: 1, col: 2, label: 'A' });
+                editor.Elementals.addButton({ row: 2, col: 2, label: 'B' });
+                editor.Elementals.addButton({ row: 3, col: 2, label: 'C' });
+                editor.Elementals.enabled = true;
+
+                const focusable = editor.Elementals.getFocusableElements();
+                assertEqual(focusable.length, 3, 'Should have 3 focusable elements');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('removes elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeElementals(editor);
+                editor.Model.text = '\n\n\n';
+                const id = editor.Elementals.addButton({ row: 1, col: 2, label: 'Test' });
+                assertEqual(editor.Elementals.elements.length, 1, 'Should have 1 element');
+                editor.Elementals.removeElement(id);
+                assertEqual(editor.Elementals.elements.length, 0, 'Should have 0 elements after removal');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears all elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeElementals(editor);
+                editor.Model.text = '\n\n\n';
+                editor.Elementals.addButton({ row: 1, col: 2, label: 'A' });
+                editor.Elementals.addButton({ row: 2, col: 2, label: 'B' });
+                assertEqual(editor.Elementals.elements.length, 2, 'Should have 2 elements');
+                editor.Elementals.clear();
+                assertEqual(editor.Elementals.elements.length, 0, 'Should have 0 elements after clear');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+
+    // ===== TUI LEGACY TESTS =====
+    extRunner.describe('TUI Legacy', () => {
+        extRunner.it('initializes TUI extension', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeTUI(editor);
+                assertTrue(!!editor.TUI, 'TUI should be attached to editor');
+                assertFalse(editor.TUI.enabled, 'TUI should be disabled by default');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('adds buttons', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeTUI(editor);
+                editor.Model.text = '\n\n\n';
+                const id = editor.TUI.addButton({
+                    row: 1, col: 2, label: ' OK '
+                });
+                assertTrue(id > 0, 'Should return element ID');
+                assertEqual(editor.TUI.elements.length, 1, 'Should have 1 element');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('adds buttons with borders', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeTUI(editor);
+                editor.Model.text = '\n\n\n\n';
+                const id = editor.TUI.addButton({
+                    row: 1, col: 2, label: 'OK', border: true
+                });
+                assertTrue(id > 0, 'Should return element ID');
+                // Bordered buttons have 3 content lines (top border, label, bottom border)
+                assertEqual(editor.TUI.elements[0].contents.length, 3, 'Bordered button should have 3 content lines');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('handles navigation', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeTUI(editor);
+                editor.Model.text = '\n\n\n\n';
+                editor.TUI.addButton({ row: 1, col: 2, label: 'A' });
+                editor.TUI.addButton({ row: 2, col: 2, label: 'B' });
+                editor.TUI.enabled = true;
+
+                // TUI uses elements array directly
+                assertEqual(editor.TUI.elements.length, 2, 'Should have 2 elements');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears elements', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeTUI(editor);
+                editor.Model.text = '\n\n\n';
+                editor.TUI.addButton({ row: 1, col: 2, label: 'Test' });
+                editor.TUI.clear();
+                assertEqual(editor.TUI.elements.length, 0, 'Should have 0 elements after clear');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+
+    // ===== ULTRAHIGHCAPACITY TESTS =====
+    extRunner.describe('UltraHighCapacity', () => {
+        extRunner.it('initializes UltraHighCapacity extension', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUltraHighCapacity(editor);
+                assertTrue(!!editor.UltraHighCapacity, 'UltraHighCapacity should be attached to editor');
+                assertFalse(editor.UltraHighCapacity.enabled, 'Should be disabled by default');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('activates chunked mode', () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUltraHighCapacity(editor);
+                editor.UltraHighCapacity.activate(1000);
+                assertTrue(editor.UltraHighCapacity.enabled, 'Should be enabled after activate');
+                assertEqual(editor.UltraHighCapacity.totalLines, 0, 'Should start with 0 lines');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('tracks total lines after append', async () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUltraHighCapacity(editor);
+                editor.UltraHighCapacity.activate(1000);
+
+                // Append some lines
+                await editor.UltraHighCapacity.appendLines(['line1', 'line2', 'line3']);
+                assertEqual(editor.UltraHighCapacity.totalLines, 3, 'Should have 3 total lines');
+            } finally {
+                cleanup();
+            }
+        });
+
+        extRunner.it('clears chunk data', async () => {
+            const { editor, cleanup } = createTestEditor();
+            try {
+                BuffeeUltraHighCapacity(editor);
+                editor.UltraHighCapacity.activate(1000);
+                await editor.UltraHighCapacity.appendLines(['line1', 'line2']);
+                assertEqual(editor.UltraHighCapacity.totalLines, 2, 'Should have 2 lines');
+
+                editor.UltraHighCapacity.clear();
+                assertEqual(editor.UltraHighCapacity.totalLines, 0, 'Should have 0 lines after clear');
+            } finally {
+                cleanup();
+            }
+        });
+    });
+}
+
+// ===========================================
+// Results Rendering
+// ===========================================
+
+function renderExtensionResults(results) {
+    const resultsContainer = document.getElementById('ext-test-results');
+    resultsContainer.innerHTML = '';
+
+    extRunner.suites.forEach(suite => {
+        const suiteDiv = document.createElement('div');
+        suiteDiv.className = 'test-suite';
+
+        const passedInSuite = suite.results.filter(t => t.status === 'pass').length;
+        const failedInSuite = suite.results.filter(t => t.status === 'fail').length;
+
+        const suiteHeader = document.createElement('div');
+        suiteHeader.className = 'test-suite-header';
+        suiteHeader.innerHTML = `
+            <div>
+                <span>${suite.name}</span>
+                <span style="margin-left: 12px; opacity: 0.7; font-size: 12px;">
+                    ${passedInSuite} passed, ${failedInSuite} failed
+                </span>
+            </div>
+            <span class="toggle-icon">▼</span>
+        `;
+        suiteHeader.onclick = () => suiteDiv.classList.toggle('collapsed');
+
+        const suiteBody = document.createElement('div');
+        suiteBody.className = 'test-suite-body';
+
+        suite.results.forEach(test => {
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${test.status}`;
+            const icon = test.status === 'pass' ? '✓' : '✗';
+
+            testDiv.innerHTML = `
+                <span class="test-icon ${test.status}">${icon}</span>
+                <div class="test-message">
+                    ${test.name}
+                    ${test.error ? `<div class="test-error">${test.error.message}</div>` : ''}
+                </div>
+            `;
+
+            suiteBody.appendChild(testDiv);
+        });
+
+        suiteDiv.appendChild(suiteHeader);
+        suiteDiv.appendChild(suiteBody);
+        resultsContainer.appendChild(suiteDiv);
+    });
+
+    document.getElementById('ext-total-tests').textContent = results.total;
+    document.getElementById('ext-passed-tests').textContent = results.passed;
+    document.getElementById('ext-failed-tests').textContent = results.failed;
+}
+
+// ===========================================
+// Run Extension Tests
+// ===========================================
+
+async function runExtensionTests() {
+    const startTime = new Date();
+
+    defineExtensionTests();
+    const results = await extRunner.run();
+
+    const endTime = new Date();
+    const duration = endTime - startTime;
+
+    const timingDiv = document.getElementById('ext-test-timing');
+    timingDiv.innerHTML = `
+        <span class="icon">⏱️</span>
+        <span class="duration">Runtime: ${duration} ms</span>
+    `;
+
+    renderExtensionResults(results);
+}
+
+// Run extension tests on page load
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(runExtensionTests, 500);
+});
