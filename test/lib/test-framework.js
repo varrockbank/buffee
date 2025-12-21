@@ -3,6 +3,7 @@ class TestRunner {
   constructor() {
     this.suites = [];
     this.currentSuite = null;
+    this.failFast = false;
   }
 
   describe(name, fn) {
@@ -35,12 +36,21 @@ class TestRunner {
   }
 
   async run() {
-    const results = { total: 0, passed: 0, failed: 0, skipped: 0 };
+    const results = { total: 0, passed: 0, failed: 0, skipped: 0, stopped: false };
 
     for (const suite of this.suites) {
       const suiteResults = [];
 
       for (const test of suite.tests) {
+        // Fail-fast: stop if we already failed
+        if (this.failFast && results.failed > 0) {
+          results.stopped = true;
+          test.status = 'skipped';
+          results.skipped++;
+          suiteResults.push(test);
+          continue;
+        }
+
         results.total++;
 
         if (test.status === 'skipped') {

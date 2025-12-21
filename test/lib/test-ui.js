@@ -1287,5 +1287,26 @@
             });
         }
 
+        function toggleFailFast() {
+            const checkbox = document.getElementById('fail-fast-checkbox');
+            if (typeof runner !== 'undefined') {
+                runner.failFast = checkbox.checked;
+            }
+            // Save preference
+            localStorage.setItem('buffee-test-fail-fast', checkbox.checked);
+        }
+
+        // Restore fail-fast preference on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('buffee-test-fail-fast') === 'true';
+            const checkbox = document.getElementById('fail-fast-checkbox');
+            if (checkbox) {
+                checkbox.checked = saved;
+                if (typeof runner !== 'undefined') {
+                    runner.failFast = saved;
+                }
+            }
+        });
+
         // Update diagnostics when switching to that tab
         document.querySelector('.tab[data-tab="diagnostics"]').addEventListener('click', updateDiagnostics);

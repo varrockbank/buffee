@@ -371,6 +371,9 @@ expect(3+5).toBe(8);               <span class="g-arr">→</span>  expect(3+5).t
     <div id="tab-diagnostics" class="tab-content">
         <main>
             <p style="margin-bottom: 1rem;">Copy all test failures to paste into Claude for debugging:</p>
+            <div style="margin-bottom: 1rem;">
+                <label><input type="checkbox" id="fail-fast-checkbox" onchange="toggleFailFast()"> Fail-fast mode (stop on first failure)</label>
+            </div>
             <button id="copy-diagnostics-btn" onclick="copyDiagnosticsText()">Copy to Clipboard</button>
             <pre id="diagnostics-output" style="margin-top: 1rem; padding: 1rem; background: #f4f4f4; border: 1px solid #ccc; white-space: pre-wrap; max-height: 600px; overflow: auto;">Loading...</pre>
         </main>
