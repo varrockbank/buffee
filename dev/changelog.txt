@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 8.8.14-alpha.1 [2025-12-20]  gz+min: 4.27 KB (-0.01), min: 12.48 KB (-0.01)
+*** perf 
+- only render delta of gutter lines
+
 ** 8.8.13-alpha.1 [2025-12-20]  gz+min: 4.27 KB (+0.02), min: 12.49 KB (+0.08)
 *** refactor 
 - make auto-fit a property on Viewport

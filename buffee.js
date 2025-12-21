@@ -30,7 +30,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, config = {}) {
-  this.version = "8.8.13-alpha.1";
+  this.version = "8.8.14-alpha.1";
   const self = this;
 
   // TODO: make everything mutable, and observed.
@@ -933,10 +933,6 @@ function Buffee($parent, config = {}) {
     const digits = Math.max(2, (Viewport.start + Viewport.displayLines).toString().length);
     if (digits !== gutterSize)
       $gutter.style.width = (gutterSize = digits) + gutterPadding + 'ch';
-    $gutter.textContent = null;
-    for (let i = 0; i < Viewport.displayLines; i++)
-      fragmentGutters.appendChild(document.createElement("div")).textContent = Viewport.start + i + 1;
-    $gutter.appendChild(fragmentGutters);
 
     // Renders the containers for the viewport lines, as well as selections and highlights
     // Only adds/removes the delta of elements when viewport size changes
@@ -946,6 +942,7 @@ function Buffee($parent, config = {}) {
         const base = $selections.length;
         for (let i = 0; i < Viewport.delta; i++) {
           fragmentLines.appendChild(document.createElement("pre"));
+          fragmentGutters.appendChild(document.createElement("div"));
 
           const sel = $selections[base + i] = fragmentSelections.appendChild(document.createElement("div"));
           sel.className = "wb-selection";
@@ -953,10 +950,11 @@ function Buffee($parent, config = {}) {
         }
         $textLayer.appendChild(fragmentLines);
         $l.appendChild(fragmentSelections);
-
+        $gutter.appendChild(fragmentGutters);
       } else if (Viewport.delta < 0) {
         // Remove excess line containers and selections
         for (let i = 0; i < -Viewport.delta; i++) {
+          $gutter.lastChild?.remove();
           $textLayer.lastChild?.remove();
           $selections.pop()?.remove();
         }
@@ -971,6 +969,7 @@ function Buffee($parent, config = {}) {
 
     // Update contents of line containers
     for(let i = 0; i < Viewport.displayLines; i++) {
+      $gutter.children[i].textContent = Viewport.start + i + 1;
       $textLayer.children[i].textContent = Model.lines[Viewport.start + i] ?? null;
       $selections[i].style.width = '0ch';
     }
