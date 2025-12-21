@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
-  this.version = "11.1.1-alpha.1";
+  this.version = "11.1.2-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
@@ -811,74 +811,68 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
     // In read-only mode (-1), hide cursor and skip selection rendering
     if (Mode.interactive === -1) {
       $cursor.style.visibility = 'hidden';
-      // Skip to render complete hooks
-      for (const hook of renderHooks.onRenderComplete) {
-        hook($l, Viewport);
-      }
-
-      return this;
-    }
-
-    const [firstEdge, secondEdge] = Selection.ordered;
-
-    // Convert absolute rows to viewport-relative
-    const firstViewportRow = firstEdge.row - Viewport.start;
-    const secondViewportRow = secondEdge.row - Viewport.start;
-
-    // Render middle selection lines (only those within viewport)
-    for (let absRow = firstEdge.row + 1; absRow <= secondEdge.row - 1; absRow++) {
-      const viewportRow = absRow - Viewport.start;
-      if (viewportRow >= 0 && viewportRow < Viewport.size) {
-        // +1 for phantom newline character (shows newline is part of selection)
-        sizeSelection(viewportRow, 0, Model.lines[absRow].length + 1);
-      }
-    }
-
-    // Render the first edge line (if within viewport)
-    if (firstViewportRow >= 0 && firstViewportRow < Viewport.size) {
-      // Single-line: width = secondEdge.col - firstEdge.col
-      // Multi-line: width = text.length - firstEdge.col + 1 (includes phantom newline)
-      const width = secondEdge.row === firstEdge.row
-        ? secondEdge.col - firstEdge.col
-        : Model.lines[firstEdge.row].length - firstEdge.col + 1;
-      sizeSelection(firstViewportRow, firstEdge.col, width);
-    }
-
-    // Render the second edge line (if within viewport and multi-line selection)
-    // Excludes cursor head position
-    if (secondEdge.row !== firstEdge.row && secondViewportRow >= 0 && secondViewportRow < Viewport.size) {
-      // Last line of selection starts from column 0
-      const width = Math.min(secondEdge.col, Model.lines[secondEdge.row].length);
-      sizeSelection(secondViewportRow, 0, width);
-    }
-    // * END render selection
-
-    // Render cursor overlay (always shows head position)
-    const headViewportRow = head.row - Viewport.start;
-    if (headViewportRow >= 0 && headViewportRow < Viewport.size) {
-      $cursor.style.top = headViewportRow * lineHeight + 'px';
-      $cursor.style.left = head.col + 'ch';
-      $cursor.style.visibility = 'visible';
-
-      // Horizontal scroll to keep cursor in view
-      const containerRect = $l.getBoundingClientRect();
-      const cursorRect = $cursor.getBoundingClientRect();
-      const charWidth = cursorRect.width || 14;
-
-      if (cursorRect.left < containerRect.left) {
-        const deficit = containerRect.left - cursorRect.left;
-        const charsToScroll = Math.ceil(deficit / charWidth);
-        $l.scrollLeft -= charsToScroll * charWidth;
-      } else if (cursorRect.right > containerRect.right) {
-        const deficit = cursorRect.right - containerRect.right;
-        const charsToScroll = Math.ceil(deficit / charWidth);
-        $l.scrollLeft += charsToScroll * charWidth;
-      }
-      // Snap to character boundary to prevent accumulated drift
-      $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
     } else {
-      // TODO: why do we ever do this
-      $cursor.style.visibility = 'hidden';
+      const [firstEdge, secondEdge] = Selection.ordered;
+
+      // Convert absolute rows to viewport-relative
+      const firstViewportRow = firstEdge.row - Viewport.start;
+      const secondViewportRow = secondEdge.row - Viewport.start;
+
+      // Render middle selection lines (only those within viewport)
+      for (let absRow = firstEdge.row + 1; absRow <= secondEdge.row - 1; absRow++) {
+        const viewportRow = absRow - Viewport.start;
+        if (viewportRow >= 0 && viewportRow < Viewport.size) {
+          // +1 for phantom newline character (shows newline is part of selection)
+          sizeSelection(viewportRow, 0, Model.lines[absRow].length + 1);
+        }
+      }
+
+      // Render the first edge line (if within viewport)
+      if (firstViewportRow >= 0 && firstViewportRow < Viewport.size) {
+        // Single-line: width = secondEdge.col - firstEdge.col
+        // Multi-line: width = text.length - firstEdge.col + 1 (includes phantom newline)
+        const width = secondEdge.row === firstEdge.row
+          ? secondEdge.col - firstEdge.col
+          : Model.lines[firstEdge.row].length - firstEdge.col + 1;
+        sizeSelection(firstViewportRow, firstEdge.col, width);
+      }
+
+      // Render the second edge line (if within viewport and multi-line selection)
+      // Excludes cursor head position
+      if (secondEdge.row !== firstEdge.row && secondViewportRow >= 0 && secondViewportRow < Viewport.size) {
+        // Last line of selection starts from column 0
+        const width = Math.min(secondEdge.col, Model.lines[secondEdge.row].length);
+        sizeSelection(secondViewportRow, 0, width);
+      }
+      // * END render selection
+
+      // Render cursor overlay (always shows head position)
+      const headViewportRow = head.row - Viewport.start;
+      if (headViewportRow >= 0 && headViewportRow < Viewport.size) {
+        $cursor.style.top = headViewportRow * lineHeight + 'px';
+        $cursor.style.left = head.col + 'ch';
+        $cursor.style.visibility = 'visible';
+
+        // Horizontal scroll to keep cursor in view
+        const containerRect = $l.getBoundingClientRect();
+        const cursorRect = $cursor.getBoundingClientRect();
+        const charWidth = cursorRect.width || 14;
+
+        if (cursorRect.left < containerRect.left) {
+          const deficit = containerRect.left - cursorRect.left;
+          const charsToScroll = Math.ceil(deficit / charWidth);
+          $l.scrollLeft -= charsToScroll * charWidth;
+        } else if (cursorRect.right > containerRect.right) {
+          const deficit = cursorRect.right - containerRect.right;
+          const charsToScroll = Math.ceil(deficit / charWidth);
+          $l.scrollLeft += charsToScroll * charWidth;
+        }
+        // Snap to character boundary to prevent accumulated drift
+        $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
+      } else {
+        // TODO: why do we ever do this
+        $cursor.style.visibility = 'hidden';
+      }
     }
 
     // Call extension hooks for render complete
