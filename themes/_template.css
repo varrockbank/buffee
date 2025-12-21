@@ -1,0 +1,17 @@
+/* [Name] Theme */
+.buffee-themepack1.[name] > .wb-elements {
+  background-color: [bg];
+  color: [text];
+}
+.buffee-themepack1.[name] .wb-selection {
+  background-color: [selection-bg];
+  mix-blend-mode: normal;
+}
+.buffee-themepack1.[name] .wb-cursor {
+  background-color: [cursor];
+}
+.buffee-themepack1.[name] .wb-gutter,
+.buffee-themepack1.[name] .wb-status {
+  background-color: [gutter-bg];
+  color: [text];
+}
