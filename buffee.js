@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
-  this.version = "11.2.1-alpha";
+  this.version = "11.2.2-alpha";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
@@ -966,10 +966,8 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
 
     const arrowCode = arrowMap[event.key] || 0;
     if (arrowCode) {
-      // direction: -1 (up/left) or 1 (down/right). isHorizontal: truthy for ±1, falsy for ±2
+      // arrowCode: ±1 horizontal, ±2 vertical. direction: -1 (up/left), 1 (down/right)
       const direction = arrowCode >> 31 | 1;
-      const isHorizontal = arrowCode % 2;
-      const edgeIndex = direction > 0 | 0;
       event.preventDefault(); // prevents page scroll
       if (Mode.interactive === -1) return; // read-only mode: no navigation
 
@@ -977,22 +975,22 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
         if(event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-        if (isHorizontal) {
+        if (arrowCode % 2) {
           Selection[direction > 0 ? 'moveCursorEndOfLine' : 'moveCursorStartOfLine']();
         }
       } else if (event.altKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
         if(event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-        if (isHorizontal) {
+        if (arrowCode % 2) {
           Selection[direction > 0 ? 'moveWord' : 'moveBackWord']();
         }
       } else if (!event.shiftKey && Selection.isSelection) { // no meta key, no shift key, selection.
-        if (isHorizontal) {
-          Selection.setCursor(Selection.ordered[edgeIndex]);
+        if (arrowCode % 2) {
+          Selection.setCursor(Selection.ordered[direction > 0 | 0]);
           render();
         } else {
-          const edge = Selection.ordered[edgeIndex];
+          const edge = Selection.ordered[direction > 0 | 0];
           // edge.row is already absolute
           const targetAbsRow = $clamp(
             edge.row + direction,
@@ -1016,7 +1014,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         }
       } else { // no meta key.
         if (event.shiftKey && !Selection.isSelection) Selection.makeSelection();
-        Selection[isHorizontal ? 'moveCol' : 'moveRow'](direction);
+        Selection[arrowCode % 2 ? 'moveCol' : 'moveRow'](direction);
       }
     } else if (Mode.interactive !== 1) { // navigation-only or read-only mode: no editing
     } else if (event.key === "Backspace") {
