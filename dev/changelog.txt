@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 12.3.2-alpha.1 [2025-12-24]  gz+min: 3.39 KB (-0.01), min: 9.32 KB (-0.04)
+*** golf 
+- collapse branches
+
 ** 12.3.1-alpha.1 [2025-12-24]  gz+min: 3.40 KB (-0.00), min: 9.35 KB (-0.04)
 *** golf 
 - simplify loop to find unindentation spaces
