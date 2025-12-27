@@ -3,7 +3,7 @@
   background-color: #2e3440;
   color: #d8dee9;
 }
-.buffee-themepack1-nord .buffee-selection {
+.buffee-themepack1-nord .buffee-layer-selection > div {
   background-color: #5e81ac;
   mix-blend-mode: normal;
 }

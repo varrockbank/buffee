@@ -3,7 +3,7 @@
   background-color: #1e1e28;
   color: #d4d4d4;
 }
-.buffee-themepack1-eva .buffee-selection {
+.buffee-themepack1-eva .buffee-layer-selection > div {
   background-color: #9c6bce;
   mix-blend-mode: normal;
 }

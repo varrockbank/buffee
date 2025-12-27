@@ -25,7 +25,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
-  this.version = "12.5.0-alpha.1";
+  this.version = "12.6.0-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -628,11 +628,10 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
     if (rebuilt) {
       if (rebuilt > 0) {
         // Add new line containers and selections
-        const base = $selections.length;
         for (let i = 0; i < rebuilt; i++) {
           $lines.push(fragmentLines.appendChild(document.createElement('pre')));
           $gutters.push(fragmentGutters.appendChild(document.createElement('div')));
-          ($selections[base+i] = fragmentSelections.appendChild(document.createElement('div'))).className = 'buffee-selection';
+          $selections.push(fragmentSelections.appendChild(document.createElement('div')));
         }
         $textLayer.appendChild(fragmentLines);
         $selectionLayer.appendChild(fragmentSelections);

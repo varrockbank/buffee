@@ -58,7 +58,7 @@ To test: type "A" 100+ times and move cursor to end. If misaligned, try a differ
 
 ```css
 .buffee { background-color: #282C34; color: #B2B2B2 }
-.buffee .buffee-selection { background-color: #EDAD10 }
+.buffee .buffee-layer-selection > div { background-color: #EDAD10 }
 .buffee .buffee-cursor { background-color: #FF6B6B }
 .buffee .buffee-gutter, .buffee .buffee-status { background-color: #21252B; color: #636D83 }
 ```

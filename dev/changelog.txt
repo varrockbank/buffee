@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 12.6.0-alpha.1 [2025-12-24]  gz+min: 3.29 KB (-0.03), min: 9.09 KB (-0.05)
+*** refactor 
+- style the selection with child css selector, avoids setting class in code
+
 ** 12.5.0-alpha.1 [2025-12-24]  gz+min: 3.31 KB (+0.00), min: 9.14 KB (0)
 *** perf 
 - cache the children of lines and gutters

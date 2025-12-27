@@ -3,7 +3,7 @@
   background-color: [bg];
   color: [text];
 }
-.buffee-themepack1-[name] .buffee-selection {
+.buffee-themepack1-[name] .buffee-layer-selection > div {
   background-color: [selection-bg];
   mix-blend-mode: normal;
 }

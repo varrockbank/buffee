@@ -3,7 +3,7 @@
   background-color: #282c34;
   color: #B2B2B2;
 }
-.buffee-themepack1-boring .buffee-selection {
+.buffee-themepack1-boring .buffee-layer-selection > div {
   background-color: #3e4451;
   mix-blend-mode: normal;
 }

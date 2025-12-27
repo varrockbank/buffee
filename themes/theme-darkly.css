@@ -3,7 +3,7 @@
   background-color: #002b36;
   color: #839496;
 }
-.buffee-themepack1-darkly .buffee-selection {
+.buffee-themepack1-darkly .buffee-layer-selection > div {
   background-color: #268bd2;
   mix-blend-mode: normal;
 }

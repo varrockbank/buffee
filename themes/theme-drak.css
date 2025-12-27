@@ -3,7 +3,7 @@
   background-color: #282a36;
   color: #f8f8f2;
 }
-.buffee-themepack1-drak .buffee-selection {
+.buffee-themepack1-drak .buffee-layer-selection > div {
   background-color: #6272a4;
   mix-blend-mode: normal;
 }

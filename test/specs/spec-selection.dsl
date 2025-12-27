@@ -423,7 +423,7 @@ left with meta
 right 5 times with shift
 // Selection from col 0 to col 5 on "Hello" (len 5), no second line
 // Should show 5ch (selection excludes cursor head position)
-const $sel = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel.style.width).toBe("5ch");
 
 ## should show selection excluding cursor when selecting forward to EOL with newline
@@ -436,7 +436,7 @@ left with meta
 right 5 times with shift
 // Selection from col 0 to col 5 on "Hello" (len 5), with newline after
 // Selection excludes cursor head, shows 5ch
-const $sel = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel.style.width).toBe("5ch");
 
 ## should not show phantom newline when selecting backward from EOL (no newline)
@@ -445,7 +445,7 @@ TYPE "Hello"
 left with shift
 // Selection from col 4 to col 5, but selecting LEFT from col 5
 // Backward selection should show 1ch (just "o", no phantom)
-const $sel = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel.style.width).toBe("1ch");
 
 ## should not show phantom newline when selecting backward from EOL (with newline)
@@ -458,7 +458,7 @@ right with meta
 left with shift
 // On first line "Hello" with newline, select backward from col 5 to col 4
 // Backward selection should show 1ch (just "o", not the newline)
-const $sel = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel.style.width).toBe("1ch");
 
 ## should show phantom newline on first line of multi-line selection
@@ -470,7 +470,7 @@ up
 left with meta
 down with shift
 // First line "Hello" from col 0 should show 6ch (5 chars + phantom)
-const $sel0 = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel0 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel0.style.width).toBe("6ch");
 
 ## should show phantom newline on middle lines of multi-line selection
@@ -484,7 +484,7 @@ up 2 times
 left with meta
 down 2 times with shift
 // Middle line "Middle" (row 1) should show 7ch (6 chars + phantom)
-const $sel1 = fixture.node.querySelectorAll(".buffee-selection")[1];
+const $sel1 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[1];
 expect($sel1.style.width).toBe("7ch");
 
 ## should select newline before wrapping to next line
@@ -497,12 +497,12 @@ left with meta
 // Select "Hell" (4 chars): 4 shift+rights from col 0 to col 4
 right 4 times with shift
 EXPECT selection at 0,0-0,4
-const $sel4 = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel4 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel4.style.width).toBe("4ch");
 // Select one more (col 5, still on row 0)
 right with shift
 EXPECT selection at 0,0-0,5
-const $sel5 = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel5 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel5.style.width).toBe("5ch");
 // Select one more to wrap to next line (row 1, col 0)
 right with shift
@@ -524,16 +524,16 @@ right with meta
 // Select right: wrap to row 1 col 0
 right with shift
 EXPECT selection at 0,1-1,0
-const $r0a = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $r0a = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($r0a.style.width).toBe("1ch");
-const $r1a = fixture.node.querySelectorAll(".buffee-selection")[1];
+const $r1a = fixture.node.querySelectorAll(".buffee-layer-selection > div")[1];
 expect($r1a.style.width).toBe("0ch");
 // Select right again: row 1 col 1 (phantom position of "b")
 right with shift
 EXPECT selection at 0,1-1,1
-const $r0b = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $r0b = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($r0b.style.width).toBe("1ch");
-const $r1b = fixture.node.querySelectorAll(".buffee-selection")[1];
+const $r1b = fixture.node.querySelectorAll(".buffee-layer-selection > div")[1];
 expect($r1b.style.width).toBe("1ch");
 // Select right again: wrap to row 2
 right with shift
@@ -640,11 +640,11 @@ expect(fixture.editor.Viewport.start).toBe(0);
 down 5 times with shift
 EXPECT selection at 0,2-5,2
 // First edge at row 0 should start at col 2
-const $sel0 = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $sel0 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($sel0.style.left).toBe("2ch");
 expect($sel0.style.width).toBe("4ch");
 // Middle lines (rows 1-4) should be full width (left: 0)
-const $sel2 = fixture.node.querySelectorAll(".buffee-selection")[2];
+const $sel2 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[2];
 expect($sel2.style.left).toBe("0ch");
 expect($sel2.style.width).toBe("6ch");
 // Continue selecting down 8 more rows - this will scroll the viewport
@@ -656,11 +656,11 @@ EXPECT selection at 0,2-13,4
 expect(fixture.editor.Viewport.start).toBe(4);
 // First edge (row 0) is now ABOVE viewport - not rendered
 // Row 4 is viewport row 0, rendered as middle line (full width)
-const $vp0 = fixture.node.querySelectorAll(".buffee-selection")[0];
+const $vp0 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[0];
 expect($vp0.style.left).toBe("0ch");
 expect($vp0.style.width).toBe("6ch");
 // Row 13 is viewport row 9 (last line of selection, excludes cursor head)
-const $vp9 = fixture.node.querySelectorAll(".buffee-selection")[9];
+const $vp9 = fixture.node.querySelectorAll(".buffee-layer-selection > div")[9];
 expect($vp9.style.left).toBe("0ch");
 expect($vp9.style.width).toBe("4ch");
 

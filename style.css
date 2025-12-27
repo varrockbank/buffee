@@ -1,13 +1,13 @@
 /**
  * Buffee Editor - Required Styles
- * @version 12.4.0-alpha.1
+ * @version 12.6.0-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
  *
  * Required color properties to define:
  *   .buffee { background-color, color }
- *   .buffee .buffee-selection { background-color }
+ *   .buffee .buffee-layer-selection > div { background-color }
  *   .buffee .buffee-cursor { background-color }
  *   .buffee .buffee-status { background-color, color } (optional)
  */
@@ -75,7 +75,7 @@
 }
 
 /* Selection overlay */
-.buffee .buffee-selection {
+.buffee .buffee-layer-selection > div {
   position: relative;
   display: block;
 }
@@ -134,7 +134,7 @@
   z-index: var(--buffee-z-elements);
 }
 
-.buffee .buffee-cursor, .buffee .buffee-selection { height: var(--buffee-cell); }
-.buffee .buffee-cursor, .buffee .buffee-gutter, .buffee .buffee-lines, .buffee .buffee-selection {
+.buffee .buffee-cursor, .buffee .buffee-layer-selection > div { height: var(--buffee-cell); }
+.buffee .buffee-cursor, .buffee .buffee-gutter, .buffee .buffee-lines, .buffee .buffee-layer-selection > div {
   font-size: var(--buffee-cell); line-height: var(--buffee-cell);
 }
