@@ -13,7 +13,7 @@
 function BuffeeIOS(editor) {
   const $e = editor._$e;
   const lineHeight = editor.lineHeight;
-  const { Selection } = editor;
+  const { Selection, Model, Viewport } = editor;
 
   const editingArea = $e.querySelector('.buffee-lines');
   const editorElement = $e;
@@ -87,11 +87,18 @@ function BuffeeIOS(editor) {
 
   function setCursor(evt) {
     const { x, y } = getPoint(evt);
-    const row = Math.max(0, Math.floor(y / lineHeight));
+    let row = Math.max(0, Math.floor(y / lineHeight));
     const col = Math.max(0, Math.floor(x / ch));
-    if (Selection.iosSetCursorAndRender) {
-      Selection.iosSetCursorAndRender({ row, col });
-    }
+    // Bounds check row to last meaningful viewport row
+    const linesFromViewportStart = Model.lastIndex - Viewport.start;
+    const lastMeaningfulViewportRow = Math.min(Viewport.size - 1, linesFromViewportStart);
+    row = Math.min(row, lastMeaningfulViewportRow);
+    // Convert to absolute row
+    const absRow = Viewport.start + row;
+    // Bounds check col to line length
+    const lineLength = Model.lines[absRow].length;
+    Selection.setCursor({ row: absRow, col: Math.min(col, lineLength) });
+    editor._render();
   }
 
   // Dispatch synthetic keydown to the editor

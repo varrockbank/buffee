@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
-  this.version = "11.1.0-alpha.1";
+  this.version = "11.2.2-alpha";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
@@ -45,12 +45,13 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
      */
     interactive: 1
   };
-  const frameCallbacks = callbacks || {};
+  const frameCallbacks = Object.entries(callbacks || {});
+  
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
   const lineHeight = prop("--buffee-cell");
   const editorPaddingPX = prop("--buffee-padding");
   const gutterDigitsMinimum = prop("--buffee-gutter-digits-initial");
-  let gutterDigits = gutterDigitsMinimum;
+  let gutterDigits = -1; // as long as different from guggers digit minimum, we trigger setting gutter on first render
   const gutterCols = () => gutterDigits + prop("--buffee-gutter-digits-padding");
   const $ = (n, q) => n.querySelector(q); 
   const $e = $($parent, '.buffee-elements');
@@ -62,13 +63,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
 
   // Set container width if cols specified
   // Width = gutter(ch) + lines(ch) + margins(px): gutter has margin*2, lines has margin*2
-  if (cols) {
-    if ($gutter) {
-      $e.style.width = `calc(${gutterCols() + cols}ch + ${editorPaddingPX * 4}px)`;
-    } else {
-      $e.style.width = `calc(${cols}ch + ${editorPaddingPX * 2}px)`;
-    }
-  }
+  cols && !$gutter && ($e.style.width = `calc(${cols}ch + ${editorPaddingPX * 2}px)`);
 
   // Set container height if rows specified (don't use flex: 1)
   if (rows) {
@@ -186,27 +181,6 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
      */
     get isForwardSelection() {
       return tail.row === head.row && tail.col < head.col || tail.row < head.row;
-    },
-
-    /**
-     * Sets cursor position with bounds checking for iOS compatibility.
-     * Takes viewport-relative coordinates from touch input.
-     * @param {Position} position - Target cursor position (viewport-relative)
-     */
-    iosSetCursorAndRender({row, col}) {
-      const linesFromViewportStart = Model.lastIndex - Viewport.start;
-      // Case 1: linesFromViewportStart is outside viewport. case 2: linesFromViewportStart is less than viewport.
-      const lastMeaningfulViewportRow = Math.min(Viewport.size-1, linesFromViewportStart);
-      row = Math.min(row, lastMeaningfulViewportRow);
-      // Convert to absolute row
-      const absRow = Viewport.start + row;
-      // Cursor 1 past last character
-      let positionOfLastChar = Model.lines[absRow].length;
-      this.setCursor({
-        row: absRow,
-        col: Math.min(col, positionOfLastChar)}
-      );
-      render();
     },
 
     /**
@@ -505,27 +479,6 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
 
       render();
     },
-
-    /**
-     * Partitions a line into left and right segments at the given position.
-     * @param {Position} position - Position to partition at (absolute row)
-     * @returns {{index: number, left: string, right: string, rightExclusive: string}}
-     *   - index: Absolute line index in Model.lines
-     *   - left: Text before the column
-     *   - right: Text from the column onwards
-     *   - rightExclusive: Text after the column (excludes character at column)
-     */
-    partitionLine({ row, col }) {
-      const line = Model.lines[row];
-      return {
-        index: row,
-        left: line.slice(0, col),
-        right: line.slice(col),
-        // In the case where the partitioning point is a selection, we exclude the character
-        // at th cursor
-        rightExclusive: line.slice(col+1)
-      }
-    }
   };
 
   // ============================================================================
@@ -741,7 +694,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
     frame.spaces = Mode.spaces;
     frame.frameCount = lastFrame.frameCount + 1;
     // TODO: consider caching Object.entries once.
-    for (const [key, callback] of Object.entries(frameCallbacks)) {
+    for (const [key, callback] of frameCallbacks) {
       if (frame[key] !== lastFrame[key]) {
         callback(frame, self);
       }
@@ -811,74 +764,68 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
     // In read-only mode (-1), hide cursor and skip selection rendering
     if (Mode.interactive === -1) {
       $cursor.style.visibility = 'hidden';
-      // Skip to render complete hooks
-      for (const hook of renderHooks.onRenderComplete) {
-        hook($l, Viewport);
-      }
-
-      return this;
-    }
-
-    const [firstEdge, secondEdge] = Selection.ordered;
-
-    // Convert absolute rows to viewport-relative
-    const firstViewportRow = firstEdge.row - Viewport.start;
-    const secondViewportRow = secondEdge.row - Viewport.start;
-
-    // Render middle selection lines (only those within viewport)
-    for (let absRow = firstEdge.row + 1; absRow <= secondEdge.row - 1; absRow++) {
-      const viewportRow = absRow - Viewport.start;
-      if (viewportRow >= 0 && viewportRow < Viewport.size) {
-        // +1 for phantom newline character (shows newline is part of selection)
-        sizeSelection(viewportRow, 0, Model.lines[absRow].length + 1);
-      }
-    }
-
-    // Render the first edge line (if within viewport)
-    if (firstViewportRow >= 0 && firstViewportRow < Viewport.size) {
-      // Single-line: width = secondEdge.col - firstEdge.col
-      // Multi-line: width = text.length - firstEdge.col + 1 (includes phantom newline)
-      const width = secondEdge.row === firstEdge.row
-        ? secondEdge.col - firstEdge.col
-        : Model.lines[firstEdge.row].length - firstEdge.col + 1;
-      sizeSelection(firstViewportRow, firstEdge.col, width);
-    }
-
-    // Render the second edge line (if within viewport and multi-line selection)
-    // Excludes cursor head position
-    if (secondEdge.row !== firstEdge.row && secondViewportRow >= 0 && secondViewportRow < Viewport.size) {
-      // Last line of selection starts from column 0
-      const width = Math.min(secondEdge.col, Model.lines[secondEdge.row].length);
-      sizeSelection(secondViewportRow, 0, width);
-    }
-    // * END render selection
-
-    // Render cursor overlay (always shows head position)
-    const headViewportRow = head.row - Viewport.start;
-    if (headViewportRow >= 0 && headViewportRow < Viewport.size) {
-      $cursor.style.top = headViewportRow * lineHeight + 'px';
-      $cursor.style.left = head.col + 'ch';
-      $cursor.style.visibility = 'visible';
-
-      // Horizontal scroll to keep cursor in view
-      const containerRect = $l.getBoundingClientRect();
-      const cursorRect = $cursor.getBoundingClientRect();
-      const charWidth = cursorRect.width || 14;
-
-      if (cursorRect.left < containerRect.left) {
-        const deficit = containerRect.left - cursorRect.left;
-        const charsToScroll = Math.ceil(deficit / charWidth);
-        $l.scrollLeft -= charsToScroll * charWidth;
-      } else if (cursorRect.right > containerRect.right) {
-        const deficit = cursorRect.right - containerRect.right;
-        const charsToScroll = Math.ceil(deficit / charWidth);
-        $l.scrollLeft += charsToScroll * charWidth;
-      }
-      // Snap to character boundary to prevent accumulated drift
-      $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
     } else {
-      // TODO: why do we ever do this
-      $cursor.style.visibility = 'hidden';
+      const [firstEdge, secondEdge] = Selection.ordered;
+
+      // Convert absolute rows to viewport-relative
+      const firstViewportRow = firstEdge.row - Viewport.start;
+      const secondViewportRow = secondEdge.row - Viewport.start;
+
+      // Render middle selection lines (only those within viewport)
+      for (let absRow = firstEdge.row + 1; absRow <= secondEdge.row - 1; absRow++) {
+        const viewportRow = absRow - Viewport.start;
+        if (viewportRow >= 0 && viewportRow < Viewport.size) {
+          // +1 for phantom newline character (shows newline is part of selection)
+          sizeSelection(viewportRow, 0, Model.lines[absRow].length + 1);
+        }
+      }
+
+      // Render the first edge line (if within viewport)
+      if (firstViewportRow >= 0 && firstViewportRow < Viewport.size) {
+        // Single-line: width = secondEdge.col - firstEdge.col
+        // Multi-line: width = text.length - firstEdge.col + 1 (includes phantom newline)
+        const width = secondEdge.row === firstEdge.row
+          ? secondEdge.col - firstEdge.col
+          : Model.lines[firstEdge.row].length - firstEdge.col + 1;
+        sizeSelection(firstViewportRow, firstEdge.col, width);
+      }
+
+      // Render the second edge line (if within viewport and multi-line selection)
+      // Excludes cursor head position
+      if (secondEdge.row !== firstEdge.row && secondViewportRow >= 0 && secondViewportRow < Viewport.size) {
+        // Last line of selection starts from column 0
+        const width = Math.min(secondEdge.col, Model.lines[secondEdge.row].length);
+        sizeSelection(secondViewportRow, 0, width);
+      }
+      // * END render selection
+
+      // Render cursor overlay (always shows head position)
+      const headViewportRow = head.row - Viewport.start;
+      if (headViewportRow >= 0 && headViewportRow < Viewport.size) {
+        $cursor.style.top = headViewportRow * lineHeight + 'px';
+        $cursor.style.left = head.col + 'ch';
+        $cursor.style.visibility = 'visible';
+
+        // Horizontal scroll to keep cursor in view
+        const containerRect = $l.getBoundingClientRect();
+        const cursorRect = $cursor.getBoundingClientRect();
+        const charWidth = cursorRect.width || 14;
+
+        if (cursorRect.left < containerRect.left) {
+          const deficit = containerRect.left - cursorRect.left;
+          const charsToScroll = Math.ceil(deficit / charWidth);
+          $l.scrollLeft -= charsToScroll * charWidth;
+        } else if (cursorRect.right > containerRect.right) {
+          const deficit = cursorRect.right - containerRect.right;
+          const charsToScroll = Math.ceil(deficit / charWidth);
+          $l.scrollLeft += charsToScroll * charWidth;
+        }
+        // Snap to character boundary to prevent accumulated drift
+        $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
+      } else {
+        // TODO: why do we ever do this
+        $cursor.style.visibility = 'hidden';
+      }
     }
 
     // Call extension hooks for render complete
@@ -973,23 +920,22 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
       Selection.insert(text);
     }
   });
-
+  const copy = e => {
+    e.preventDefault(); // take over the clipboard contents                   
+    e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
+  }
   // Triggered by a keydown paste event. a copy event handler can read the clipboard
   // by the standard security model. Meanwhile, we don't have to make the editor "selectable".
   // Listen on $clipboardBridge since that's where focus moves on Ctrl+C/X.
-  $clipboardBridge.addEventListener('copy', e => {
-    e.preventDefault();                    // take over the clipboard contents
-    e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
-  });
-
+  $clipboardBridge.addEventListener('copy', copy);
   $clipboardBridge.addEventListener('cut', e => {
-    e.preventDefault();
-    e.clipboardData.setData('text/plain', Selection.lines.join("\n"));
+    copy(e);
     Selection.delete();
     $l.focus({ preventScroll: true });     // Return focus to editor
   });
 
-  // Bind keyboard control to move viewport
+  // Arrow key encoding: ±1 = horizontal, ±2 = vertical, sign = direction
+  const arrowMap = { ArrowDown: 2, ArrowUp: -2, ArrowLeft: -1, ArrowRight: 1 };
   $l.addEventListener('keydown', event => {
     // Do nothing for Meta+V (on Mac) or Ctrl+V (on Windows/Linux) as to avoid conflict with the paste event.
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "v") {
@@ -1018,7 +964,10 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
       return;
     }
 
-    if(event.key.startsWith("Arrow")) {
+    const arrowCode = arrowMap[event.key] || 0;
+    if (arrowCode) {
+      // arrowCode: ±1 horizontal, ±2 vertical. direction: -1 (up/left), 1 (down/right)
+      const direction = arrowCode >> 31 | 1;
       event.preventDefault(); // prevents page scroll
       if (Mode.interactive === -1) return; // read-only mode: no navigation
 
@@ -1026,33 +975,25 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
         if(event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-        if(event.key === "ArrowLeft") {
-          Selection.moveCursorStartOfLine();
-        } else if (event.key === "ArrowRight") {
-          Selection.moveCursorEndOfLine();
+        if (arrowCode % 2) {
+          Selection[direction > 0 ? 'moveCursorEndOfLine' : 'moveCursorStartOfLine']();
         }
       } else if (event.altKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
         if(event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-        if(event.key === "ArrowLeft") {
-          Selection.moveBackWord();
-        } else if (event.key === "ArrowRight") {
-          Selection.moveWord();
+        if (arrowCode % 2) {
+          Selection[direction > 0 ? 'moveWord' : 'moveBackWord']();
         }
       } else if (!event.shiftKey && Selection.isSelection) { // no meta key, no shift key, selection.
-        if(event.key === "ArrowLeft") {
-          Selection.setCursor(Selection.ordered[0]); // Move cursor to the first edge
+        if (arrowCode % 2) {
+          Selection.setCursor(Selection.ordered[direction > 0 | 0]);
           render();
-        } else if (event.key === "ArrowRight") {
-          Selection.setCursor(Selection.ordered[1]); // Move cursor to the second edge
-          render();
-        } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-          const movingDown = event.key === "ArrowDown";
-          const edge = Selection.ordered[movingDown ? 1 : 0];
+        } else {
+          const edge = Selection.ordered[direction > 0 | 0];
           // edge.row is already absolute
           const targetAbsRow = $clamp(
-            edge.row + (movingDown ? 1 : -1),
+            edge.row + direction,
             0,
             Model.lastIndex
           );
@@ -1073,16 +1014,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         }
       } else { // no meta key.
         if (event.shiftKey && !Selection.isSelection) Selection.makeSelection();
-
-        if (event.key === "ArrowDown") {
-          Selection.moveRow(1);
-        } else if (event.key === "ArrowUp") {
-          Selection.moveRow(-1);
-        } else if (event.key === "ArrowLeft") {
-          Selection.moveCol(-1);
-        } else if (event.key === "ArrowRight") {
-          Selection.moveCol(1);
-        }
+        Selection[arrowCode % 2 ? 'moveCol' : 'moveRow'](direction);
       }
     } else if (Mode.interactive !== 1) { // navigation-only or read-only mode: no editing
     } else if (event.key === "Backspace") {
@@ -1095,18 +1027,12 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
       // Users needing keyboard navigation can use browser shortcuts or focus the editor container.
       event.preventDefault();
 
-      if(Selection.isSelection) {
-        if(event.shiftKey) {
-          Selection.unindent();
-        } else {
-          Selection.indent();
-        }
+      if(event.shiftKey) {
+        Selection.unindent();
+      } else if(Selection.isSelection) {
+        Selection.indent();
       } else {
-        if(event.shiftKey) {
-          Selection.unindent();
-        } else {
-          Selection.insert(" ".repeat(Mode.spaces));
-        }
+        Selection.insert(" ".repeat(Mode.spaces));
       }
     } else if (event.key.length > 1) {
       logger.warn('Ignoring unknown key: ', event.code, event.key);
