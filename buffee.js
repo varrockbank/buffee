@@ -25,7 +25,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
-  this.version = "12.6.3-alpha.1";
+  this.version = "12.6.4-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -60,21 +60,8 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
   const $cursor = $($e, '.buffee-cursor');
   const $textLayer = $($e, '.buffee-layer-text');
   const $selectionLayer = $($e, '.buffee-layer-selection');
-
   const $clipboardBridge = $($parent, '.buffee-clipboard-bridge');
   const $gutter = $($e, '.buffee-gutter');
-
-  // Set container width if cols specified
-  // Width = gutter(ch) + lines(ch) + margins(px): gutter has margin*2, lines has margin*2
-  cols && !$gutter && ($e.style.width = `calc(${cols}ch + ${editorPaddingPX * 2}px)`);
-
-  // Set container height if rows specified (don't use flex: 1)
-  if (rows) {
-    const linesHeight = rows * lineHeight + 'px';
-    $textLayer.style.height = linesHeight;
-    $gutter && ($gutter.style.height = linesHeight);
-    $selectionLayer.style.height = linesHeight;
-  }
 
   // [array, fragment, parent, tagName, updateFn]
   const viewportLayers = [
@@ -82,6 +69,12 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
     [[], document.createDocumentFragment(), $gutter, 'div', (el, i) => el.textContent = Viewport.start + i + 1],
     [[], document.createDocumentFragment(), $selectionLayer, 'div', (el) => el.style.width = 0]
   ];
+
+  // Set container width if cols specified
+  // Width = gutter(ch) + lines(ch) + margins(px): gutter has margin*2, lines has margin*2
+  cols && !$gutter && ($e.style.width = `calc(${cols}ch + ${editorPaddingPX * 2}px)`);
+  // Set container height if rows specified (don't use flex: 1). TODO: perhaps can just set on parent
+  rows && viewportLayers.forEach(([, , p]) => p && (p.style.height = rows * lineHeight + 'px'));
 
   const detachedHead = { row : 0, col : 0};
   // head.row and tail.row are ABSOLUTE line numbers (Model indices, not viewport-relative).
