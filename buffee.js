@@ -7,7 +7,6 @@
  * @property {number} [rows] - Fixed number of visible lines (if omitted, auto-fits to container height)
  * @property {number} [cols] - Fixed number of text columns (auto-calculates container width including gutter)
  * @property {number} [spaces=4] - Number of spaces per tab/indentation level
- * @property {function(string): void} [logger=console] - Logger with log and warning methods
  */
 
 /**
@@ -25,8 +24,8 @@
  * const editor = new Buffee(document.getElementById('editor'), { rows: 25 });
  * editor.Model.text = 'Hello, World!';
  */
-function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
-  this.version = "12.3.3-alpha.1";
+function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
+  this.version = "12.3.4-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -112,18 +111,14 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
           head.col = Math.min(maxCol, Model.lines[++head.row].length);
 
           // Scroll viewport if cursor went below visible area
-          if (head.row > Viewport.end) {
-            Viewport.start = head.row - Viewport.size + 1;
-          }
+          if (head.row > Viewport.end) Viewport.start = head.row - Viewport.size + 1;
         }
         // else: at last line of file, No-Op
       } else if (head.row > 0) { // Move up
         // Adjust column to fit new line's length
         head.col = Math.min(maxCol, Model.lines[--head.row].length);
         // Scroll viewport if cursor went above visible area
-        if (head.row < Viewport.start) {
-          Viewport.start = head.row;
-        }
+        if (head.row < Viewport.start) Viewport.start = head.row;
       }
       // else: at first line of file, No-Op
       render();
@@ -142,18 +137,14 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
         } else if (head.row < Model.lastIndex) {                   // Move to beginning of next line.
           maxCol = head.col = 0;
           // Scroll viewport if cursor went below visible area
-          if (++head.row > Viewport.end) {
-            Viewport.start = head.row - Viewport.size + 1;
-          }
+          if (++head.row > Viewport.end) Viewport.start = head.row - Viewport.size + 1;
         } // else: at end of file, No-Op
       } else if (head.col > 0) {
           maxCol = --head.col;
       } else if (head.row > 0) {                                 // Move to end of previous line (phantom newline position)
           maxCol = head.col = Model.lines[--head.row].length;
           // Scroll viewport if cursor went above visible area
-          if (head.row < Viewport.start) {
-            Viewport.start = head.row;
-          }
+          if (head.row < Viewport.start) Viewport.start = head.row;
       } // else: at start of file, No-Op
       render();
     },
@@ -192,14 +183,12 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
       const [left, right] = this.ordered;
       if(left.row === right.row) {
         const text = Model.lines[left.row];
-        const isLastLine = left.row === Model.lastIndex;
-        const selectedText = text.slice(left.col, right.col);
-
+        const texts = [text.slice(left.col, right.col)];
+        
         // If selection extends to phantom newline position and there is a newline
-        if (right.col >= text.length && !isLastLine) {
-          return [selectedText, ''];  // Include empty string to represent newline
-        }
-        return [selectedText];
+        if (right.col >= text.length && left.row < Model.lastIndex) texts.push('');
+
+        return texts;
       } else {
         const firstLine = Model.lines[left.row].slice(left.col);
         const lastLine = Model.lines[right.row].slice(0, right.col);
@@ -259,14 +248,13 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
         self._._delete(first.row, first.col, selectedText);
         const insertedLines = self._._insert(first.row, first.col, s);
 
+        head.row = first.row;
         // Update cursor to end of inserted text
         if (insertedLines?.length > 1) {
-          head.row = first.row + insertedLines.length - 1;
+          head.row += insertedLines.length - 1;
           head.col = insertedLines[insertedLines.length - 1].length;
-        } else {
-          head.row = first.row;
-          head.col = first.col + s.length;
-        }
+        } else head.col = first.col + s.length;
+        
         this.makeCursor();
       } else {
         const insertedLines = self._._insert(tail.row, tail.col, s);
@@ -275,9 +263,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
         if (insertedLines?.length > 1) {
           head.row += insertedLines.length - 1;
           maxCol = head.col = insertedLines[insertedLines.length - 1].length;
-        } else {
-          maxCol = head.col += s.length;
-        }
+        } else maxCol = head.col += s.length;
       }
       if (!skipRender) render();
     },
@@ -298,11 +284,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
         const prevLineLen = Model.lines[tail.row - 1].length;
         self._._delete(tail.row - 1, prevLineLen, '\n');
         head.col = prevLineLen;
-        head.row--;
-        // Scroll viewport if cursor went above visible area
-        if (head.row < Viewport.start) {
-          Viewport.start = head.row;
-        }
+        if (--head.row < Viewport.start) Viewport.start = head.row;
       }
 
       render();
@@ -686,10 +668,9 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
       // Render middle selection lines (only those within viewport)
       for (let absRow = firstEdge.row + 1; absRow <= secondEdge.row - 1; absRow++) {
         const viewportRow = absRow - Viewport.start;
-        if (viewportRow >= 0 && viewportRow < Viewport.size) {
+        if (viewportRow >= 0 && viewportRow < Viewport.size)
           // +1 for phantom newline character (shows newline is part of selection)
           sizeSelection(viewportRow, 0, Model.lines[absRow].length + 1);
-        }
       }
 
       // Render the first edge line (if within viewport)
@@ -705,9 +686,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
       // Render the second edge line (if within viewport and multi-line selection)
       // Excludes cursor head position
       if (secondEdge.row !== firstEdge.row && secondViewportRow >= 0 && secondViewportRow < Viewport.size) {
-        // Last line of selection starts from column 0
-        const width = Math.min(secondEdge.col, Model.lines[secondEdge.row].length);
-        sizeSelection(secondViewportRow, 0, width);
+        sizeSelection(secondViewportRow, 0, Math.min(secondEdge.col, Model.lines[secondEdge.row].length));
       }
       // * END render selection
 
@@ -810,9 +789,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
   $l.addEventListener('paste', e => {
     e.preventDefault(); // stop browser from inserting raw clipboard text
     const text = e.clipboardData.getData("text/plain");
-    if (text) {
-      Selection.insert(text);
-    }
+    if (text) Selection.insert(text);
   });
   const copy = e => {
     e.preventDefault(); // take over the clipboard contents                   
@@ -869,16 +846,12 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
         if(event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-        if (arrowCode % 2) {
-          Selection[direction > 0 ? 'moveCursorEndOfLine' : 'moveCursorStartOfLine']();
-        }
+        if (arrowCode % 2) Selection[direction > 0 ? 'moveCursorEndOfLine' : 'moveCursorStartOfLine']();
       } else if (event.altKey) {
         if(!event.shiftKey && Selection.isSelection) Selection.makeCursor();
         if(event.shiftKey && !Selection.isSelection) Selection.makeSelection();
 
-        if (arrowCode % 2) {
-          Selection[direction > 0 ? 'moveWord' : 'moveBackWord']();
-        }
+        if (arrowCode % 2) Selection[direction > 0 ? 'moveWord' : 'moveBackWord']();
       } else if (!event.shiftKey && Selection.isSelection) { // no meta key, no shift key, selection.
         if (arrowCode % 2) {
           Selection.setCursor(Selection.ordered[direction > 0 | 0]);
@@ -893,44 +866,31 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
           );
 
           // Scroll viewport if target is outside visible area
-          if (targetAbsRow < Viewport.start) {
-            Viewport.start = targetAbsRow;
-          } else if (targetAbsRow > Viewport.end) {
-            Viewport.start = targetAbsRow - Viewport.size + 1;
-          }
+          if (targetAbsRow < Viewport.start) Viewport.start = targetAbsRow;
+          else if (targetAbsRow > Viewport.end) Viewport.start = targetAbsRow - Viewport.size + 1;
 
           maxCol = Math.min(edge.col, Model.lines[targetAbsRow].length);
-          Selection.setCursor({
-            row: targetAbsRow,
-            col: maxCol
-          });
+          Selection.setCursor({ row: targetAbsRow, col: maxCol});
           render();
         }
       } else { // no meta key.
         if (event.shiftKey && !Selection.isSelection) Selection.makeSelection();
         Selection[arrowCode % 2 ? 'moveCol' : 'moveRow'](direction);
       }
-    } else if (Mode.interactive !== 1) { // navigation-only or read-only mode: no editing
+    } else if (Mode.interactive !== 1 || event.key === "Escape") { // navigation-only or read-only mode: no editing
     } else if (event.key === "Backspace") {
       Selection.delete();
     } else if (event.key === "Enter") {
       Selection.newLine();
-    } else if (event.key === "Escape") {
     } else if (event.key === "Tab" ) {
       // Capture Tab for indentation (standard code editor behavior).
       // Users needing keyboard navigation can use browser shortcuts or focus the editor container.
       event.preventDefault();
 
-      if(event.shiftKey) {
-        Selection.unindent();
-      } else if(Selection.isSelection) {
-        Selection.indent();
-      } else {
-        Selection.insert(" ".repeat(Mode.spaces));
-      }
-    } else if (event.key.length > 1) {
-      logger.warn('Ignoring unknown key: ', event.code, event.key);
-    } else {
+      if(event.shiftKey) Selection.unindent();
+      else if(Selection.isSelection) Selection.indent();
+      else Selection.insert(" ".repeat(Mode.spaces));
+    } else if (event.key.length == 1) {
       event.key === " " && event.preventDefault();
       Selection.insert(event.key);
     }
@@ -945,13 +905,5 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
  * @returns {number} The clamped value
  */
 function $clamp(value, min, max) {
-  if (value < min) {
-    logger.warn("Out of bounds");
-    return min;
-  }
-  if (value > max) {
-    logger.warn("Out of bounds");
-    return max;
-  }
-  return value;
+  return value < min ? min : ( value > max ? max : value);
 }
