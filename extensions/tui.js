@@ -276,48 +276,44 @@ function BuffeeTUI(editor) {
   };
 
   // ============================================================================
-  // Render Hooks
+  // Render Hook
   // ============================================================================
 
-  // Render element text content into the text layer
-  renderHooks.onRenderContent.push(($container, viewport) => {
-    if (!enabled || elements.length === 0) return;
+  renderHooks.push(($container, viewport) => {
+    // Render element text content into the text layer
+    if (enabled && elements.length > 0) {
+      for (const el of elements) {
+        for (let i = 0; i < el.contents.length; i++) {
+          const absRow = el.row + i;
+          const viewportRow = absRow - viewport.start;
 
-    for (const el of elements) {
-      for (let i = 0; i < el.contents.length; i++) {
-        const absRow = el.row + i;
-        const viewportRow = absRow - viewport.start;
+          if (viewportRow >= 0 && viewportRow < viewport.size) {
+            const $line = $textLayer.children[viewportRow];
+            if (!$line) continue;
 
-        if (viewportRow >= 0 && viewportRow < viewport.size) {
-          const $line = $textLayer.children[viewportRow];
-          if (!$line) continue;
+            let text = $line.textContent || '';
 
-          let text = $line.textContent || '';
+            // Ensure line is long enough
+            while (text.length < el.col + el.width) {
+              text += ' ';
+            }
 
-          // Ensure line is long enough
-          while (text.length < el.col + el.width) {
-            text += ' ';
+            // Splice in element content
+            const before = text.slice(0, el.col);
+            const after = text.slice(el.col + el.width);
+            $line.textContent = before + el.contents[i] + after;
           }
-
-          // Splice in element content
-          const before = text.slice(0, el.col);
-          const after = text.slice(el.col + el.width);
-          $line.textContent = before + el.contents[i] + after;
         }
       }
     }
-  });
 
-  // Render highlights using Highlights extension
-  renderHooks.onRenderComplete.push(($container, viewport) => {
+    // Render highlights using Highlights extension
     Highlights.clear();
-
     if (!enabled || !showHighlights || elements.length === 0) return;
 
     const currentEl = elements[currentIndex];
     if (!currentEl) return;
 
-    // Create highlights for current element
     for (let i = 0; i < currentEl.contents.length; i++) {
       const absRow = currentEl.row + i;
       const viewportRow = absRow - viewport.start;

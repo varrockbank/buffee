@@ -98,7 +98,7 @@ function BuffeeTreeSitter(editor, { parser, query }) {
   }
 
   // Register render hook for syntax highlighting
-  renderHooks.onRenderContent.push(($container, viewport) => {
+  renderHooks.push(($container, viewport) => {
     if (!enabled || !tree || captures.length === 0) return;
 
     let minJ = 0;

@@ -1,6 +1,21 @@
 * Project Devlog
 
-** 12.0.0-alpha [2025-12-24]  gz+min: 3.58 KB (0), min: 9.90 KB (0)
+** 12.2.0-alpha.1 [2025-12-24]  gz+min: 3.48 KB (-0.08), min: 9.58 KB (-0.25)
+*** extensions / rendering hooks
+- consolidate renderHooks from object with 3 arrays to single array
+- hooks receive (container, viewport, rebuilt) where rebuilt = Viewport.delta
+- remove onContainerRebuild, onRenderContent, onRenderComplete
+- add e() helper for document.createElement golf
+
+** 12.1.1-alpha.1 [2025-12-24]  gz+min: 3.54 KB (-0.03), min: 9.78 KB (-0.04)
+*** golf 
+- optimize branch checks in insert method
+
+** 12.1.0-alpha.1 [2025-12-24]  gz+min: 3.56 KB (-0.02), min: 9.82 KB (-0.07)
+*** golf
+- always keep cursor visible, just hide off screen for read-only
+
+** 12.0.0-alpha.1 [2025-12-24]  gz+min: 3.58 KB (0), min: 9.90 KB (0)
 *** breaking
 - refactor to decorator pattern for extensions
 - remove editor.use() method from core
@@ -8,11 +23,11 @@
 - access internals via: const { render, insert, delete: del } = editor._
 - extensions are pure functions: BuffeeHistory(editor) returns editor
 
-** 11.2.2-alpha [2025-12-22]  gz+min: 3.62 KB (+0.00), min: 10.05 KB (+0.00)
+** 11.2.2-alpha.1 [2025-12-22]  gz+min: 3.62 KB (+0.00), min: 10.05 KB (+0.00)
 *** golf
 - inline isHorizontal and edgeIndex, only 2 vars: arrowCode, direction
 
-** 11.2.1-alpha [2025-12-22]  gz+min: 3.62 KB (-0.01), min: 10.04 KB (-0.02)
+** 11.2.1-alpha.1 [2025-12-22]  gz+min: 3.62 KB (-0.01), min: 10.04 KB (-0.02)
 *** golf
 - bitwise ops: n >> 31 | 1 for sign, n % 2 for horizontal
 

@@ -26,10 +26,12 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
-  this.version = "12.0.0-alpha";
+  this.version = "12.2.0-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
+  const e = d => document.createElement(d);
+
   /**
    * Editor mode settings (shared between internal and external code).
    * @namespace Mode
@@ -265,36 +267,27 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
 
         // Get selected text before deleting
         const selectedText = this.lines.join('\n');
-
-        // Delete selection, then insert new text
         self._.delete(first.row, first.col, selectedText);
-        const insertedLines = s.length > 0
-          ? self._.insert(first.row, first.col, s)
-          : null;
+        const insertedLines = self._.insert(first.row, first.col, s);
 
         // Update cursor to end of inserted text
-        if (!insertedLines || insertedLines.length === 1) {
-          // Single-line insert (single char, multi-char, or empty)
-          head.row = first.row;
-          head.col = first.col + s.length;
-        } else {
-          // Multi-line insert
+        if (insertedLines?.length > 1) {
           head.row = first.row + insertedLines.length - 1;
           head.col = insertedLines[insertedLines.length - 1].length;
+        } else {
+          head.row = first.row;
+          head.col = first.col + s.length;
         }
         this.makeCursor();
       } else {
         const insertedLines = self._.insert(tail.row, tail.col, s);
 
         // Update cursor
-        if (!insertedLines) {
-          // Single char - no newlines
-          maxCol = head.col += s.length;
-        } else if (insertedLines.length === 1) {
-          maxCol = head.col += s.length;
-        } else {
+        if (insertedLines?.length > 1) {
           head.row += insertedLines.length - 1;
           maxCol = head.col = insertedLines[insertedLines.length - 1].length;
+        } else {
+          maxCol = head.col += s.length;
         }
       }
       if (!skipRender) render();
@@ -485,18 +478,8 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
   // Extension hooks - allows extensions to hook into editor without Buffee knowing about them
   // ============================================================================
 
-  /**
-   * Render hooks that extensions can register callbacks with.
-   * @type {Object}
-   */
-  const renderHooks = {
-    /** Called when the viewport container is rebuilt (for setting up DOM elements) */
-    onContainerRebuild: [],
-    /** Called during render after text content is set (for overlaying elements) */
-    onRenderContent: [],
-    /** Called at the end of render (for highlights and final touches) */
-    onRenderComplete: []
-  };
+  /** Render hooks - called after text content is set. Args: ($l, Viewport, rebuilt) */
+  const renderHooks = [];
 
   /**
    * Document model managing text content.
@@ -718,52 +701,43 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
 
     // Renders the containers for the viewport lines, as well as selections and highlights
     // Only adds/removes the delta of elements when viewport size changes
-    if(Viewport.delta) {
-      if (Viewport.delta > 0) {
+    const rebuilt = Viewport.delta;
+    if (rebuilt) {
+      if (rebuilt > 0) {
         // Add new line containers and selections
         const base = $selections.length;
-        for (let i = 0; i < Viewport.delta; i++) {
-          fragmentLines.appendChild(document.createElement("pre"));
-          fragmentGutters.appendChild(document.createElement("div"));
+        for (let i = 0; i < rebuilt; i++) {
+          fragmentLines.appendChild(e("pre"));
+          fragmentGutters.appendChild(e("div"));
 
-          const sel = $selections[base + i] = fragmentSelections.appendChild(document.createElement("div"));
+          const sel = $selections[base + i] = fragmentSelections.appendChild(e("div"));
           sel.className = "buffee-selection";
           sel.style.top = (base + i) * lineHeight + 'px';
         }
         $textLayer.appendChild(fragmentLines);
         $l.appendChild(fragmentSelections);
         $gutter && $gutter.appendChild(fragmentGutters);
-      } else if (Viewport.delta < 0) {
+      } else {
         // Remove excess line containers and selections
-        for (let i = 0; i < -Viewport.delta; i++) {
+        for (let i = 0; i < -rebuilt; i++) {
           $gutter && $gutter.lastChild?.remove();
           $textLayer.lastChild?.remove();
           $selections.pop()?.remove();
         }
       }
       Viewport.delta = 0;
-
-      // Call extension hooks for container rebuild
-      for (const hook of renderHooks.onContainerRebuild) {
-        hook($l, Viewport);
-      }
     }
 
     // Update contents of line containers
     for(let i = 0; i < Viewport.displayLines; i++) {
       $gutter && ($gutter.children[i].textContent = Viewport.start + i + 1);
       $textLayer.children[i].textContent = Model.lines[Viewport.start + i] ?? null;
-      $selections[i].style.width = '0ch';
+      $selections[i].style.width = 0;
     }
 
-    // Call extension hooks for content overlay
-    for (const hook of renderHooks.onRenderContent) {
-      hook($l, Viewport);
-    }
-
-    // In read-only mode (-1), hide cursor and skip selection rendering
-    if (Mode.interactive === -1) {
-      $cursor.style.visibility = 'hidden';
+    // In read-only mode (-1), hide cursor off screen and skip selection rendering
+    if (Mode.interactive < 0) {
+      $cursor.style.left = '-1ch';
     } else {
       const [firstEdge, secondEdge] = Selection.ordered;
 
@@ -804,7 +778,6 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
       if (headViewportRow >= 0 && headViewportRow < Viewport.size) {
         $cursor.style.top = headViewportRow * lineHeight + 'px';
         $cursor.style.left = head.col + 'ch';
-        $cursor.style.visibility = 'visible';
 
         // Horizontal scroll to keep cursor in view
         const containerRect = $l.getBoundingClientRect();
@@ -822,15 +795,12 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         }
         // Snap to character boundary to prevent accumulated drift
         $l.scrollLeft = Math.round($l.scrollLeft / charWidth) * charWidth;
-      } else {
-        // TODO: why do we ever do this
-        $cursor.style.visibility = 'hidden';
       }
     }
 
-    // Call extension hooks for render complete
-    for (const hook of renderHooks.onRenderComplete) {
-      hook($l, Viewport);
+    // Call extension hooks
+    for (const hook of renderHooks) {
+      hook($l, Viewport, rebuilt);
     }
 
     return this;

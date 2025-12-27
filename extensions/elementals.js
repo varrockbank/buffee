@@ -76,7 +76,7 @@ function BuffeeElementals(editor) {
   }
 
   // Register render hook to update positions when viewport changes
-  renderHooks.onRenderComplete.push(() => {
+  renderHooks.push(() => {
     if (enabled) {
       updatePositions();
     }

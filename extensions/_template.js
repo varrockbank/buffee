@@ -23,11 +23,12 @@ function Buffee__NAME__(editor) {
   // === STATE ===
   let enabled = false;
 
-  // === RENDER HOOKS (optional) ===
-  // Called after each render cycle
-  renderHooks.onRenderComplete.push(($container, viewport) => {
+  // === RENDER HOOK (optional) ===
+  // Called after each render cycle. Args: ($container, viewport, rebuilt)
+  renderHooks.push(($container, viewport, rebuilt) => {
     if (!enabled) return;
     // Update DOM based on new viewport state
+    // rebuilt is non-zero when container was rebuilt (viewport size changed)
   });
 
   // === API ===

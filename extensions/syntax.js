@@ -278,7 +278,7 @@ function BuffeeSyntax(editor) {
   }
 
   // Register render hook
-  renderHooks.onRenderContent.push(highlightViewport);
+  renderHooks.push(highlightViewport);
 
   // ============================================================================
   // Built-in language definitions
