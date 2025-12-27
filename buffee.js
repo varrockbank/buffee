@@ -25,7 +25,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
-  this.version = "12.6.1-alpha.1";
+  this.version = "12.6.2-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -76,13 +76,13 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
     $selectionLayer.style.height = linesHeight;
   }
 
-  // [array, fragment, parent, tagName]
+  // [array, fragment, parent, tagName, updateFn]
   const viewportLayers = [
-    [[], document.createDocumentFragment(), $textLayer, 'pre'],
-    [[], document.createDocumentFragment(), $gutter, 'div'],
-    [[], document.createDocumentFragment(), $selectionLayer, 'div']
+    [[], document.createDocumentFragment(), $textLayer, 'pre', (el, i) => el.textContent = Model.lines[Viewport.start + i] ?? null],
+    [[], document.createDocumentFragment(), $gutter, 'div', (el, i) => el.textContent = Viewport.start + i + 1],
+    [[], document.createDocumentFragment(), $selectionLayer, 'div', (el) => el.style.width = 0]
   ];
-  const [$lines, $gutters, $selections] = viewportLayers.map(l => l[0]);
+  const $selections = viewportLayers[2][0]; // needed by sizeSelection
 
   const detachedHead = { row : 0, col : 0};
   // head.row and tail.row are ABSOLUTE line numbers (Model indices, not viewport-relative).
@@ -646,9 +646,7 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
 
     // Update contents of line containers
     for(let i = 0; i < Viewport.displayLines; i++) {
-      $gutters[i] && ($gutters[i].textContent = Viewport.start + i + 1);
-      $lines[i].textContent = Model.lines[Viewport.start + i] ?? null;
-      $selections[i].style.width = 0;
+      viewportLayers.forEach(([arr, , , , update]) => arr[i] && update(arr[i], i));
     }
 
     // In read-only mode (-1), hide cursor off screen and skip selection rendering
