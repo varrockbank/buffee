@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 12.6.3-alpha.1 [2025-12-24]  gz+min: 3.27 KB (-0.01), min: 9.07 KB (-0.03)
+*** refactor 
+- remove $selections, prune #sizeSelections
+
 ** 12.6.2-alpha.1 [2025-12-24]  gz+min: 3.28 KB (+0.00), min: 9.09 KB (+0.03)
 *** refactor 
 - encode update lambda for each of lines, selections, gutters in definition map

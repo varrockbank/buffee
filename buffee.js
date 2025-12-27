@@ -25,7 +25,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
-  this.version = "12.6.2-alpha.1";
+  this.version = "12.6.3-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -82,7 +82,6 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
     [[], document.createDocumentFragment(), $gutter, 'div', (el, i) => el.textContent = Viewport.start + i + 1],
     [[], document.createDocumentFragment(), $selectionLayer, 'div', (el) => el.style.width = 0]
   ];
-  const $selections = viewportLayers[2][0]; // needed by sizeSelection
 
   const detachedHead = { row : 0, col : 0};
   // head.row and tail.row are ABSOLUTE line numbers (Model indices, not viewport-relative).
@@ -600,9 +599,9 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
   let frameCount = 0;
 
   function sizeSelection(i, left, width) {
-    const style = $selections[i].style;
-    left != null && (style.left = left + 'ch');
-    width != null && (style.width = width + 'ch');
+    const style = viewportLayers[2][0][i].style;
+    style.left = left + 'ch';
+    style.width = width + 'ch';
   }
 
   /**
