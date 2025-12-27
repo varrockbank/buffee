@@ -25,12 +25,15 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
-  this.version = "12.6.5-alpha.1";
+  this.version = "12.6.6-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
-  const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
-      isSpace = ch => /\s/.test(ch),
-      isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
+  const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
+  const isSpace = ch => /\s/.test(ch);
+  const isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
+  const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
+  const $ = q => $parent.querySelector(q);
+  const $clamp = (value, min, max) => value < min ? min : ( value > max ? max : value);
 
   /**
    * Editor mode settings (shared between internal and external code).
@@ -48,13 +51,12 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
     interactive: 1
   };
 
-  const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
-  const lineHeight = prop("--buffee-cell");
-  const editorPaddingPX = prop("--buffee-padding");
-  const gutterDigitsMinimum = prop("--buffee-gutter-digits-initial");
   let gutterDigits = -1; // as long as different from gutters digit minimum, we trigger setting gutter on first render
-  const gutterCols = () => gutterDigits + prop("--buffee-gutter-digits-padding");
-  const $ = q => $parent.querySelector(q); 
+
+  const lineHeight = prop('--buffee-cell');
+  const editorPaddingPX = prop('--buffee-padding');
+  const gutterDigitsMinimum = prop('--buffee-gutter-digits-initial');
+  const gutterCols = () => gutterDigits + prop('--buffee-gutter-digits-padding');
   const $e = $('.buffee-elements');
   const $l = $('.buffee-lines');
   const $cursor = $('.buffee-cursor');
@@ -881,15 +883,4 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
       Selection.insert(event.key);
     }
   });
-}
-
-/**
- * Clamps a value between a minimum and maximum, logging a warning if out of bounds.
- * @param {number} value - The value to clamp
- * @param {number} min - Minimum allowed value
- * @param {number} max - Maximum allowed value
- * @returns {number} The clamped value
- */
-function $clamp(value, min, max) {
-  return value < min ? min : ( value > max ? max : value);
 }

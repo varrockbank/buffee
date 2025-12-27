@@ -1,6 +1,10 @@
 * Project Devlog
 
-** 12.6.5-alpha.1 [2025-12-24] 
+** 12.6.6-alpha.1 [2025-12-24] 
+*** refactor 
+- declare $clamp as lambda util
+
+** 12.6.5-alpha.1 [2025-12-24] gz+min: 3.26 KB (0), min: 9.02 KB (-0.02)
 *** refactor 
 - query against $parent container unconditionally
 
