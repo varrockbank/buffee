@@ -26,7 +26,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
-  this.version = "12.3.2-alpha.1";
+  this.version = "12.3.3-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -328,30 +328,17 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
      * Word boundaries are whitespace, word characters, or punctuation runs.
      */
     moveBackWord() {
-      const s = Model.lines[head.row];
-
       if(head.col === 0) {
         if(head.row > 0) {
-          head.row--;
-          head.col = Model.lines[head.row].length;
-          // Scroll viewport if cursor went above visible area
-          if (head.row < Viewport.start) {
-            Viewport.start = head.row;
-          }
+          head.col = Model.lines[--head.row].length;
+          if (head.row < Viewport.start) Viewport.start = head.row;
         }
-        // else: at first line of file - do nothing
       } else {
+        const s = Model.lines[head.row];
         let j = head.col;
-        if (isSpace(s[j])) { // Case 1: at whitespace → skip to next non-space character
-          while (j > 0 && isSpace(s[j])) j--;
-          while (j > 0 && isWord(s[j])) j--;
-        } else if (isWord(s[j])) { // Case 2: at word-chars → consume word run to 1 past the word
-          while (j > 0 && isWord(s[j])) j--;
-        } else { // Case 3: at punctuation/symbols
-          const c = s[j--];
-          // Consuming continuous sequence of the same char
-          while( j > 0 && s[j] === c) j--;
-        }
+        if (isSpace(s[j])) { while (j > 0 && isSpace(s[j])) j--; while (j > 0 && isWord(s[j])) j--; } // whitespace
+        else if (isWord(s[j])) while (j > 0 && isWord(s[j])) j--; // word
+        else { const c = s[j--]; while(j > 0 && s[j] === c) j--; } // punctuation
         head.col = j;
       }
 
@@ -367,29 +354,15 @@ function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
       const n = s.length;
       if(head.col === n) { // Edge case: At end of line
         if (head.row < Model.lastIndex) {
-          // Not at last line - move to next line
           head.col = 0;
-          head.row++;
-          // Scroll viewport if cursor went below visible area
-          if (head.row > Viewport.end) {
-            Viewport.start = head.row - Viewport.size + 1;
-          }
+          if (++head.row > Viewport.end) Viewport.start = head.row - Viewport.size + 1;
         }
         // else: at end of file - do nothing
       } else {
-        const isSpace = ch => /\s/.test(ch);
-        const isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
         let j = head.col;
-        if (isSpace(s[j])) { // Case 1: at whitespace → skip run to end of spaces, then next non-word
-          while (j < n && isSpace(s[j])) j++;
-          while (j < n && isWord(s[j])) j++;
-        } else if (isWord(s[j])) { // Case 2: at word-chars → consume word run to 1 past the word
-          while (j < n && isWord(s[j])) j++;
-        } else { // Case 3: at punctuation/symbols
-          const c = s[j++];
-          // Consuming continuous sequence of the same char
-          while( j < n && s[j] === c) j++;
-        }
+        if (isSpace(s[j])) { while (j < n && isSpace(s[j])) j++; while (j < n && isWord(s[j])) j++; } // whitespace
+        else if (isWord(s[j])) while (j < n && isWord(s[j])) j++; // word
+        else { const c = s[j++]; while(j < n && s[j] === c) j++; } // punctuation
         head.col = j;
       }
 
