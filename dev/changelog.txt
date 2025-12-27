@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 12.4.0-alpha.1 [2025-12-24]  gz+min: 3.31 KB (-0.00), min: 9.14 KB (+0.02)
+*** refactor 
+- add selection to their own layer 
+
 ** 12.3.4-alpha.1 [2025-12-24]  gz+min: 3.31 KB (-0.06), min: 9.12 KB (-0.13)
 *** golf 
 

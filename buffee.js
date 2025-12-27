@@ -25,7 +25,7 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
-  this.version = "12.3.4-alpha.1";
+  this.version = "12.4.0-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -59,6 +59,8 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
   const $l = $($e, '.buffee-lines');
   const $cursor = $($e, '.buffee-cursor');
   const $textLayer = $($e, '.buffee-layer-text');
+  const $selectionLayer = $($e, '.buffee-layer-selection');
+
   const $clipboardBridge = $($parent, '.buffee-clipboard-bridge');
   const $gutter = $($e, '.buffee-gutter');
 
@@ -71,6 +73,7 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
     const linesHeight = rows * lineHeight + 'px';
     $textLayer.style.height = linesHeight;
     $gutter && ($gutter.style.height = linesHeight);
+    $selectionLayer.style.height = linesHeight;
   }
 
   const $selections = [];   // We place an invisible selection on each viewport line. We only display the active selection.
@@ -629,13 +632,10 @@ function Buffee($parent, { rows, cols, spaces = 4 } = {}) {
         for (let i = 0; i < rebuilt; i++) {
           fragmentLines.appendChild(document.createElement('pre'));
           fragmentGutters.appendChild(document.createElement('div'));
-
-          const sel = $selections[base + i] = fragmentSelections.appendChild(document.createElement('div'));
-          sel.className = "buffee-selection";
-          sel.style.top = (base + i) * lineHeight + 'px';
+          ($selections[base+i] = fragmentSelections.appendChild(document.createElement('div'))).className = 'buffee-selection';
         }
         $textLayer.appendChild(fragmentLines);
-        $l.appendChild(fragmentSelections);
+        $selectionLayer.appendChild(fragmentSelections);
         $gutter && $gutter.appendChild(fragmentGutters);
       } else {
         // Remove excess line containers and selections

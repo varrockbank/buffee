@@ -1,6 +1,6 @@
 /**
  * Buffee Editor - Required Styles
- * @version 10.0.4-alpha.1
+ * @version 12.4.0-alpha.1
  *
  * This stylesheet contains the essential structural CSS for Buffee.
  * Colors are intentionally omitted - define them at point of usage.
@@ -76,7 +76,7 @@
 
 /* Selection overlay */
 .buffee .buffee-selection {
-  position: absolute;
+  position: relative;
   display: block;
 }
 
@@ -111,6 +111,17 @@
   min-width: 100%;
   padding-right: 2ch; /** config: right scroll buffer */
   z-index: var(--buffee-z-text);
+}
+
+.buffee .buffee-layer-selection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks to pass through to elements below*/
+  padding-right: 2ch; /** config: right scroll buffer */
+  z-index: var(--buffee-z-selection);
 }
 
 .buffee .buffee-layer-elements {

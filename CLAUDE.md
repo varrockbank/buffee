@@ -155,6 +155,7 @@ Templates: `extensions/_template.js`, `samples/_template.html`, `themes/_templat
 | `.buffee-elements` | Inner wrapper | Contains gutter + lines |
 | `.buffee-gutter` | Gutter | Line numbers |
 | `.buffee-lines` | Text area | Focus target (tabindex=0) |
+| `.buffee-layer-selection` | Selection layer | Contains selection spans |
 | `.buffee-layer-text` | `<blockquote>` | Text content layer |
 | `.buffee-layer-elements` | Overlay | TUI/Elementals overlay |
 | `.buffee-cursor` | Cursor | Blinking cursor |

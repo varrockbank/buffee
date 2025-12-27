@@ -118,6 +118,7 @@ const BuffeeEditor = defineComponent({
       h('div', { class: 'no-select buffee-elements' }, [
         !this.gutterRight ? gutter : null,
         h('div', { class: 'buffee-lines', tabindex: 0 }, [
+          h('div', { class: 'buffee-layer-selection' }),
           h('blockquote', { class: 'buffee-layer-text' }),
           h('div', { class: 'buffee-layer-elements' }),
           h('div', { class: 'buffee-cursor' })
