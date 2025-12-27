@@ -1,5 +1,9 @@
 * Project Devlog
 
+** 12.2.3-alpha.1 [2025-12-24]  gz+min: 3.50 KB (+0.01), min: 9.56 KB (-0.01)
+*** perf 
+- cache #isSpace, #isWord regex
+
 ** 12.2.2-alpha.1 [2025-12-24]  gz+min: 3.48 KB (+0.00), min: 9.57 KB (+0.00)
 *** golf 
 - export _insert, _delete to extensions instead of renaming as insert, delete

@@ -26,11 +26,12 @@
  * editor.Model.text = 'Hello, World!';
  */
 function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
-  this.version = "12.2.2-alpha.1";
+  this.version = "12.2.3-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
-  const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s;
-  const e = d => document.createElement(d);
+  const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
+      isSpace = ch => /\s/.test(ch);
+      isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
 
   /**
    * Editor mode settings (shared between internal and external code).
@@ -352,8 +353,6 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         }
         // else: at first line of file - do nothing
       } else {
-        const isSpace = ch => /\s/.test(ch);
-        const isWord = ch => /[\p{L}\p{Nd}_]/u.test(ch);
         let j = head.col;
         if (isSpace(s[j])) { // Case 1: at whitespace → skip to next non-space character
           while (j > 0 && isSpace(s[j])) j--;
@@ -707,10 +706,10 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         // Add new line containers and selections
         const base = $selections.length;
         for (let i = 0; i < rebuilt; i++) {
-          fragmentLines.appendChild(e("pre"));
-          fragmentGutters.appendChild(e("div"));
+          fragmentLines.appendChild(document.createElement('pre'));
+          fragmentGutters.appendChild(document.createElement('div'));
 
-          const sel = $selections[base + i] = fragmentSelections.appendChild(e("div"));
+          const sel = $selections[base + i] = fragmentSelections.appendChild(document.createElement('div'));
           sel.className = "buffee-selection";
           sel.style.top = (base + i) * lineHeight + 'px';
         }
