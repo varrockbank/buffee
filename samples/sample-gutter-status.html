@@ -155,19 +155,12 @@ hello();`;
 
     // Default
     const elDefault = document.getElementById('editor-default');
-    const edDefault = new Buffee(elDefault, {
-      rows: 6,
-                
-      callbacks: BuffeeStatusLine(elDefault)
-    });
+    const edDefault = BuffeeStatusLine(new Buffee(elDefault, { rows: 6 }));
     edDefault.Model.text = content;
 
     // No gutter
     const elNoGutter = document.getElementById('editor-no-gutter');
-    const edNoGutter = new Buffee(elNoGutter, {
-      rows: 10,
-      callbacks: BuffeeStatusLine(elNoGutter)
-    });
+    const edNoGutter = BuffeeStatusLine(new Buffee(elNoGutter, { rows: 10 }));
     edNoGutter.Model.text = content;
 
     // No status bar
@@ -179,20 +172,12 @@ hello();`;
 
     // Status line on top
     const elStatusTop = document.getElementById('editor-status-top');
-    const edStatusTop = new Buffee(elStatusTop, {
-      rows: 10,
-                
-      callbacks: BuffeeStatusLine(elStatusTop)
-    });
+    const edStatusTop = BuffeeStatusLine(new Buffee(elStatusTop, { rows: 10 }));
     edStatusTop.Model.text = content;
 
     // Gutter on right
     const elGutterRight = document.getElementById('editor-gutter-right');
-    const edGutterRight = new Buffee(elGutterRight, {
-      rows: 10,
-                
-      callbacks: BuffeeStatusLine(elGutterRight)
-    });
+    const edGutterRight = BuffeeStatusLine(new Buffee(elGutterRight, { rows: 10 }));
     edGutterRight.Model.text = content;
   </script>
 </body>

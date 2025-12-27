@@ -39,11 +39,7 @@
 
   <script>
     const editorEl = document.getElementById('editor');
-    const editor = new Buffee(editorEl, {
-      rows: 20,
-                   
-      callbacks: BuffeeStatusLine(editorEl)
-    });
+    const editor = BuffeeStatusLine(new Buffee(editorEl, { rows: 20 }));
 
     const MATRIX_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+-=[]{}|;:,.<>?/~`';
     const MATRIX_COLS = 80;

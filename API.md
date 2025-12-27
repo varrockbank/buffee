@@ -439,6 +439,7 @@ Internal state is exposed via `editor._` for building extensions. Extensions can
 const {
   render,       // render() function
   renderHooks,  // Hook registration array
+  frameCount,   // Number of render calls (getter)
   $e,           // Elements container DOM element
   $l,           // Lines container DOM element
   $textLayer,   // Text layer DOM element

@@ -281,9 +281,7 @@ for (let i = 0; i < 10; i++) {
 
     themeNames.forEach(name => {
       const el = document.getElementById('ed-' + name);
-      const editor = new Buffee(el, {
-        callbacks: BuffeeStatusLine(el)
-      });
+      const editor = BuffeeStatusLine(new Buffee(el));
       editor.Model.text = sampleCode;
     });
   </script>

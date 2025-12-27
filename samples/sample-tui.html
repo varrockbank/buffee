@@ -104,11 +104,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
 
     // Buttons (no border)
     const plainEl = document.getElementById('buttons-plain');
-    const plainEditor = new Buffee(plainEl, {
-      rows: 3,
-                
-      callbacks: BuffeeStatusLine(plainEl)
-    });
+    const plainEditor = BuffeeStatusLine(new Buffee(plainEl, { rows: 3 }));
     BuffeeTUI(plainEditor);
     plainEditor.Model.text = '\n  Select action:';
     plainEditor.TUI.addButton({ row: 1, col: 20, label: '[Save]', onActivate: () => { alert('Save clicked'); } });
@@ -122,11 +118,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
 
     // Buttons (with border)
     const borderEl = document.getElementById('buttons-border');
-    const borderEditor = new Buffee(borderEl, {
-      rows: 5,
-                
-      callbacks: BuffeeStatusLine(borderEl)
-    });
+    const borderEditor = BuffeeStatusLine(new Buffee(borderEl, { rows: 5 }));
     BuffeeTUI(borderEditor);
     borderEditor.Model.text = '\n\n\n\n';
     borderEditor.TUI.addButton({ row: 1, col: 2, label: ' OK ', border: true, onActivate: () => { alert('OK clicked'); } });
@@ -140,11 +132,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
 
     // Prompt
     const promptEl = document.getElementById('prompt-demo');
-    const promptEditor = new Buffee(promptEl, {
-      rows: 8,
-                
-      callbacks: BuffeeStatusLine(promptEl)
-    });
+    const promptEditor = BuffeeStatusLine(new Buffee(promptEl, { rows: 8 }));
     BuffeeTUI(promptEditor);
     promptEditor.Model.text = '\n\n\n\n\n\n\n';
     promptEditor.TUI.addPrompt({ row: 1, col: 2, width: 30, title: 'Search', onActivate: (el) => { alert('Search: ' + el.input); } });
@@ -157,11 +145,7 @@ TUI.addScrollBox({ row: 1, col: 2, width: 40, height: 8, title: 'Logs', lines: [
 
     // ScrollBox
     const scrollEl = document.getElementById('scrollbox-demo');
-    const scrollEditor = new Buffee(scrollEl, {
-      rows: 10,
-                
-      callbacks: BuffeeStatusLine(scrollEl)
-    });
+    const scrollEditor = BuffeeStatusLine(new Buffee(scrollEl, { rows: 10 }));
     BuffeeTUI(scrollEditor);
     scrollEditor.Model.text = '\n\n\n\n\n\n\n\n\n';
     const logLines = [

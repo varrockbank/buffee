@@ -64,12 +64,14 @@ const BuffeeEditor = defineComponent({
         spaces: props.spaces
       };
 
-      // Add status line callbacks if available
+      let ed = new Buffee(container.value, config);
+
+      // Add status line extension if available
       if (props.showStatus && typeof BuffeeStatusLine !== 'undefined') {
-        config.callbacks = BuffeeStatusLine(container.value);
+        ed = BuffeeStatusLine(ed);
       }
 
-      editor.value = new Buffee(container.value, config);
+      editor.value = ed;
 
       if (props.initialText) {
         editor.value.Model.text = props.initialText;

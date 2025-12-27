@@ -49,11 +49,7 @@
 
   <script>
     const editorEl = document.getElementById('editor');
-    const editor = new Buffee(editorEl, {
-      rows: 30,
-                   
-      callbacks: BuffeeStatusLine(editorEl)
-    });
+    const editor = BuffeeStatusLine(new Buffee(editorEl, { rows: 30 }));
 
     const CONWAY_COLS = 80;
     const CONWAY_ROWS = 30;

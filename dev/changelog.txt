@@ -1,5 +1,11 @@
 * Project Devlog
 
+** 12.3.0-alpha.1 [2025-12-24]  gz+min: 3.40 KB (-0.10), min: 9.38 KB (-0.23)
+*** breaking
+- remove `callbacks` config option and `frameCallbacks` internal pattern
+- BuffeeStatusLine now decorator: `BuffeeStatusLine(new Buffee(el))`
+- add `editor._.frameCount` getter for render count tracking
+
 ** 12.2.3-alpha.1 [2025-12-24]  gz+min: 3.50 KB (+0.01), min: 9.56 KB (-0.01)
 *** perf 
 - cache #isSpace, #isWord regex

@@ -86,12 +86,12 @@
 
     const config = { rows, cols, spaces };
 
-    // Add status line callbacks if available
-    if (showStatus && typeof BuffeeStatusLine !== 'undefined') {
-      config.callbacks = BuffeeStatusLine(container);
-    }
-
     editor = new Buffee(container, config);
+
+    // Add status line extension if available
+    if (showStatus && typeof BuffeeStatusLine !== 'undefined') {
+      editor = BuffeeStatusLine(editor);
+    }
 
     if (initialText) {
       editor.Model.text = initialText;

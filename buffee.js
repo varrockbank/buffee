@@ -25,8 +25,8 @@
  * const editor = new Buffee(document.getElementById('editor'), { rows: 25 });
  * editor.Model.text = 'Hello, World!';
  */
-function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
-  this.version = "12.2.3-alpha.1";
+function Buffee($parent, { rows, cols, spaces = 4, logger } = {}) {
+  this.version = "12.3.0-alpha.1";
   const self = this;
   /** Replaces tabs with spaces (spaces = number of spaces, 0 = keep tabs) */
   const expandTabs = s => Mode.spaces ? s.replace(/\t/g, ' '.repeat(Mode.spaces)) : s,
@@ -48,8 +48,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
      */
     interactive: 1
   };
-  const frameCallbacks = Object.entries(callbacks || {});
-  
+
   const prop = p => parseFloat(getComputedStyle($parent).getPropertyValue(p));
   const lineHeight = prop("--buffee-cell");
   const editorPaddingPX = prop("--buffee-padding");
@@ -268,8 +267,8 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
 
         // Get selected text before deleting
         const selectedText = this.lines.join('\n');
-        self._.delete(first.row, first.col, selectedText);
-        const insertedLines = self._.insert(first.row, first.col, s);
+        self._._delete(first.row, first.col, selectedText);
+        const insertedLines = self._._insert(first.row, first.col, s);
 
         // Update cursor to end of inserted text
         if (insertedLines?.length > 1) {
@@ -281,7 +280,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
         }
         this.makeCursor();
       } else {
-        const insertedLines = self._.insert(tail.row, tail.col, s);
+        const insertedLines = self._._insert(tail.row, tail.col, s);
 
         // Update cursor
         if (insertedLines?.length > 1) {
@@ -303,12 +302,12 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
       if (tail.col > 0) {
         // Delete character before cursor
         const charToDelete = Model.lines[tail.row][tail.col - 1];
-        self._.delete(tail.row, tail.col - 1, charToDelete);
+        self._._delete(tail.row, tail.col - 1, charToDelete);
         head.col--;
       } else if (tail.row > 0) {
         // At start of line - delete newline (join with previous line)
         const prevLineLen = Model.lines[tail.row - 1].length;
-        self._.delete(tail.row - 1, prevLineLen, '\n');
+        self._._delete(tail.row - 1, prevLineLen, '\n');
         head.col = prevLineLen;
         head.row--;
         // Scroll viewport if cursor went above visible area
@@ -327,7 +326,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
       if (this.isSelection) Selection.insert('', true); // skipRender - we render below
 
       // Insert newline character
-      self._.insert(tail.row, tail.col, '\n');
+      self._._insert(tail.row, tail.col, '\n');
 
       head.col = 0, head.row++;
       if (head.row > Viewport.end) Viewport.start = head.row - Viewport.size + 1;
@@ -654,9 +653,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
     },
   };
   
-  /** @private Double-buffer for render state diffing */
-  let frame = { lineCount: 0, row: 0, col: 0, frameCount: 0 };
-  let lastFrame = { lineCount: -1, row: -1, col: -1, frameCount: -1 };
+  let frameCount = 0;
 
   function sizeSelection(i, left, width) {
     const style = $selections[i].style;
@@ -667,23 +664,9 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
   /**
    * Renders the editor viewport, selection, and calls extension hooks.
    * @private
-   * @returns {Buffee} The Buffee instance for chaining
    */
   function render() {
-    frame.lineCount = Model.lastIndex + 1;
-    frame.row = head.row;
-    frame.col = head.col;
-    frame.spaces = Mode.spaces;
-    frame.frameCount = lastFrame.frameCount + 1;
-    // TODO: consider caching Object.entries once.
-    for (const [key, callback] of frameCallbacks) {
-      if (frame[key] !== lastFrame[key]) {
-        callback(frame, self);
-      }
-    }
-    const temp = lastFrame;
-    lastFrame = frame;
-    frame = temp;
+    frameCount++;
 
     // Adjust gutter width based on largest visible line number
     // Minimum width from CSS variable to avoid jitter for small documents
@@ -828,6 +811,7 @@ function Buffee($parent, { rows, cols, spaces = 4, logger, callbacks } = {}) {
   this._ = {
     get head() { return head; },
     get tail() { return tail; },
+    get frameCount() { return frameCount; },
     get contentOffset() {
       return {
         ch: $gutter ? gutterCols() : 0,

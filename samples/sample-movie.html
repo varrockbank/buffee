@@ -52,10 +52,7 @@
 
   <script>
     const editorEl = document.getElementById('editor');
-    const editor = new Buffee(editorEl, {
-      rows: 13,
-      callbacks: BuffeeStatusLine(editorEl)
-    });
+    const editor = BuffeeStatusLine(new Buffee(editorEl, { rows: 13 }));
 
     editor.Model.text = 'Loading Star Wars ASCII movie...';
 

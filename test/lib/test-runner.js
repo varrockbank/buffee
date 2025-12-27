@@ -194,7 +194,7 @@ class EditorTestHarness {
   constructor(node, size = 10) {
     this.node = node;
     this.blockquote = node.querySelector('.buffee-lines') || node;
-    this.editor = new Buffee(node, { rows: size, callbacks: BuffeeStatusLine(node) });
+    this.editor = BuffeeStatusLine(new Buffee(node, { rows: size }));
     this.walkthrough = new Walkthrough();
     window.currentTestFixture = this;
   }

@@ -54,10 +54,7 @@
   <!-- Initialization -->
   <script>
     const el = document.getElementById('editor');
-    const editor = new Buffee(el, {
-      rows: 10,
-      callbacks: BuffeeStatusLine(el)
-    });
+    const editor = BuffeeStatusLine(new Buffee(el, { rows: 10 }));
 
     // Initialize extensions
     // BuffeeSyntax(editor);

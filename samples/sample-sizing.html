@@ -195,72 +195,49 @@
 
     // 1. Auto-rows and auto-cols (default behavior)
     const elAutoBoth = document.getElementById('editor-auto-both');
-    const edAutoBoth = new Buffee(elAutoBoth, {
-      callbacks: BuffeeStatusLine(elAutoBoth)
-    });
+    const edAutoBoth = BuffeeStatusLine(new Buffee(elAutoBoth));
     edAutoBoth.Model.text = ruler(120) + '\n// Auto-rows and auto-cols\n// Drag corner to resize\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 2. Fixed-rows, auto-cols
     const elFixedRowsAutoCols = document.getElementById('editor-fixed-rows-auto-cols');
-    const edFixedRowsAutoCols = new Buffee(elFixedRowsAutoCols, {
-      rows: 8,
-      callbacks: BuffeeStatusLine(elFixedRowsAutoCols)
-    });
+    const edFixedRowsAutoCols = BuffeeStatusLine(new Buffee(elFixedRowsAutoCols, { rows: 8 }));
     edFixedRowsAutoCols.Model.text = ruler(120) + '\n// Fixed 8 rows, auto-cols\nLine 3\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 3. rows smaller than container
     const elFixedRowsLarge = document.getElementById('editor-fixed-rows-large-container');
-    const edFixedRowsLarge = new Buffee(elFixedRowsLarge, {
-      rows: 5,
-      callbacks: BuffeeStatusLine(elFixedRowsLarge)
-    });
+    const edFixedRowsLarge = BuffeeStatusLine(new Buffee(elFixedRowsLarge, { rows: 5 }));
     edFixedRowsLarge.Model.text = ruler(80) + '\n// rows: 5 overrides container height\n' +
       Array.from({length: 10}, (_, i) => `Line ${i + 3}`).join('\n');
 
     // 4. rows larger than container
     const elFixedRowsOverflow = document.getElementById('editor-fixed-rows-overflow');
-    const edFixedRowsOverflow = new Buffee(elFixedRowsOverflow, {
-      rows: 20,
-      callbacks: BuffeeStatusLine(elFixedRowsOverflow)
-    });
+    const edFixedRowsOverflow = BuffeeStatusLine(new Buffee(elFixedRowsOverflow, { rows: 20 }));
     edFixedRowsOverflow.Model.text = ruler(80) + '\n// rows: 20 exceeds container height\n' +
       Array.from({length: 25}, (_, i) => `Line ${i + 3}`).join('\n');
 
     // 5. rows larger than container (scrollable)
     const elFixedRowsScroll = document.getElementById('editor-fixed-rows-scroll');
-    const edFixedRowsScroll = new Buffee(elFixedRowsScroll, {
-      rows: 20,
-      callbacks: BuffeeStatusLine(elFixedRowsScroll)
-    });
+    const edFixedRowsScroll = BuffeeStatusLine(new Buffee(elFixedRowsScroll, { rows: 20 }));
     edFixedRowsScroll.Model.text = ruler(80) + '\n// rows: 20 exceeds container height\n// Scroll to see more\n' +
       Array.from({length: 25}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 6. Auto-rows, fixed-cols (status bar stretches)
     const elFixedCols = document.getElementById('editor-fixed-cols');
-    const edFixedCols = new Buffee(elFixedCols, {
-      cols: 40,
-      callbacks: BuffeeStatusLine(elFixedCols)
-    });
+    const edFixedCols = BuffeeStatusLine(new Buffee(elFixedCols, { cols: 40 }));
     edFixedCols.Model.text = ruler(40) + '\n// Fixed 55 cols\n// Status bar stretches\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 7. Auto-rows, fixed-cols (fit-content)
     const elFitContent = document.getElementById('editor-fit-content');
-    const edFitContent = new Buffee(elFitContent, {
-      cols: 40,
-      callbacks: BuffeeStatusLine(elFitContent)
-    });
+    const edFitContent = BuffeeStatusLine(new Buffee(elFitContent, { cols: 40 }));
     edFitContent.Model.text = ruler(55) + '\n// Fixed 55 cols\n// width: fit-content\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 
     // 8. Auto-rows, fixed-cols (contain: inline-size)
     const elContain = document.getElementById('editor-contain');
-    const edContain = new Buffee(elContain, {
-      cols: 20,
-      callbacks: BuffeeStatusLine(elContain)
-    });
+    const edContain = BuffeeStatusLine(new Buffee(elContain, { cols: 20 }));
     edContain.Model.text = ruler(20) + '\n// Fixed 20 cols\n// contain: inline-size\n' +
       Array.from({length: 20}, (_, i) => `Line ${i + 4}`).join('\n');
 

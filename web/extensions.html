@@ -92,6 +92,12 @@ editor.iOS.focus()   // Show keyboard
 editor.iOS.destroy() // Cleanup</pre>
   <p><a href="../samples/sample-ios.html">Demo →</a></p>
 
+  <h2>StatusLine</h2>
+  <p><a href="../extensions/statusline.js"><code>extensions/statusline.js</code></a></p>
+  <p>Updates status bar elements (row, col, line count, spaces) on each render. Looks for elements with classes <code>.buffee-head-row</code>, <code>.buffee-head-col</code>, <code>.buffee-linecount</code>, <code>.buffee-spaces</code>.</p>
+  <pre>const editor = BuffeeStatusLine(new Buffee(container, config))</pre>
+  <p><a href="../samples/sample-basic.html">Demo →</a></p>
+
   <hr>
 
   <h2>Using Multiple Extensions</h2>

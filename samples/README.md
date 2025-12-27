@@ -26,7 +26,7 @@ Copy-paste patterns for common use cases. See `_template.html` for full boilerpl
 
 ```javascript
 const el = document.getElementById('editor');
-const editor = new Buffee(el, { callbacks: BuffeeStatusLine(el) });
+const editor = BuffeeStatusLine(new Buffee(el));
 editor.Model.text = 'Hello, World!';
 ```
 

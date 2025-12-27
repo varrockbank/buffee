@@ -82,20 +82,14 @@ example();`;
 
     // Option 1: TUI mode
     const elTui = document.getElementById('editor-tui');
-    const edTui = new Buffee(elTui, {
-      rows: 10,
-      callbacks: BuffeeStatusLine(elTui)
-    });
+    const edTui = BuffeeStatusLine(new Buffee(elTui, { rows: 10 }));
     BuffeeTUI(edTui);
     edTui.Model.text = content;
     edTui.TUI.enabled = true;
 
     // Option 2: Ultra High Capacity mode (for large files)
     const elChunked = document.getElementById('editor-chunked');
-    const edChunked = new Buffee(elChunked, {
-      rows: 10,
-      callbacks: BuffeeStatusLine(elChunked)
-    });
+    const edChunked = BuffeeStatusLine(new Buffee(elChunked, { rows: 10 }));
     BuffeeUltraHighCapacity(edChunked);
     edChunked.UltraHighCapacity.activate();
     (async () => {

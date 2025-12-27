@@ -5,7 +5,7 @@
 ## Quick Reference
 
 ```javascript
-new Buffee(el, { rows: 20, cols: 80, spaces: 4, callbacks: BuffeeStatusLine(el) });
+BuffeeStatusLine(new Buffee(el, { rows: 20, cols: 80, spaces: 4 }));
 
 editor.Model.text = "content";     // Set content
 editor.Model.lines;                // ["line1", "line2"]
@@ -93,7 +93,7 @@ Located in `extensions/`, tested in "Extensions" tab of `test/index.html`.
 | File | Function | Description |
 |------|----------|-------------|
 | `history.js` | `BuffeeHistory(editor)` | Undo/redo support (opt-in) |
-| `statusline.js` | `BuffeeStatusLine(node)` | Status bar callbacks |
+| `statusline.js` | `BuffeeStatusLine(editor)` | Status bar updates |
 | `syntax.js` | `BuffeeSyntax(editor)` | Regex-based syntax highlighting |
 | `elementals.js` | `BuffeeElementals(editor)` | DOM-based UI elements in overlay |
 | `highlights.js` | `BuffeeHighlights(editor)` | Line/range highlighting |

@@ -113,11 +113,7 @@ editor.Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
 
     // Buttons demo
     const buttonsEl = document.getElementById('buttons-demo');
-    const buttonsEditor = new Buffee(buttonsEl, {
-      rows: 5,
-                   
-      callbacks: BuffeeStatusLine(buttonsEl)
-    });
+    const buttonsEditor = BuffeeStatusLine(new Buffee(buttonsEl, { rows: 5 }));
     BuffeeElementals(buttonsEditor);
     buttonsEditor.Model.text = '\n\n\n\n';
     buttonsEditor.Elementals.addButton({
@@ -153,11 +149,7 @@ editor.Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
 
     // Inputs demo
     const inputsEl = document.getElementById('inputs-demo');
-    const inputsEditor = new Buffee(inputsEl, {
-      rows: 5,
-                   
-      callbacks: BuffeeStatusLine(inputsEl)
-    });
+    const inputsEditor = BuffeeStatusLine(new Buffee(inputsEl, { rows: 5 }));
     BuffeeElementals(inputsEditor);
     inputsEditor.Model.text = '\n\n\n\n';
     inputsEditor.Elementals.addLabel({ row: 1, col: 2, text: 'Name:' });
@@ -184,11 +176,7 @@ editor.Elementals.addButton({ row: 1, col: 5, label: 'Click Me' })</pre>
 
     // Mixed demo
     const mixedEl = document.getElementById('mixed-demo');
-    const mixedEditor = new Buffee(mixedEl, {
-      rows: 8,
-                   
-      callbacks: BuffeeStatusLine(mixedEl)
-    });
+    const mixedEditor = BuffeeStatusLine(new Buffee(mixedEl, { rows: 8 }));
     BuffeeElementals(mixedEditor);
     mixedEditor.Model.text = '\n\n\n\n\n\n\n';
 
